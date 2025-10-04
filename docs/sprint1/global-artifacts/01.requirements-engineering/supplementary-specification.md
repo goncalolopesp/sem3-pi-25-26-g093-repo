@@ -2,75 +2,99 @@
 
 ## Functionality
 
-* All the images/figures produced should be recorded in SVG format
+- All images, diagrams, and figures (models, domain diagrams, reports) must be stored in **SVG format**.
+- The system must validate business rules when importing and handling data (e.g., SKU verification, dates, quantities, and entity integrity).
+- The system must allow reading and writing of CSV files (e.g., `wagons.csv`, `bays.csv`, `orders.csv`) robustly, reporting errors clearly and deterministically.
+- The system must ensure **data persistence** using a **relational database (Oracle)** and **in-memory data structures**.
+- The system must support **user authentication** (operators, planners, managers) to access main functionalities.
+- The system must **log critical operations and audits** (e.g., quarantine processing and return inspections).
 
-_Specifies functionalities that:  
-&nbsp; &nbsp; (i) are common across several US/UC;  
-&nbsp; &nbsp; (ii) are not related to US/UC, namely: Audit, Reporting and Security._
+_This section defines functionalities that are transversal or not tied to a specific use case, including integrity, security, and logging._
+
+---
 
 ## Usability
 
-* The application interface must be developed in JavaFX 11.
+- The application interface (LAPR3 component) must be developed using **JavaFX 11**.
+- Error and success messages must be **clear, deterministic, and informative**, specifying the exact file, line, and field involved.
+- The interface must follow **consistent visual and terminological standards**, using coherent logistics and railway terminology.
+- The system must provide **basic user assistance and documentation** (tooltips, Javadoc comments, README).
 
-_Evaluates the user interface. It has several subcategories,
-among them: error prevention; interface aesthetics and design; help and
-documentation; consistency and standards._
+_Evaluates the user interface in terms of design, error prevention, consistency, and documentation._
 
+---
 
 ## Reliability
 
-* Business rules validation must be respected when recording and updating data. (Data Integrity)
-* The application should use object serialization to ensure data persistence between two runs of the application.
-* The application must use password authentication with specific complexity requirements (minimum 7 characters, including 3 uppercase letters and 2 digits). (Security)
+- All business rules (e.g., FEFO/FIFO logic, expiry control, quarantine validation, CSV validation) must be strictly enforced.
+- Data integrity between sessions must be maintained using **Oracle DB persistence** and/or **object serialization**.
+- The system must include **password authentication** with the following requirements:
+    - Minimum 7 characters
+    - At least 3 uppercase letters
+    - At least 2 digits
+- The system must handle data import errors gracefully, loading valid records even when some are invalid.
+- Quarantine and audit logs must be written to external files for accountability.
 
-_Refers to the integrity, compliance and interoperability of the software. The requirements to be considered are: frequency and severity of failure, possibility of recovery, possibility of prediction, accuracy, average time between failures._
+_Refers to data integrity, fault tolerance, recovery, and security mechanisms._
 
+---
 
 ## Performance
 
-N/A
+- CSV files with up to **10,000 records** must be processed and validated within **10 seconds**.
+- Picking plan generation (USEI03/USEI04) must execute in **under 2 seconds** for up to **5,000 boxes**.
+- The system must handle multiple sequential imports (batch mode) without significant performance degradation.
 
-_Evaluates the performance requirements of the software, namely: response time, start-up time, recovery time, memory consumption, CPU usage, load capacity and application availability._
+_Assesses response time, processing speed, and scalability._
 
+---
 
 ## Supportability
 
-* The class structure must be designed for easy maintenance and future feature additions following best Object-Oriented (OO) practices(adopt best practices for identify requirements, software analysis and design) (adopt recognized coding standards) (use Javadoc to generate useful documentation for Java code). (Maintainability)
-* Javadoc comments must be used for code documentation. (Documentation)
-* Unit tests must be implemented for all methods (excluding Input/Output methods) using the JUnit 5 framework. Test coverage reports should be generated using the JaCoCo plugin. (Testability)
-* The application must be developed in Java using IntelliJ IDE or NetBeans. (Development Environment)
+- The system must be modular and maintainable, following **Object-Oriented Programming (OOP)** best practices and **SOLID principles**.
+- Recognized **coding standards** (e.g., CamelCase, indentation, naming conventions) must be used.
+- All Java code must include **Javadoc comments**, and documentation must be generated automatically.
+- **Unit tests** must be implemented for all non-I/O methods using **JUnit 5**, with coverage reports generated via **JaCoCo**.
+- The application must be developed in **Java**, using **IntelliJ IDEA** or **NetBeans** as the IDE.
+- The project must use a **clear package structure** (e.g., `domain`, `controller`, `ui`, `utils`, `repository`).
+- Version control must follow the department’s guidelines (private **GitHub repository**, structured board, and Scrum process).
+- The architecture should allow easy integration of future modules (e.g., new optimization heuristics or simulation features).
 
-_The supportability requirements gathers several characteristics, such as:
-testability, adaptability, maintainability, compatibility,
-configurability, installability, scalability and more._
+_Gathers characteristics like testability, maintainability, adaptability, and scalability._
+
+---
 
 ## Others +
 
 ### Design Constraints
 
-N/A
+- The system must follow a modular architecture compatible with the diagram shown in **Figure 4** of the assignment document.
+- UML models (domain, class, and use case diagrams) must be created using **Visual Paradigm** and exported in **SVG format**.
+- Design patterns such as **MVC** and **DAO** must be applied to ensure separation of concerns.
 
-_Specifies or constraints the system design process. Examples may include: programming languages, software process, mandatory standards/patterns, use of development tools, class library, etc._
-
+---
 
 ### Implementation Constraints
 
-* The application must be developed in Java language.
-* The application's graphical interface is to be developed in JavaFX 11.
+- The application must be implemented in **Java**.
+- The graphical user interface must use **JavaFX 11**.
+- The database must be implemented in **Oracle DB**, with scripts generated in **PL/SQL**.
+- C/Assembly modules may be used for hardware-level or low-level operations (ARQCP component).
 
-_Specifies or constraints the code or construction of a system such
-such as: mandatory standards/patterns, implementation languages,
-database integrity, resource limits, operating system._
+---
 
 ### Interface Constraints
 
-N/A
+- The system must exchange data between components (PL/SQL, Java, C) using **well-defined file interfaces** (CSV or JSON).
+- Import/export formats must strictly follow defined schemas and field names (`items.csv`, `returns.csv`, etc.).
 
-_Specifies or constraints the features inherent to the interaction of the
-system being developed with other external systems._
+---
 
 ### Physical Constraints
 
-N/A
+- The system must run on **Windows**, **macOS**, or **Linux**, requiring **JDK 17+**.
+- Recommended system specifications: at least **8 GB RAM** and **2 GB free storage**.
 
-_Specifies a limitation or physical requirement regarding the hardware used to house the system, as for example: material, shape, size or weight._
+---
+
+**End of Document**
