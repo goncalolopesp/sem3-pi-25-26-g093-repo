@@ -12,7 +12,7 @@ However, be aware, this is a pedagogical simplification. On further projects and
 
 # Use Cases / User Stories
 
-| UC/US | Description                                                           |                   
-|:------|:----------------------------------------------------------------------|
+| UC/US | Description |                   
+|:------|:------------|
 |
 
