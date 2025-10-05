@@ -1,0 +1,131 @@
+@startuml
+
+hide circle
+hide methods
+skinparam monochrome true
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class Station {
+    +name
+    +position
+}
+
+class StationType {
+    +typeName ' e.g., Freight Yard, Terminal, Intermodal
+}
+
+Station --> StationType : ofType >
+
+class Building {
+    +name
+}
+
+class BuildingType {
+    +typeName ' e.g., Warehouse, RefrigeratedStorage, Office
+}
+
+Station o-- "0..*" Building : has >
+Building --> "1" BuildingType : ofType >
+
+class RailwayLine {
+    +name
+    +length
+    +type
+}
+
+class RailwaySegment {
+    +length
+    +gauge
+    +isElectrified
+    +trackType
+    +trackConfiguration  ' e.g., Single, Double
+    +speedLimit
+    +weightLimit
+}
+
+class Operator {
+    +name
+}
+
+class OperatorType {
+    +typeName  ' e.g., Infrastructure Manager, Train Operator
+}
+
+Operator --> OperatorType : ofType >
+Operator "1" --> "0..*" RailwayLine : owns >
+RailwayLine *-- "1..*" RailwaySegment : composedOf >
+
+RailwayLine *-- "2..*" Station : connects >
+
+class Train {
+    +name
+    +length
+    +purchaseDate
+}
+
+class Locomotive {
+    +name
+    +power
+    +acceleration
+    +topSpeed
+    +weight
+    +startYear
+    +gauge
+    +fuelCapacity
+    +numberOfBogies
+}
+
+class LocomotiveType {
+    +typeName ' e.g., Diesel, Electric, Hybrid
+}
+
+class Wagon {
+    +capacity
+    +volumeCapacity
+    +tareWeight
+    +gauge
+}
+
+class WagonType {
+    +typeName  ' e.g., Boxcar, Tank, Flat, Hopper, Refrigerated
+}
+
+Operator "1" --> "0..*" Train : operates >
+Train *-- "1" Locomotive : has >
+Locomotive --> LocomotiveType : ofType >
+Train *-- "0..*" Wagon : composedOf >
+Wagon --> WagonType : ofType >
+
+class Route {
+    +name
+}
+
+class RouteStation {
+    +sequenceOrder
+}
+
+Route *-- "2..*" RouteStation : includes >
+RouteStation --> "1" Station : station >
+
+class CargoType {
+    +typeName
+}
+
+class Cargo {
+    +quantity
+}
+
+Cargo --> CargoType : of >
+
+class Freight {
+    +status ' e.g., Planned, InTransit, Delivered
+}
+
+Freight *-- "1..*" Cargo : contains >
+Freight --> "1" Station : origin >
+Freight --> "1" Station : destination >
+Freight --> Route : follows >
+Freight --> Train : transportedBy >
+
+@enduml
