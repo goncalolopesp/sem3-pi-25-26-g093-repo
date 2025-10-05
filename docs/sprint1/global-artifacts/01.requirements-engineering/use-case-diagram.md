@@ -10,9 +10,24 @@ However, be aware, this is a pedagogical simplification. On further projects and
 
 **For each UC/US, it must be provided evidences of applying main activities of the software development process (requirements, analysis, design, tests and code). Gather those evidences on a separate file for each UC/US and set up a link as suggested below.**
 
-# Use Cases / User Stories
+# Use Cases / User Stories - Data Base
 
-| UC/US | Description |                   
-|:------|:------------|
-|
+| UC/US  | Description                                                                  |                   
+|:-------|:-----------------------------------------------------------------------------|
+| USBD01 | [Create a glossary](USBD001-requirements.md)                                 |
+| USBD02 | [Create a relational model](USBD002-requirements.md)                         |
+| USBD03 | [Instantiate relational model](USBD003-requirements.md)                      |
+| USBD04 | [Insert provided data into new database](USBD004-requirements.md)            |
+| USBD07 | [List of all line segments](USBD007-requirements.md)                         |
+| USBD12 | [List of all wagons of a given type and gauge](USBD012-requirements.md)      |
+| USBD18 | [list of all locomotives of a given type and gauge](USBD018-requirements.md) |
+
+# Use Cases / User Stories - LAPR3
+
+| UC/US  | Description                                                         |                   
+|:-------|:--------------------------------------------------------------------|
+| USPL01 | [Create a domain model](USPL001-requirements.md)                    |
+| USPL02 | [Present the Cargo Handling functionality](USPL002-requirements.md) |
+
+
 
