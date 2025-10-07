@@ -1,4 +1,4 @@
-package repository;
+package pt.ipp.isep.dei.pi25_26.g093.app.repository;
 
 import pt.isep.lei.esoft.auth.AuthFacade;
 import pt.isep.lei.esoft.auth.UserSession;

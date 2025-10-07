@@ -1,4 +1,4 @@
-package controller;
+package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.repository.AuthenticationRepository;
 import pt.ipp.isep.dei.repository.Repositories;

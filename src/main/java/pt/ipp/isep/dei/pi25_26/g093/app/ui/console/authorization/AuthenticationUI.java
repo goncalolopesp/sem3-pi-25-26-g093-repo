@@ -1,4 +1,4 @@
-package ui.console.authorization;
+package pt.ipp.isep.dei.pi25_26.g093.app.ui.console.authorization;
 
 import pt.ipp.isep.dei.controller.AuthenticationController;
 import pt.ipp.isep.dei.ui.console.menu.AdminUI;

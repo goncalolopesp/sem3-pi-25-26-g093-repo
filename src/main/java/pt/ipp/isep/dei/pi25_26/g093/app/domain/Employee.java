@@ -1,4 +1,4 @@
-package domain;
+package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import java.util.Objects;
 

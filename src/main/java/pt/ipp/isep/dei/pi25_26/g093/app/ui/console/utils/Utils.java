@@ -1,4 +1,4 @@
-package ui.console.utils;
+package pt.ipp.isep.dei.pi25_26.g093.app.ui.console.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

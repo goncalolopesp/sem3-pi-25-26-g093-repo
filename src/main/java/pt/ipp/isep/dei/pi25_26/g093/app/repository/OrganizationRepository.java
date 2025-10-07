@@ -1,4 +1,4 @@
-package repository;
+package pt.ipp.isep.dei.pi25_26.g093.app.repository;
 
 import pt.ipp.isep.dei.domain.Employee;
 import pt.ipp.isep.dei.domain.Organization;

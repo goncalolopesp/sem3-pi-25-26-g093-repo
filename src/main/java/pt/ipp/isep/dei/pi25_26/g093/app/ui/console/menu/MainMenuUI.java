@@ -1,4 +1,4 @@
-package ui.console.menu;
+package pt.ipp.isep.dei.pi25_26.g093.app.ui.console.menu;
 
 import pt.ipp.isep.dei.ui.console.DevTeamUI;
 import pt.ipp.isep.dei.ui.console.authorization.AuthenticationUI;

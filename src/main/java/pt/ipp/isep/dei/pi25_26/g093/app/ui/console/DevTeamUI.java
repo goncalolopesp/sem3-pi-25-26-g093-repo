@@ -1,4 +1,4 @@
-package ui.console;
+package pt.ipp.isep.dei.pi25_26.g093.app.ui.console;
 
 public class DevTeamUI implements Runnable {
 

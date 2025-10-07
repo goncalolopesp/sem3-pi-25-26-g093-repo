@@ -1,4 +1,4 @@
-package repository;
+package pt.ipp.isep.dei.pi25_26.g093.app.repository;
 
 /**
  * Inspired on https://refactoring.guru/design-patterns/singleton/java/example
