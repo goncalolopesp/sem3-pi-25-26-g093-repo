@@ -29,7 +29,6 @@ As a Product Owner, I want a data dictionary/glossary to be created.
 **Input Data:**
 
 * Railway infrastructure and rolling stock documentation (Sections 2.2.1 and 2.2.2).
-* Existing CSV data examples from ESINF (optional reference).
 * Naming conventions and data modelling standards.
 
 **Output Data:**
