@@ -4,7 +4,7 @@
 
 However, be aware, this is a pedagogical simplification. On further projects and course units there may also exist _1 to N **and/or** N to 1_ relationships between UC and US.
 
-**Insert below the Use Case Diagram in a SVG format**
+**Insert below the Use Case Diagram in a SV[bddad-us](../../user-stories/bddad-us)G format**
 
 ![Use Case Diagram](svg/use-case-diagram.svg)
 
@@ -29,5 +29,14 @@ However, be aware, this is a pedagogical simplification. On further projects and
 | USPL01 | [Create a domain model](USPL001-requirements.md)                    |
 | USPL02 | [Present the Cargo Handling functionality](USPL002-requirements.md) |
 
+# Use Cases / User Stories - ESINF
+
+| UC/US  | Description                                                         |                   
+|:-------|:--------------------------------------------------------------------|
+| USEI01 | [Create a domain model](USEI001-requirements.md)                    |
+| USEI02 | [Present the Cargo Handling functionality](USEI002-requirements.md) |
+| USEI03 | [Create a domain model](USEI003-requirements.md)                    |
+| USEI04 | [Present the Cargo Handling functionality](USEI004-requirements.md) |
+| USEI05 | [Create a domain model](USEI005-requirements.md)                    |
 
 
