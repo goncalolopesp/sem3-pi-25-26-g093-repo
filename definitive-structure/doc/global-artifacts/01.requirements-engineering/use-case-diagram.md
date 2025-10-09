@@ -4,7 +4,7 @@
 
 However, be aware, this is a pedagogical simplification. On further projects and course units there may also exist _1 to N **and/or** N to 1_ relationships between UC and US.
 
-**Insert below the Use Case Diagram in a SV[bddad-us](../../../../docs/sprint1/user-stories/bddad-us)G format**
+**Insert below the Use Case Diagram in a SV[bddad-us](../../../user-stories/bddad-us)G format**
 
 ![Use Case Diagram](svg/use-case-diagram.svg)
 
