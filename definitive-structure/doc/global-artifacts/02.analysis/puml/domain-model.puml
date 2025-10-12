@@ -5,7 +5,6 @@ skinparam monochrome true
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
-
 class Station {
   +name
   +position
@@ -48,12 +47,11 @@ Operator <|-- InfrastructureManager
 Operator <|-- TrainOperator
 
 InfrastructureManager "1" --> "0..*" RailwayLine : owns >
-RailwayLine --> "1" InfrastructureManager : ownedBy >
-
 
 abstract class RollingStock {
   +gauge
-  +weight
+  +tareWeight
+  +maxWeight
 }
 RollingStock <|-- Locomotive
 RollingStock <|-- Wagon
@@ -66,6 +64,7 @@ abstract class Locomotive {
   +startYear
   +numberOfBogies
   +tareWeight
+  +dimensions
 }
 class DieselLocomotive {
   +fuelCapacity
@@ -80,6 +79,8 @@ ElectricLocomotive --> RailwaySegment : operatesOn (electrified only) >
 abstract class Wagon {
   +payloadCapacity
   +volumeCapacity
+  +tareWeight
+  +dimensions
 }
 class Boxcar {}
 class Flatcar {}
@@ -129,5 +130,19 @@ class RouteStation {
 }
 Route *-- "2..*" RouteStation : includes >
 RouteStation --> "1" Station : station >
+
+class Building{
+    +name
+}
+
+enum BuildingType{
+    WareHouse
+    GrainSilo
+    RefrigeratedArea
+}
+
+Building --> BuildingType : ofType >
+Station "1" --> "0..*" Building : includes >
+TrainOperator "1" --> "0..*" Route : defines >
 
 @enduml
