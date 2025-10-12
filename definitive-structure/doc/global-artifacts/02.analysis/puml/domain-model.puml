@@ -1,131 +1,133 @@
 @startuml
-
 hide circle
 hide methods
 skinparam monochrome true
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
+
 class Station {
-    +name
-    +position
+  +name
+  +position
 }
-
-class StationType {
-    +typeName ' e.g., Freight Yard, Terminal, Intermodal
+enum StationTypeName {
+  FreightYard
+  Terminal
+  Intermodal
 }
-
-Station --> StationType : ofType >
-
-class Building {
-    +name
-}
-
-class BuildingType {
-    +typeName ' e.g., Warehouse, RefrigeratedStorage, Office
-}
-
-Station o-- "0..*" Building : has >
-Building --> "1" BuildingType : ofType >
+Station --> StationTypeName : ofType >
 
 class RailwayLine {
-    +name
-    +length
-    +type
+  +name
+  +length
 }
-
 class RailwaySegment {
-    +length
-    +gauge
-    +isElectrified
-    +trackType
-    +trackConfiguration  ' e.g., Single, Double
-    +speedLimit
-    +weightLimit
+  +length
+  +gauge
+  +isElectrified
+  +trackType
+  +trackConfiguration
+  +speedLimit
+  +weightLimit
 }
-
-class Operator {
-    +name
-}
-
-class OperatorType {
-    +typeName  ' e.g., Infrastructure Manager, Train Operator
-}
-
-Operator --> OperatorType : ofType >
-Operator "1" --> "0..*" RailwayLine : owns >
 RailwayLine *-- "1..*" RailwaySegment : composedOf >
+RailwayLine --> "1" Station : start >
+RailwayLine --> "1" Station : end >
 
-RailwayLine *-- "2..*" Station : connects >
 
-class Train {
-    +name
-    +length
-    +purchaseDate
+abstract class Operator {
+  +name
 }
-
-class Locomotive {
-    +name
-    +power
-    +acceleration
-    +topSpeed
-    +weight
-    +startYear
-    +gauge
-    +fuelCapacity
-    +numberOfBogies
+class InfrastructureManager {
+  +maintenanceAreas
 }
-
-class LocomotiveType {
-    +typeName ' e.g., Diesel, Electric, Hybrid
+class TrainOperator {
+  +fleetSize
 }
+Operator <|-- InfrastructureManager
+Operator <|-- TrainOperator
 
-class Wagon {
-    +capacity
-    +volumeCapacity
-    +tareWeight
-    +gauge
+InfrastructureManager "1" --> "0..*" RailwayLine : owns >
+RailwayLine --> "1" InfrastructureManager : ownedBy >
+
+
+abstract class RollingStock {
+  +gauge
+  +weight
 }
+RollingStock <|-- Locomotive
+RollingStock <|-- Wagon
 
-class WagonType {
-    +typeName  ' e.g., Boxcar, Tank, Flat, Hopper, Refrigerated
+abstract class Locomotive {
+  +make
+  +model
+  +power
+  +acceleration
+  +startYear
+  +numberOfBogies
+  +tareWeight
 }
-
-Operator "1" --> "0..*" Train : operates >
-Train *-- "1" Locomotive : has >
-Locomotive --> LocomotiveType : ofType >
-Train *-- "0..*" Wagon : composedOf >
-Wagon --> WagonType : ofType >
-
-class Route {
-    +name
+class DieselLocomotive {
+  +fuelCapacity
 }
+class ElectricLocomotive {
 
-class RouteStation {
-    +sequenceOrder
 }
+Locomotive <|-- DieselLocomotive
+Locomotive <|-- ElectricLocomotive
+ElectricLocomotive --> RailwaySegment : operatesOn (electrified only) >
 
-Route *-- "2..*" RouteStation : includes >
-RouteStation --> "1" Station : station >
-
-class CargoType {
-    +typeName
+abstract class Wagon {
+  +payloadCapacity
+  +volumeCapacity
 }
+class Boxcar {}
+class Flatcar {}
+class TankCar {
+  +liquidType
+}
+class HopperCar {
+  +materialType
+}
+class RefrigeratedCar {
+  +temperatureRange
+}
+Wagon <|-- Boxcar
+Wagon <|-- Flatcar
+Wagon <|-- TankCar
+Wagon <|-- HopperCar
+Wagon <|-- RefrigeratedCar
+
+TrainOperator "1" --> "0..*" Locomotive : operates >
+TrainOperator "1" --> "0..*" Wagon : manages >
+
 
 class Cargo {
-    +quantity
+  +description
+  +weight
+  +volume
+  +isPerishable
+  +temperatureRequirement
 }
-
-Cargo --> CargoType : of >
-
-class Freight {
-    +status ' e.g., Planned, InTransit, Delivered
+enum CargoType {
+  GeneralGoods
+  Container
+  Liquid
+  Grain
+  Chemical
+  Refrigerated
 }
+Cargo --> CargoType : ofType >
+Wagon --> "0..*" Cargo : transports >
 
-Freight *-- "1..*" Cargo : contains >
-Freight --> "1" Station : origin >
-Freight --> "1" Station : destination >
-Freight --> Route : follows >
-Freight --> Train : transportedBy >
+class Route {
+  +name
+  +description
+}
+class RouteStation {
+  +sequenceOrder
+}
+Route *-- "2..*" RouteStation : includes >
+RouteStation --> "1" Station : station >
 
 @enduml
