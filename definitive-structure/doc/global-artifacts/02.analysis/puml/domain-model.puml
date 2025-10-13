@@ -37,17 +37,17 @@ RailwayLine *-- "1..*" RailwaySegment : composedOf >
 RailwayLine --> "1" Station : start >
 RailwayLine --> "1" Station : end >
 
-abstract class Operator {
+class Enterprise {
   +name
 }
-class InfrastructureManager {
+class Owner {
 }
-class TrainOperator {
+class Operator {
 }
-Operator <|-- InfrastructureManager
-Operator <|-- TrainOperator
+Enterprise <|-- Owner
+Enterprise <|-- Operator
 
-InfrastructureManager "1" --> "0..*" RailwayLine : owns >
+Owner "1" --> "0..*" RailwayLine : owns >
 
 abstract class RollingStock {
   +gauge
@@ -98,10 +98,10 @@ Wagon <|-- TankCar
 Wagon <|-- HopperCar
 Wagon <|-- RefrigeratedCar
 
-TrainOperator "1" --> "0..*" Locomotive : operates >
-TrainOperator "1" --> "0..*" Wagon : manages >
+Operator "1" --> "0..*" Locomotive : operates >
+Operator "1" --> "0..*" Wagon : manages >
 
-class Cargo {
+class  Cargo {
   +description
   +weight
   +volume
@@ -117,7 +117,7 @@ enum CargoType {
   Refrigerated
 }
 Cargo --> CargoType : ofType >
-Wagon --> "0..*" Cargo : transports >
+Wagon --> "1" Cargo : transports >
 
 class Route {
   +name
@@ -140,8 +140,16 @@ enum BuildingType {
 }
 Building --> BuildingType : ofType >
 Station "1" --> "0..*" Building : includes >
-TrainOperator "1" --> "0..*" Route : defines >
+Operator "1" --> "0..*" Route : defines >
 Cargo --> Building : storedIn >
+Operator "1" --> "0..*" RailwayLine : operates >
+
+note right of RailwayLine
+  Each RailwayLine is owned by exactly one Owner (Enterprise),
+  and may be operated by one or more Operators (different Enterprises).
+  The same Enterprise cannot be both the Owner and Operator
+  of the same RailwayLine.
+end note
 
 RollingStock <|-- Locomotive
 RollingStock <|-- Wagon
