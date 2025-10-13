@@ -41,10 +41,8 @@ abstract class Operator {
   +name
 }
 class InfrastructureManager {
-  +maintenanceAreas
 }
 class TrainOperator {
-  +fleetSize
 }
 Operator <|-- InfrastructureManager
 Operator <|-- TrainOperator
