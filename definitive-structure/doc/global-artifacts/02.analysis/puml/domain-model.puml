@@ -10,12 +10,6 @@ class Station {
   +position
   +isIntermodal
 }
-enum StationTypeName {
-  FreightYard
-  Terminal
-}
-
-Station --> StationTypeName : ofType >
 
 class RailwayLine {
   +name
@@ -31,6 +25,7 @@ class RailwaySegment {
   +trackConfiguration
   +speedLimit
   +weightLimit
+  +hasSiding
 }
 
 RailwayLine *-- "1..*" RailwaySegment : composedOf >
@@ -71,7 +66,6 @@ class ElectricLocomotive {
 Locomotive <|-- DieselLocomotive
 Locomotive <|-- ElectricLocomotive
 
-ElectricLocomotive --> RailwaySegment : operatesOn >
 note on link
   Electric locomotives can only operate on
   railway segments where isElectrified = true
@@ -153,4 +147,28 @@ end note
 
 RollingStock <|-- Locomotive
 RollingStock <|-- Wagon
+
+class Terminal{
++capacity
+}
+
+class FreightYard{
++storageCapacity
++numTracks
+}
+
+Station "1" --> "0..*" Terminal : includes >
+Station "1" --> "0..*" FreightYard : includes >
+
+class Siding {
+  +name
+  +length
+  +position
+}
+
+note right of RailwaySegment
+  Sidings only exist on single-track segments.
+  Use 'hasSiding' = true only if trackConfiguration = "Single".
+end note
+RailwaySegment "1" --> "0..*" Siding : includes >
 @enduml
