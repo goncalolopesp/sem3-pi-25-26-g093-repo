@@ -1,5 +1,4 @@
 @startuml
-
 hide circle
 hide methods
 skinparam monochrome true
@@ -7,134 +6,169 @@ skinparam classAttributeIconSize 0
 skinparam shadowing false
 
 class Station {
-    +name
-    +position
+  +name
+  +position
+  +isIntermodal
 }
-
-class StationType {
-    +typeName ' e.g., Freight Yard, Terminal, Intermodal
-}
-
-Station --> StationType : ofType >
-
-class Building {
-    +name
-}
-
-class BuildingType {
-    +typeName ' e.g., Warehouse, RefrigeratedStorage, Office
-}
-
-Station o-- "0..*" Building : has >
-Building --> "1" BuildingType : ofType >
 
 class RailwayLine {
-    +name
-    +length
-    +type
+  +name
+  +length
+  +startStation
+  +endStation
 }
-
 class RailwaySegment {
-    +length
-    +gauge
-    +isElectrified
-    +trackType
-    +trackConfiguration  ' e.g., Single, Double
-    +speedLimit
-    +weightLimit
+  +length
+  +gauge
+  +isElectrified
+  +trackType
+  +trackConfiguration
+  +speedLimit
+  +weightLimit
+  +hasSiding
 }
 
-class Operator {
-    +name
-}
-
-class OperatorType {
-    +typeName  ' e.g., Infrastructure Manager, Train Operator
-}
-
-Operator --> OperatorType : ofType >
-Operator "1" --> "0..*" RailwayLine : owns >
 RailwayLine *-- "1..*" RailwaySegment : composedOf >
+RailwayLine --> "1" Station : start >
+RailwayLine --> "1" Station : end >
 
-RailwayLine *-- "2..*" Station : connects >
+class Enterprise {
+  +name
+}
+class Owner {
+}
+class Operator {
+}
+Enterprise <|-- Owner
+Enterprise <|-- Operator
 
-class Train {
-    +name
-    +length
-    +purchaseDate
+Owner "1" --> "0..*" RailwayLine : owns >
+
+abstract class RollingStock {
+  +gauge
+  +tareWeight
+  +maxWeight
 }
 
-class Locomotive {
-    +name
-    +power
-    +acceleration
-    +topSpeed
-    +weight
-    +startYear
-    +gauge
-    +fuelCapacity
-    +numberOfBogies
+abstract class Locomotive {
+  +make
+  +model
+  +power
+  +acceleration
+  +startYear
+  +numberOfBogies
 }
-
-class LocomotiveType {
-    +typeName ' e.g., Diesel, Electric, Hybrid
+class DieselLocomotive {
+  +fuelCapacity
 }
-
-class Wagon {
-    +capacity
-    +volumeCapacity
-    +tareWeight
-    +gauge
-    +status
-    +compatibleCargoTypes
-    +currentWeight
-    +currentVolume
+class ElectricLocomotive {
 }
+Locomotive <|-- DieselLocomotive
+Locomotive <|-- ElectricLocomotive
 
-class WagonType {
-    +typeName  ' e.g., Boxcar, Tank, Flat, Hopper, Refrigerated
+note on link
+  Electric locomotives can only operate on
+  railway segments where isElectrified = true
+end note
+
+abstract class Wagon {
+  +payloadCapacity
+  +volumeCapacity
 }
+class Boxcar {}
+class Flatcar {}
+class TankCar {
+  +liquidType
+}
+class HopperCar {
+  +materialType
+}
+class RefrigeratedCar {
+  +temperatureRange
+}
+Wagon <|-- Boxcar
+Wagon <|-- Flatcar
+Wagon <|-- TankCar
+Wagon <|-- HopperCar
+Wagon <|-- RefrigeratedCar
 
-Operator "1" --> "0..*" Train : operates >
-Train *-- "1" Locomotive : has >
-Locomotive --> LocomotiveType : ofType >
-Train *-- "0..*" Wagon : composedOf >
-Wagon --> WagonType : ofType >
+Operator "1" --> "0..*" Locomotive : operates >
+Operator "1" --> "0..*" Wagon : manages >
+
+class  Cargo {
+  +description
+  +weight
+  +volume
+  +isPerishable
+  +temperatureRequirement
+}
+enum CargoType {
+  GeneralGoods
+  Container
+  Liquid
+  Grain
+  Chemical
+  Refrigerated
+}
+Cargo --> CargoType : ofType >
+Wagon --> "1" Cargo : transports >
 
 class Route {
-    +name
+  +name
+  +isComplex
+  +description
 }
-
 class RouteStation {
-    +sequenceOrder
+  +sequenceOrder
 }
-
 Route *-- "2..*" RouteStation : includes >
 RouteStation --> "1" Station : station >
 
-class CargoType {
-    +typeName
+class Building {
+  +name
+}
+enum BuildingType {
+  WareHouse
+  GrainSilo
+  RefrigeratedArea
+}
+Building --> BuildingType : ofType >
+Station "1" --> "0..*" Building : includes >
+Operator "1" --> "0..*" Route : defines >
+Cargo --> Building : storedIn >
+Operator "1" --> "0..*" RailwayLine : operates >
+
+note right of RailwayLine
+  Each RailwayLine is owned by exactly one Owner (Enterprise),
+  and may be operated by one or more Operators (different Enterprises).
+  The same Enterprise cannot be both the Owner and Operator
+  of the same RailwayLine.
+end note
+
+RollingStock <|-- Locomotive
+RollingStock <|-- Wagon
+
+class Terminal{
++capacity
 }
 
-class Cargo {
-    +id
-    +weight
-    +volume
-    +origin
-    +destination
-    +status
+class FreightYard{
++storageCapacity
++numTracks
 }
 
-Cargo --> CargoType : of >
+Station "1" --> "0..*" Terminal : includes >
+Station "1" --> "0..*" FreightYard : includes >
 
-class Freight {
-    +status ' e.g., Planned, InTransit, Delivered
+class Siding {
+  +name
+  +length
+  +position
 }
 
-Freight *-- "1..*" Cargo : contains >
-Freight --> "1" Station : origin >
-Freight --> "1" Station : destination >
-Freight --> Route : follows >
-Freight --> Train : transportedBy >
-
+note right of RailwaySegment
+  Sidings only exist on single-track segments.
+  Use 'hasSiding' = true only if trackConfiguration = "Single".
+end note
+RailwaySegment "1" --> "0..*" Siding : includes >
 @enduml
