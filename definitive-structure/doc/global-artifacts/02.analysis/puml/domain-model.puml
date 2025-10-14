@@ -85,6 +85,10 @@ class Wagon {
     +volumeCapacity
     +tareWeight
     +gauge
+    +status
+    +compatibleCargoTypes
+    +currentWeight
+    +currentVolume
 }
 
 class WagonType {
@@ -113,7 +117,12 @@ class CargoType {
 }
 
 class Cargo {
-    +quantity
+    +id
+    +weight
+    +volume
+    +origin
+    +destination
+    +status
 }
 
 Cargo --> CargoType : of >

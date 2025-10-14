@@ -1,36 +1,45 @@
 @startuml
-skinparam monochrome true
-skinparam packageStyle rectangle
-skinparam shadowing false
+title SSD - USLP02: Station Storage Manager Cargo Handling (compatível)
 
-autonumber
+actor "Station Storage Manager" as Manager
+boundary "Cargo Handling System" as System
 
-actor "Organization\nEmployee" as Employee
-participant ":System" as System
+' 1. Acesso ao sistema
+Manager -> System: Access Cargo Handling
+activate System
+System --> Manager: Show available cargos and wagons
+deactivate System
 
-activate Employee
-
-    Employee -> System : asks to create a new task
+' 2. Loop: Escolher carga válida
+loop Until a valid cargo is selected
+    Manager -> System: Select cargo X
     activate System
-
-        System --> Employee : shows task category list and asks to select one
+    alt Cargo available
+        System --> Manager: Confirm "Cargo X selected"
+    else Cargo not available
+        System --> Manager: Error "Cargo X not available"
+        System --> Manager: Show available cargos again
+    end
     deactivate System
+end
 
-    Employee -> System : selects a task category
+' 3. Loop: Escolher vagão válido
+loop Until a valid wagon is selected
+    Manager -> System: Select wagon Y
     activate System
-
-        System --> Employee : requests data (i.e. reference, designation, informal\ndescription, technical description, duration, cost)
+    alt Wagon available and not full
+        System --> Manager: Confirm "Cargo X loaded into wagon Y"
+    else Wagon full or unavailable
+        System --> Manager: Error "Wagon not available or full"
+        System --> Manager: Show available wagons again
+    end
     deactivate System
+end
 
-    Employee -> System : types requested data
-    activate System
+' 4. Sair do sistema
+Manager -> System: Exit
+activate System
+System --> Manager: Close interface
+deactivate System
 
-        System --> Employee : shows all data and requests confirmation
-    deactivate System
-
-    Employee -> System : confirms data
-    activate System
-
-        System --> Employee : displays operation success
-    deactivate System
 @enduml
