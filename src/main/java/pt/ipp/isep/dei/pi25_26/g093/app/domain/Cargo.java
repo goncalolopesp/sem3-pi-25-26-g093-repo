@@ -11,6 +11,9 @@ public class Cargo {
         this.boxID = boxID;
         this.sku = sku;
         this.quantity = quantity;
+        if (expiryDate == null || expiryDate.length() == 0){
+            expiryDate = "9999-12-31";
+        }
         this.expiryDate = new Date(expiryDate);
         this.receivedAt = new DateTime(receivedAt);
     }
