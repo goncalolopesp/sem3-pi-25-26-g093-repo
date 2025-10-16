@@ -14,13 +14,13 @@ public class CSVParser {
         List<String> headers = new ArrayList<>();
         Map<String, String> csvDataMap = new HashMap<>();
         csvData = new ArrayList<>();
-        for (String header : headerData.split(",")){
+        for (String header : headerData.split("\\s*[,;]\\s*")){
             headers.add(header);
         }
         while (scanner.hasNext()){
             String csvLine = scanner.nextLine();
             int i = 0;
-            for (String data : csvLine.split(",")){
+            for (String data : csvLine.split("\\s*[,;]\\s*")){
                 csvDataMap.put(headers.get(i), data);
                 i++;
             }
