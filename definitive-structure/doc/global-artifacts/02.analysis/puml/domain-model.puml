@@ -5,17 +5,29 @@ skinparam monochrome true
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
-class Station {
+abstract class Facility {
   +name
   +position
   +isIntermodal
 }
 
+class Station {}
+class Terminal {
+  +capacity
+}
+class FreightYard {
+  +storageCapacity
+  +numTracks
+}
+
+Facility <|-- Station
+Facility <|-- Terminal
+Facility <|-- FreightYard
+
+
 class RailwayLine {
   +name
   +length
-  +startStation
-  +endStation
 }
 class RailwaySegment {
   +length
@@ -29,8 +41,8 @@ class RailwaySegment {
 }
 
 RailwayLine *-- "1..*" RailwaySegment : composedOf >
-RailwayLine --> "1" Station : start >
-RailwayLine --> "1" Station : end >
+RailwayLine --> "1" Facility : start >
+RailwayLine --> "1" Facility : end >
 
 class Enterprise {
   +name
@@ -92,8 +104,7 @@ Wagon <|-- TankCar
 Wagon <|-- HopperCar
 Wagon <|-- RefrigeratedCar
 
-Operator "1" --> "0..*" Locomotive : operates >
-Operator "1" --> "0..*" Wagon : manages >
+Operator "1" --> "0..*" RollingStock : operates >
 
 class  Cargo {
   +description
@@ -118,11 +129,11 @@ class Route {
   +isComplex
   +description
 }
-class RouteStation {
+class RouteFacility {
   +sequenceOrder
 }
-Route *-- "2..*" RouteStation : includes >
-RouteStation --> "1" Station : station >
+Route *-- "2..*" RouteFacility : includes >
+RouteFacility --> "1" Facility : Facility >
 
 class Building {
   +name
@@ -133,7 +144,7 @@ enum BuildingType {
   RefrigeratedArea
 }
 Building --> BuildingType : ofType >
-Station "1" --> "0..*" Building : includes >
+Facility "1" --> "0..*" Building : includes >
 Operator "1" --> "0..*" Route : defines >
 Cargo --> Building : storedIn >
 Operator "1" --> "0..*" RailwayLine : operates >
@@ -148,17 +159,6 @@ end note
 RollingStock <|-- Locomotive
 RollingStock <|-- Wagon
 
-class Terminal{
-+capacity
-}
-
-class FreightYard{
-+storageCapacity
-+numTracks
-}
-
-Station "1" --> "0..*" Terminal : includes >
-Station "1" --> "0..*" FreightYard : includes >
 
 class Siding {
   +name
