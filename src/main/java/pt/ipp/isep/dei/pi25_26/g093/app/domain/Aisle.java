@@ -18,4 +18,8 @@ public class Aisle {
     public void setBays(List<Bay> bays){
         this.bays = bays;
     }
+
+    public int getId() {
+        return id;
+    }
 }

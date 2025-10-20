@@ -1,9 +1,9 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WagonController;
+import pt.ipp.isep.dei.pi25_26.g093.app.controller.WarehouseController;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.DateTime;
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.Wagon;
 
 import java.util.*;
 
@@ -76,10 +76,55 @@ public class WagonUI {
                 Date receivedDate = new Date(receivedStr);
                 System.out.println("  Received Date: " + receivedDate);
 
+                int c = 0;
                 for (Wagon wagon : inner.getValue()) {
                     System.out.println("    " + wagon);
                 }
             }
         }
+        WarehouseController wc = new WarehouseController();
+
+        storeAllCargoInOrder(nested, wc);
     }
+
+    private void storeAllCargoInOrder(Map<String, Map<String, List<Wagon>>> nested, WarehouseController wc) {
+        for (Map.Entry<String, Map<String, List<Wagon>>> outer : nested.entrySet()) {
+            for (Map.Entry<String, List<Wagon>> inner : outer.getValue().entrySet()) {
+                for (Wagon wagon : inner.getValue()) {
+                    Cargo cargo = wagon.getCargo();
+                    boolean placed = placeCargoInFirstAvailableBay(cargo, wc);
+                    if (!placed) {
+                        System.out.println("Unable to store Cargo boxID=" + cargo.getBoxID() + " sku=" + cargo.getSku() + " — no free bay space available.");
+                    }
+                }
+            }
+        }
+    }
+
+    // Scans warehouses -> aisles -> bays in listed order and stores cargo in first bay with space.
+    // Returns true if stored, false otherwise.
+    private boolean placeCargoInFirstAvailableBay(Cargo cargo, WarehouseController wc) {
+        for (Warehouse wh : wc.getWarehouses()) {
+            List<Aisle> aisles = wh.getAisles();
+            if (aisles == null) continue;
+            for (Aisle aisle : aisles) {
+                List<Bay> bays = aisle.getBays();
+                if (bays == null) continue;
+                for (Bay bay : bays) {
+                    int used = bay.getCargo() == null ? 0 : bay.getCargo().size();
+                    if (used < bay.getCapacity()) {
+                        // ensure cargo list exists
+                        if (bay.getCargo() == null) {
+                            bay.setCargo(new java.util.ArrayList<>());
+                        }
+                        bay.addCargo(cargo);
+                        System.out.println("Stored Cargo boxID=" + cargo.getBoxID() + " in Warehouse " + wh.getId() + " Aisle " + aisle.getId() + " Bay " + bay.getId() + ".");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }
