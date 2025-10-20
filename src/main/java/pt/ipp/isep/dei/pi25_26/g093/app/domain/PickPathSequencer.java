@@ -1,5 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class PickPathSequencer {
@@ -43,5 +45,35 @@ public class PickPathSequencer {
 
     public int strategy1Dis(List<Coordinate>bays){
 
+        if(bays==null || bays.isEmpty()){
+            return 0;
+        }
+
+        List<Coordinate> ordered = new ArrayList<>(bays);
+
+
+        Comparator<Coordinate> comp= new Comparator<Coordinate>(){
+
+            @Override
+            public int compare(Coordinate c1, Coordinate c2){
+                if (c1.getAisle()<c2.getAisle()){
+                    return -1;
+                } else if (c1.getAisle()>c2.getAisle()) {
+                    return 1;
+                }
+
+                else{
+                    if (c1.getBay()<c2.getBay()){
+                        return -1;
+                    }
+                    else if (c1.getBay()>c2.getBay()){
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+        };
+        ordered.sort(comp);
+        return totalDistance(ordered);
     }
 }
