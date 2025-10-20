@@ -19,4 +19,7 @@ public class Warehouse {
         this.aisles = aisles;
     }
 
+    public int getId() {
+        return id;
+    }
 }
