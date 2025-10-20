@@ -76,4 +76,39 @@ public class PickPathSequencer {
         ordered.sort(comp);
         return totalDistance(ordered);
     }
+
+    public int strategy2Dis(List<Coordinate>bays){
+
+        Coordinate start = new Coordinate(0,0);
+
+        List<Coordinate> noVisited = new ArrayList<>(bays);
+        List<Coordinate> visited = new ArrayList<>();
+        if (bays == null || bays.isEmpty()) {
+            return 0;
+        }
+
+        while (!noVisited.isEmpty()){
+
+            Coordinate maisProximo=null;
+            int menorDistancia= Integer.MAX_VALUE;
+
+            for(Coordinate c : noVisited){
+
+                if(distanceCoordinates(start, c)<menorDistancia) {
+                    maisProximo=c;
+                    menorDistancia=distanceCoordinates(start, c);
+
+                }
+
+            }
+            visited.add(maisProximo);
+            noVisited.remove(maisProximo);
+            start=maisProximo;
+
+        }
+
+        return totalDistance(visited);
+
+
+    }
 }
