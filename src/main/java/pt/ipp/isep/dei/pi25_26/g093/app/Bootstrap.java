@@ -43,21 +43,34 @@ public class Bootstrap {
         warehouseRepo = repo.getWarehouseRepository();
     }
 
+    /**
+     *
+     * Prompts the user to enter the path to the CSV files.
+     *
+     */
+
     public void completeCSVFiles(){
         Scanner scanner = new Scanner(System.in);
-        System.out.printf("Path to the bays csv file: ");
+        System.out.print("Path to the bays csv file: ");
         baysCsv = scanner.nextLine();
-        System.out.println("Path to the items csv file: ");
+        System.out.print("Path to the items csv file: ");
         itemsCsv = scanner.nextLine();
-        System.out.println("Path to the order_lines csv file: ");
+        System.out.print("Path to the order_lines csv file: ");
         order_linesCsv = scanner.nextLine();
-        System.out.println("Path to the order csv file: ");
+        System.out.print("Path to the order csv file: ");
         orderCsv = scanner.nextLine();
-        System.out.println("Path to the returns csv file: ");
+        System.out.print("Path to the returns csv file: ");
         returnsCsv = scanner.nextLine();
-        System.out.println("Path to the wagons csv file: ");
+        System.out.print("Path to the wagons csv file: ");
         wagonsCsv = scanner.nextLine();
     }
+
+    /**
+     *
+     * Runs the bootstrap process.
+     *
+     * @throws FileNotFoundException if there are no files in the directory "train_station_dataset"
+     */
 
     public void run() throws FileNotFoundException {
         printAllCSVFilesOfDirectory("train_station_dataset");
@@ -66,6 +79,12 @@ public class Bootstrap {
         addWagonsToRepository();
     }
 
+    /**
+     *
+     * Gets all .csv content from the directory "dir" and prints it to the console.
+     *
+     * @param dir folder that contains all csv files
+     */
     public void printAllCSVFilesOfDirectory(String dir){
         File fileDir = new File(dir);
         File[] files = fileDir.listFiles();
@@ -80,7 +99,12 @@ public class Bootstrap {
         }
     }
 
-
+    /**
+     *
+     * Adds the warehouses from the .csv file to the warehouse repository.
+     *
+     * @throws FileNotFoundException if there is no file with the name "bays.csv" in the directory "train_station_dataset"
+     */
     public void addWarehousesToRepository() throws FileNotFoundException {
         try {
             CSVParser csvParser = new CSVParser("train_station_dataset/" + baysCsv);
@@ -115,12 +139,27 @@ public class Bootstrap {
         }
     }
 
+    /**
+     *
+     * Gets the data from a csvFile and returns it as a List of Items identified by their header
+     *
+     * @param csvDirectory the path to the csv file
+     * @return List of map with header identifying the value
+     * @throws FileNotFoundException if there is no file with the name passed as "csvDirectory"
+     */
     public List<Map<String, String>> getCSVData(String csvDirectory) throws FileNotFoundException {
         CSVParser csvParser = new CSVParser(csvDirectory);
         List<Map<String, String>> csvData = csvParser.getCSVData();
         return csvData;
     }
 
+    /**
+     *
+     * Gets all the bays in an Aisle
+     * @param aisleId the id of the Aisle to get the bays from.
+     * @return List of Bays in the Aisle with the id "aisleId"
+     * @throws FileNotFoundException if there is no file with the name "bays.csv" in the directory "train_station_dataset"
+     */
     public List<Bay> getBaysByAisle(int aisleId) throws FileNotFoundException {
         List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
         List<Bay> bays = new java.util.ArrayList<>();
@@ -137,6 +176,14 @@ public class Bootstrap {
         return bays;
     }
 
+    /**
+     *
+     * Gets the max id from the aisles
+     *
+     * @return the max id from the aisles
+     * @throws FileNotFoundException if there is no file with the name "bays.csv" in the directory "train_station_dataset"
+     */
+
     public int getMaxAisleId() throws FileNotFoundException {
 
         List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
@@ -152,6 +199,12 @@ public class Bootstrap {
         return max;
     }
 
+    /**
+     *
+     * Adds Cargo to the WagonRepository item-by-item.
+     *
+     * @throws FileNotFoundException if there is no file with the name "wagons.csv" in the directory "train_station_dataset"
+     */
     public void addWagonsToRepository1() throws FileNotFoundException {
         try {
             CSVParser csvParser = new CSVParser("train_station_dataset/" + wagonsCsv);
@@ -191,6 +244,13 @@ public class Bootstrap {
             throw new FileNotFoundException("Could not process wagon data file");
         }
     }
+
+    /**
+     *
+     * Adds Cargo to the WagonRepository box-by-box.
+     *
+     * @throws FileNotFoundException if there is no file with the name "wagons.csv" in the directory "train_station_dataset"
+     */
 
     public void addWagonsToRepository() throws FileNotFoundException {
         try {
@@ -232,12 +292,12 @@ public class Bootstrap {
 
 
     /**
-     * Compara duas strings de data (ex: "5-1-2026", "31-12-9999") manualmente.
-     * Retorna:
-     *   -1 → d1 é mais antiga
-     *    0 → iguais
-     *    1 → d1 é mais recente
-     * Datas inválidas ou vazias vão para o fim da ordenação.
+     *
+     * Compares Two Dates in a String Format
+     *
+     * @param d1 First Date to be compared
+     * @param d2 Second Date to be compared
+     * @return 1 -> if the first date is greater than the second date; 2 -> if the first date is less than the second date; 0 -> if the dates are equal.
      */
     private int compareDates(String d1, String d2) {
         // Tratar nulos ou vazios: vão para o fim
