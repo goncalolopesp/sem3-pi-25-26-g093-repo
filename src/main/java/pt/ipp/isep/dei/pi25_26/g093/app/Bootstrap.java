@@ -7,6 +7,7 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.Bay;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Wagon;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Warehouse;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -20,12 +21,19 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Bootstrap {
 
     Repositories repo;
     WagonRepository wagonRepo;
     WarehouseRepository warehouseRepo;
+    String baysCsv;
+    String itemsCsv;
+    String order_linesCsv;
+    String orderCsv;
+    String returnsCsv;
+    String wagonsCsv;
     // Read information from the csv files found in train_station_dataset
     // and add it to the respective Repositories.
 
@@ -35,14 +43,47 @@ public class Bootstrap {
         warehouseRepo = repo.getWarehouseRepository();
     }
 
+    public void completeCSVFiles(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.printf("Path to the bays csv file: ");
+        baysCsv = scanner.nextLine();
+        System.out.println("Path to the items csv file: ");
+        itemsCsv = scanner.nextLine();
+        System.out.println("Path to the order_lines csv file: ");
+        order_linesCsv = scanner.nextLine();
+        System.out.println("Path to the order csv file: ");
+        orderCsv = scanner.nextLine();
+        System.out.println("Path to the returns csv file: ");
+        returnsCsv = scanner.nextLine();
+        System.out.println("Path to the wagons csv file: ");
+        wagonsCsv = scanner.nextLine();
+    }
+
     public void run() throws FileNotFoundException {
+        printAllCSVFilesOfDirectory("train_station_dataset");
+        completeCSVFiles();
         addWarehousesToRepository();
         addWagonsToRepository();
     }
 
+    public void printAllCSVFilesOfDirectory(String dir){
+        File fileDir = new File(dir);
+        File[] files = fileDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    if (file.getName().endsWith(".csv")) {
+                        System.out.println(file.getName());
+                    }
+                }
+            }
+        }
+    }
+
+
     public void addWarehousesToRepository() throws FileNotFoundException {
         try {
-            CSVParser csvParser = new CSVParser("train_station_dataset/bays.csv");
+            CSVParser csvParser = new CSVParser("train_station_dataset/" + baysCsv);
             List<Map<String, String>> csvData = csvParser.getCSVData();
             WarehouseController warehouseController = new WarehouseController();
 
@@ -81,7 +122,7 @@ public class Bootstrap {
     }
 
     public List<Bay> getBaysByAisle(int aisleId) throws FileNotFoundException {
-        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/bays.csv");
+        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
         List<Bay> bays = new java.util.ArrayList<>();
         for (Map<String, String> csvLine : csvData) {
             int aisleId1 = Integer.parseInt(csvLine.get("aisle"));
@@ -98,7 +139,7 @@ public class Bootstrap {
 
     public int getMaxAisleId() throws FileNotFoundException {
 
-        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/bays.csv");
+        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
 
         int max = -1;
 
@@ -111,9 +152,9 @@ public class Bootstrap {
         return max;
     }
 
-    public void addWagonsToRepository() throws FileNotFoundException {
+    public void addWagonsToRepository1() throws FileNotFoundException {
         try {
-            CSVParser csvParser = new CSVParser("train_station_dataset/wagons.csv");
+            CSVParser csvParser = new CSVParser("train_station_dataset/" + wagonsCsv);
             List<Map<String, String>> csvData = csvParser.getCSVData();
             WagonController wagonController = new WagonController();
             List<Wagon> wagons = new ArrayList<>();
@@ -150,6 +191,45 @@ public class Bootstrap {
             throw new FileNotFoundException("Could not process wagon data file");
         }
     }
+
+    public void addWagonsToRepository() throws FileNotFoundException {
+        try {
+            CSVParser csvParser = new CSVParser("train_station_dataset/" + wagonsCsv);
+            List<Map<String, String>> csvData = csvParser.getCSVData();
+            WagonController wagonController = new WagonController();
+            List<Wagon> wagons = new ArrayList<>();
+
+            // Ler todas as linhas e criar Wagons por caixa
+            for (Map<String, String> csvLine : csvData) {
+                int qty = Integer.parseInt(csvLine.get("qty").trim());
+                int wagonId = Integer.parseInt(csvLine.get("wagonId").substring(3).trim());
+                int boxId = Integer.parseInt(csvLine.get("boxId").substring(3).trim());
+                int sku = Integer.parseInt(csvLine.get("sku").substring(3).trim());
+                String expiryDate = csvLine.get("expiryDate").trim();
+                String receivedAt = csvLine.get("receivedAt").trim();
+
+                // Criar um único Wagon por caixa
+                wagons.add(new Wagon(wagonId, boxId, sku, qty, expiryDate, receivedAt));
+            }
+
+            // Ordenar manualmente por data (ascendente)
+            wagons.sort((w1, w2) -> {
+                String d1 = w1.getCargo().getExpiryDate();
+                String d2 = w2.getCargo().getExpiryDate();
+                return compareDates(d1, d2);
+            });
+
+            // Adicionar já ordenados
+            for (Wagon wagon : wagons) {
+                wagonController.addWagon(wagon);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error reading wagon data: " + e.getMessage());
+            throw new FileNotFoundException("Could not process wagon data file");
+        }
+    }
+
 
     /**
      * Compara duas strings de data (ex: "5-1-2026", "31-12-9999") manualmente.
