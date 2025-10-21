@@ -12,18 +12,33 @@ import java.util.List;
 public class WarehouseController {
     Repositories repositories = Repositories.getInstance();
 
+    /**
+     * Constructor of the WarehouseController class
+     */
     public WarehouseController(){
 
     }
 
+    /**
+     * Gets the WarehouseRepository
+     * @return WarehouseRepository
+     */
     public WarehouseRepository getRepo(){
         return repositories.getWarehouseRepository();
     }
 
+    /**
+     * Gets all the stored warehouses
+     * @return Stored Warehouses in the WarehouseRepository
+     */
     public List<Warehouse> getWarehouses(){
         return getRepo().getWarehouseList();
     }
 
+    /**
+     * Adds a new warehouse to the WarehouseRepository
+     * @param w Warehouse to be added to the WarehouseRepository
+     */
     public void addWarehouse(Warehouse w){
         getRepo().add(w);
     }
