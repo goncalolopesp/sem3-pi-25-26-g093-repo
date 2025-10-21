@@ -13,7 +13,13 @@ import java.util.Map;
 
 public class Main {
 
-
+    /**
+     *
+     * Runs the code, starting by running the Bootstrap class.
+     *
+     * @param args Arguments/Variables sent through the console when executing the .jar program.
+     * @throws FileNotFoundException if there are no files in the train_station_dataset folder.
+     */
     public static void main(String[] args) throws FileNotFoundException {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.run();
