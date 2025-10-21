@@ -25,6 +25,15 @@ public class Item {
     private double volume;
     private double unitWeight;
 
+    /**
+     * Creates a new Item with the given parameters.
+     * @param sku ID of the item
+     * @param name Name of the item
+     * @param category Category of the item (Cleaning, Electronics, Hardware, Beverage, PersonalCare, Grocery)
+     * @param unit Unit of the item (Pack, Bottle, Unit, Bag, Box)
+     * @param volume Volume of the item
+     * @param unitWeight Weight of the item
+     */
     public Item(int sku, String name, String category, String unit, double volume, double unitWeight){
         this.sku = sku;
         this.name = name;
