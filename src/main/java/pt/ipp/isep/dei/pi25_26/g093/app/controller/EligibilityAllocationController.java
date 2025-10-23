@@ -10,6 +10,8 @@ import java.util.*;
 
 public class EligibilityAllocationController {
 
+    private List<Allocation> allocations = new ArrayList<>();// adicionado para usar na usei03
+
     static class Allocation {
         String orderId;
         int lineNo;
@@ -46,7 +48,7 @@ public class EligibilityAllocationController {
         SetOrderLines(mapOrderLines);
         SetWagons(mapWagons);
 
-        List<Allocation> allocations = new ArrayList<>();
+        allocations.clear();
         List<Eligibility> eligibilities = new ArrayList<>();
 
         for (Map<String, String> mapOrder : mapOrders) {
@@ -156,6 +158,10 @@ public class EligibilityAllocationController {
         }
 
         return true;
+
+    }
+    public List<Allocation> getAllocations() {
+        return allocations;
     }
 
     private static void SetOrders(List<Map<String, String>> orders)
