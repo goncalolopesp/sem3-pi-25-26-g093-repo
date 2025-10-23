@@ -37,21 +37,4 @@ public class ReturnController {
 
         return returnItems;
     }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        ReturnController controller = new ReturnController();
-        List<ReturnItem> returns = controller.loadReturnItems();
-        System.out.println("Number of items: " + returns.size());
-        returns.forEach(System.out::println);
-
-        ReturnService service = new ReturnService();
-        service.processReturns(returns);
-        System.out.println("\n---- RETURN PROCESSING SUMMARY ----");
-        System.out.println("Restocked items: " + service.getRestocked().size());
-        System.out.println("Quarantined items: " + service.getQuarantine().size());
-        System.out.println("Discarded items: " + service.getDiscarded().size());
-        System.out.println("-----------------------------------");
-        System.out.println("audit_log.txt created.");
-
-    }
 }

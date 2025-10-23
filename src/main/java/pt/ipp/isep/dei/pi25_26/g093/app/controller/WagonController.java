@@ -223,4 +223,8 @@ public class WagonController {
         sortNestedWagons(nested);
         return storeAllCargoInOrder(nested, wc);
     }
+
+    public boolean storeCargoDirectly(Cargo cargo, WarehouseController wc) {
+        return placeCargoInFirstAvailableBay(cargo, wc);
+    }
 }

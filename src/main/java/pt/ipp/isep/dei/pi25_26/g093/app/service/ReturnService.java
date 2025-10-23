@@ -1,5 +1,6 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.service;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.controller.WagonController;
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WarehouseController;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Cargo;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.ReturnItem;
@@ -58,10 +59,14 @@ public class ReturnService {
                 } else {
                     expiryStr = item.getExpiryDate().toString();
                 }
-                String receivedAtStr = item.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                String receivedAtStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
                 Cargo cargo = new Cargo(boxId, sku, item.getQuantity(), expiryStr, receivedAtStr);
 
+                WarehouseController wc = new WarehouseController();
+                WagonController wg = new WagonController();
+
+                boolean placed = wg.storeCargoDirectly(cargo, wc);
                 break;
             case "cycle-count":
                 action = "Quarantined";
