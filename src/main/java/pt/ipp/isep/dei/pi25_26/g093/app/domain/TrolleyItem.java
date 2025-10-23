@@ -1,9 +1,8 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
-/**
- * Representa um item individual (produto) colocado num trolley.
- * Cada item vem de uma alocação (AllocationRow) recebida da USEI02.
- */
+ //Representa um item individual (produto) colocado num trolley.
+ //Cada item vem de uma alocação (AllocationRow) recebida da USEI02.
+
 public class TrolleyItem {
     private final String orderId;
     private final String sku;
@@ -28,15 +27,10 @@ public class TrolleyItem {
     public int getAisle() { return aisle; }
     public int getBay() { return bay; }
 
-    @Override
     public String toString() {
         return String.format("Order %s | SKU %s | Qty %d | %.2f kg | (Aisle %d, Bay %d)",
                 orderId, sku, qty, weight, aisle, bay);
     }
 }
-/**
- * Representa um item individual (produto) colocado num trolley.
- * Cada item vem de uma alocação (AllocationRow) recebida da USEI02.
- * Esta classe é utilizada exclusivamente pela USEI03 (Picking Planner).
- */
+
 

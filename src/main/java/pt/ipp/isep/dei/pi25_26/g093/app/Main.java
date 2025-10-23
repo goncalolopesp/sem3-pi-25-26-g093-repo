@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-
     /**
      *
      * Runs the code, starting by running the Bootstrap class.
@@ -21,7 +20,7 @@ public class Main {
      * @throws FileNotFoundException if there are no files in the train_station_dataset folder.
      */
     public static void main(String[] args) throws FileNotFoundException {
-        Bootstrap bootstrap = new Bootstrap();
+        Bootstrap bootstrap = Bootstrap.getInstance();
         bootstrap.run();
         MainMenuUI mainMenuUI = new MainMenuUI();
         mainMenuUI.showMainMenu();
