@@ -1,9 +1,8 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
-/**
- * Representa um item individual (produto) colocado num trolley.
- * Cada item vem de uma alocação (AllocationRow) recebida da USEI02.
- */
+ //Representa um item individual (produto) colocado num trolley.
+ //Cada item vem de uma alocação (AllocationRow) recebida da USEI02.
+
 public class TrolleyItem {
     private final String orderId;
     private final String sku;
