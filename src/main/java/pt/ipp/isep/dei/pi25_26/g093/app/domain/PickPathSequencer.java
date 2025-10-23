@@ -107,6 +107,44 @@ public class PickPathSequencer {
     }
 
     /**
+     * Strategy A — Deterministic Sweep (returns ordered path).
+     * <p>
+     * Sorts the list of bays by ascending aisle and, in case of a tie,
+     * by ascending bay. Returns the ordered path.
+     *
+     * @param bays list of coordinates (bays) to visit
+     * @return ordered list of coordinates according to Strategy A
+     */
+    public List<Coordinate> strategy1Path(List<Coordinate> bays) {
+        if (bays == null || bays.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Copy list to avoid mutating the original one
+        List<Coordinate> ordered = new ArrayList<>(bays);
+
+        // Comparator that sorts by aisle first, then by bay
+        Comparator<Coordinate> comp = new Comparator<Coordinate>() {
+            @Override
+            public int compare(Coordinate c1, Coordinate c2) {
+                if (c1.getAisle() < c2.getAisle()) {
+                    return -1;
+                } else if (c1.getAisle() > c2.getAisle()) {
+                    return 1;
+                } else {
+                    // Same aisle -> compare by bay
+                    return Integer.compare(c1.getBay(), c2.getBay());
+                }
+            }
+        };
+
+        // Sort according to Strategy A rules
+        ordered.sort(comp);
+
+        return ordered;
+    }
+
+    /**
      * Strategy B — Nearest Neighbour (greedy algorithm).
      * <p>
      * Starts at the entrance (0,0) and repeatedly selects
@@ -148,5 +186,48 @@ public class PickPathSequencer {
 
         // Compute the total distance of the resulting path
         return totalDistance(visited);
+    }
+
+    /**
+     * Strategy B — Nearest Neighbour (greedy algorithm) - returns path.
+     * <p>
+     * Starts at the entrance (0,0) and repeatedly selects
+     * the nearest unvisited bay until all have been visited.
+     *
+     * @param bays list of coordinates (bays) to visit
+     * @return ordered list of coordinates according to Strategy B
+     */
+    public List<Coordinate> strategy2Path(List<Coordinate> bays) {
+        if (bays == null || bays.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Coordinate start = new Coordinate(0, 0);
+        List<Coordinate> noVisited = new ArrayList<>(bays);
+        List<Coordinate> visited = new ArrayList<>();
+
+        // Repeat until all bays are visited
+        while (!noVisited.isEmpty()) {
+            Coordinate nearest = null;
+            int shortestDistance = Integer.MAX_VALUE;
+
+            // Find the nearest coordinate to the current position
+            for (Coordinate c : noVisited) {
+                int dist = distanceCoordinates(start, c);
+                if (dist < shortestDistance) {
+                    shortestDistance = dist;
+                    nearest = c;
+                }
+            }
+
+            // Add to the final visiting sequence
+            visited.add(nearest);
+            // Remove from unvisited list
+            noVisited.remove(nearest);
+            // Update current position
+            start = nearest;
+        }
+
+        return visited;
     }
 }

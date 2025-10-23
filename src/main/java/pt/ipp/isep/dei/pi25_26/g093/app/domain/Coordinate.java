@@ -1,5 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+import java.util.Objects;
+
 public class Coordinate {
 
     private final int aisle;
@@ -21,6 +23,19 @@ public class Coordinate {
     @Override
     public String toString(){
         return "("+aisle+" , "+bay+")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Coordinate that = (Coordinate) obj;
+        return aisle == that.aisle && bay == that.bay;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aisle, bay);
     }
 
 }
