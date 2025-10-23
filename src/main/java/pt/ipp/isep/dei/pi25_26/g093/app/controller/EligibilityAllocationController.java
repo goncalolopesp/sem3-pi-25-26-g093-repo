@@ -1,12 +1,14 @@
-package pt.ipp.isep.dei.pi25_26.g093.app.domain;
+package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.Bootstrap;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.DateTime;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class ESINF {
+public class EligibilityAllocationController {
 
     static class Allocation {
         String orderId;
@@ -27,17 +29,7 @@ public class ESINF {
         String status;
     }
 
-    public static void ESINF02() throws FileNotFoundException {
-
-        String mode;
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Proceed with strict mode (default) or switch to partial mode? Enter P for partial, anything else for default: ");
-        mode = sc.nextLine();
-
-        if(mode.equalsIgnoreCase("P") || mode.equalsIgnoreCase("partial"))
-            mode = "partial";
-
+    public boolean Allocate(String mode) throws FileNotFoundException {
         Bootstrap bootstrap = Bootstrap.getInstance();
 
         CSVParser csvOrders = new CSVParser(bootstrap.getOrderCsv());
@@ -162,6 +154,8 @@ public class ESINF {
             System.out.printf("%s | line %d | %s | qty=%d | box=%s | aisle=%s | bay=%s%n",
                     a.orderId, a.lineNo, a.sku, a.qty, a.boxId, a.aisle, a.bay);
         }
+
+        return true;
     }
 
     private static void SetOrders(List<Map<String, String>> orders)
@@ -250,8 +244,8 @@ public class ESINF {
 
                 if(!data[0].toString().isEmpty() && !data2[0].toString().isEmpty())
                 {
-                    Date date1 = new Date(data[0].toString());
-                    Date date2 = new Date(data2[0].toString());
+                    pt.ipp.isep.dei.pi25_26.g093.app.domain.Date date1 = new pt.ipp.isep.dei.pi25_26.g093.app.domain.Date(data[0].toString());
+                    pt.ipp.isep.dei.pi25_26.g093.app.domain.Date date2 = new Date(data2[0].toString());
 
                     if(date1.compareTo(date2) == -1)
                     {
