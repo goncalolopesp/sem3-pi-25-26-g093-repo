@@ -97,13 +97,14 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
         }
     }
 
-    /**public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException {
         PickingPlanner planner = new PickingPlanner();
 
         List<TrolleyPlan> plans = planner.generatePickingPlan(60.0, "FFD");
 
         System.out.println("\n--- Picking Plan (dados reais da USEI02) ---");
         planner.displayPlan(plans);
-    }/**
-}//em cima é um teste local
+    }
+}
+
 
