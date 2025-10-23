@@ -29,6 +29,9 @@ public class Bootstrap {
     String returnsCsv;
     String wagonsCsv;
 
+    String path = "train_station_dataset";
+
+    private static Bootstrap instance;
     /**
      * Creates a new Bootstrap instance and gets the repositories.
      */
@@ -37,6 +40,22 @@ public class Bootstrap {
         wagonRepo = repo.getWagonRepository();
         warehouseRepo = repo.getWarehouseRepository();
     }
+
+    public static Bootstrap getInstance() {
+        if (instance == null) {
+            synchronized (Bootstrap.class) {
+                instance = new Bootstrap();
+            }
+        }
+        return instance;
+    }
+
+    public String getBaysCsv() {return path + "/" + baysCsv;}
+    public String getItemsCsv() {return path + "/" + itemsCsv;}
+    public String getOrder_linesCsv() {return path + "/" + order_linesCsv;}
+    public String getOrderCsv() {return path + "/" + orderCsv;}
+    public String getReturnsCsv() {return path + "/" + returnsCsv;}
+    public String getWagonsCsv() {return path + "/" + wagonsCsv;}
 
     /**
      * Prompts the user to enter the path to the CSV files.
@@ -62,7 +81,7 @@ public class Bootstrap {
      * @throws FileNotFoundException if there are no files in the directory "train_station_dataset"
      */
     public void run() throws FileNotFoundException {
-        printAllCSVFilesOfDirectory("train_station_dataset");
+        printAllCSVFilesOfDirectory(path);
         completeCSVFiles();
         addWarehousesToRepository();
         addWagonsToRepository();
@@ -92,7 +111,7 @@ public class Bootstrap {
      */
     public void addWarehousesToRepository() throws FileNotFoundException {
         try {
-            CSVParser csvParser = new CSVParser("train_station_dataset/" + baysCsv);
+            CSVParser csvParser = new CSVParser(path + "/" + baysCsv);
             List<Map<String, String>> csvData = csvParser.getCSVData();
             WarehouseController warehouseController = new WarehouseController();
 
@@ -140,7 +159,7 @@ public class Bootstrap {
      * @throws FileNotFoundException if there is no file with the name "bays.csv" in the directory "train_station_dataset"
      */
     public List<Bay> getBaysByAisle(int aisleId) throws FileNotFoundException {
-        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
+        List<Map<String, String>> csvData = this.getCSVData(path + "/" + baysCsv);
         List<Bay> bays = new java.util.ArrayList<>();
         for (Map<String, String> csvLine : csvData) {
             int aisleId1 = Integer.parseInt(csvLine.get("aisle"));
@@ -162,7 +181,7 @@ public class Bootstrap {
      */
     public int getMaxAisleId() throws FileNotFoundException {
 
-        List<Map<String, String>> csvData = this.getCSVData("train_station_dataset/" + baysCsv);
+        List<Map<String, String>> csvData = this.getCSVData(path + "/" + baysCsv);
 
         int max = -1;
 
@@ -181,7 +200,7 @@ public class Bootstrap {
      */
     public void addWagonsToRepository1() throws FileNotFoundException {
         try {
-            CSVParser csvParser = new CSVParser("train_station_dataset/" + wagonsCsv);
+            CSVParser csvParser = new CSVParser(path + "/" + wagonsCsv);
             List<Map<String, String>> csvData = csvParser.getCSVData();
             WagonController wagonController = new WagonController();
             List<Wagon> wagons = new ArrayList<>();
@@ -233,7 +252,7 @@ public class Bootstrap {
 
     public void addWagonsToRepository() throws FileNotFoundException {
         try {
-            CSVParser csvParser = new CSVParser("train_station_dataset/" + wagonsCsv);
+            CSVParser csvParser = new CSVParser(path + "/" + wagonsCsv);
             List<Map<String, String>> csvData = csvParser.getCSVData();
             WagonController wagonController = new WagonController();
             List<Wagon> wagons = new ArrayList<>();
