@@ -4,7 +4,7 @@ CREATE TABLE Cargo (id number(10) GENERATED AS IDENTITY, cargoTypeID number(10) 
 CREATE TABLE Cargo_Type (id number(10) GENERATED AS IDENTITY, typeName varchar2(50) NOT NULL, PRIMARY KEY (id));
 CREATE TABLE Diesel_Locomotive (rollingStockModelID number(10) NOT NULL, fuelCapacity number(10, 2) NOT NULL, PRIMARY KEY (rollingStockModelID));
 CREATE TABLE Electric_Locomotive (rollingStockModelID number(10) NOT NULL, PRIMARY KEY (rollingStockModelID));
-CREATE TABLE Enterprise (id number(10) GENERATED AS IDENTITY, name varchar2(50) NOT NULL, shortName varchar2(20) NOT NULL, vatNumber varchar2(40) NOT NULL, PRIMARY KEY (id));
+CREATE TABLE Enterprise (id number(10) GENERATED AS IDENTITY, name varchar2(50) NOT NULL, shortName varchar2(20) NOT NULL, vatNumber varchar2(40) NOT NULL UNIQUE, PRIMARY KEY (id));
 CREATE TABLE Facility (id number(10) GENERATED AS IDENTITY, facilityTypeID number(10) NOT NULL, name varchar2(100) NOT NULL, posX number(22) NOT NULL, posY number(22) NOT NULL, PRIMARY KEY (id));
 CREATE TABLE Facility_Type (id number(10) GENERATED AS IDENTITY, typeName varchar2(50) NOT NULL, PRIMARY KEY (id));
 CREATE TABLE Gauge (id number(10) GENERATED AS IDENTITY, width_mm number(6) NOT NULL, description varchar2(50) NOT NULL, PRIMARY KEY (id));
