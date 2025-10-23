@@ -35,7 +35,6 @@ public class TrolleyPlan { // representa um trolley, (kg)
     public double getUsedWeight() { return usedWeight; }
     public List<TrolleyItem> getItems() { return items; }
 
-    @Override
     public String toString() { //descrição do trolley
         return String.format("Trolley #%d [%.1f / %.1f kg = %.1f%% full]",
                 trolleyNo, usedWeight, capacityKg, getUtilization());

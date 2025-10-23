@@ -12,14 +12,14 @@ public class EligibilityAllocationController {
 
     private List<Allocation> allocations = new ArrayList<>();// adicionado para usar na usei03
 
-    static class Allocation {
-        String orderId;
-        int lineNo;
-        String sku;
-        int qty;
-        String boxId;
-        int aisle;
-        int bay;
+    public static class Allocation {
+        public String orderId;
+        public int lineNo;
+        public String sku;
+        public int qty;
+        public String boxId;
+        public int aisle;
+        public int bay;
     }
 
     static class Eligibility {
@@ -32,12 +32,12 @@ public class EligibilityAllocationController {
     }
 
     public boolean Allocate(String mode) throws FileNotFoundException {
-        Bootstrap bootstrap = Bootstrap.getInstance();
 
-        CSVParser csvOrders = new CSVParser(bootstrap.getOrderCsv());
-        CSVParser csvOrderLines = new CSVParser(bootstrap.getOrder_linesCsv());
-        CSVParser csvWagons = new CSVParser(bootstrap.getWagonsCsv());
-        CSVParser csvBays = new CSVParser(bootstrap.getBaysCsv());
+        CSVParser csvOrders = new CSVParser("train_station_dataset/orders.csv");
+        CSVParser csvOrderLines = new CSVParser("train_station_dataset/order_lines.csv");
+        CSVParser csvWagons = new CSVParser("train_station_dataset/wagons.csv");
+        CSVParser csvBays = new CSVParser("train_station_dataset/bays.csv");
+
 
         List<Map<String, String>> mapOrders = csvOrders.getCSVData();
         List<Map<String, String>> mapOrderLines = csvOrderLines.getCSVData();
