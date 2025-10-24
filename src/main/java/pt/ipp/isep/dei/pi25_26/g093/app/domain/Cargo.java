@@ -1,68 +1,63 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Represents a cargo box stored or handled in the terminal.
+ */
 public class Cargo {
+
     private int boxID;
     private int sku;
     private int quantity;
-    private Date expiryDate; //Format : YYYY-MM-DD
-    private DateTime receivedAt; //Format : YYYY-MM-DDTHH:MM:SS
+    private LocalDate expiryDate;     // YYYY-MM-DD
+    private LocalDateTime receivedAt; // YYYY-MM-DDTHH:MM:SS
 
     /**
      * Creates a new Cargo with the given parameters.
-     * @param boxID ID of the box
-     * @param sku ID of the item
-     * @param quantity Quantity of items in the box
-     * @param expiryDate Date of expiry (YYYY-MM-DD)
-     * @param receivedAt Date of arrival (YYYY-MM-DDTHH:MM:SS)
+     *
+     * @param boxID       ID of the box
+     * @param sku         SKU of the product
+     * @param quantity    quantity in the box
+     * @param expiryDate  expiry date (YYYY-MM-DD) or null
+     * @param receivedAt  received date-time (YYYY-MM-DDTHH:MM:SS)
      */
-    public Cargo(int boxID, int sku, int quantity, String expiryDate, String receivedAt){
+    public Cargo(int boxID, int sku, int quantity, String expiryDate, String receivedAt) {
         this.boxID = boxID;
         this.sku = sku;
         this.quantity = quantity;
-        if (expiryDate == null || expiryDate.length() == 0){
-            expiryDate = "9999-12-31";
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        if (expiryDate == null || expiryDate.isBlank()) {
+            this.expiryDate = LocalDate.parse("9999-12-31", dateFormatter);
+        } else {
+            this.expiryDate = LocalDate.parse(expiryDate, dateFormatter);
         }
-        this.expiryDate = new Date(expiryDate);
-        this.receivedAt = new DateTime(receivedAt);
+
+        this.receivedAt = LocalDateTime.parse(receivedAt, dateTimeFormatter);
     }
 
-    /**
-     * Gets the ID of the box.
-     * @return ID of the box
-     */
-    public int getBoxID(){
+    public int getBoxID() {
         return boxID;
     }
 
-    /**
-     * Gets the ID of the item.
-     * @return ID of the item.
-     */
-    public int getSku(){
+    public int getSku() {
         return sku;
     }
 
-    /**
-     * Gets the quantity of items in the box.
-     * @return quantity of items in the box.
-     */
-    public int getQuantity(){
+    public int getQuantity() {
         return quantity;
     }
 
-    /**
-     * Gets the expiry date of the cargo.
-     * @return expiry date of the cargo.
-     */
-    public String getExpiryDate(){
+    public String getExpiryDate() {
         return expiryDate.toString();
     }
 
-    /**
-     * Gets the date and time when the cargo was received.
-     * @return date and time when the cargo was received.
-     */
-    public String getReceivedAt(){
+    public String getReceivedAt() {
         return receivedAt.toString();
     }
 }
