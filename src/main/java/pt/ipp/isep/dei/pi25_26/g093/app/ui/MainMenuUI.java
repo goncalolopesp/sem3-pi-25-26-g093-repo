@@ -1,5 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.service.PickingPlanner;
+
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
@@ -20,6 +22,10 @@ public class MainMenuUI {
                 case 2:
                     AllocationUI allocationUI = new AllocationUI();
                     allocationUI.run();
+                    break;
+                case 3:
+                    PickingPlanner pickingPlanner = new PickingPlanner();
+                    pickingPlanner.run();
                     break;
             }
             DisplayHeader();

@@ -97,7 +97,7 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
         }
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void run() throws FileNotFoundException {
         PickingPlanner planner = new PickingPlanner();
 
         List<TrolleyPlan> plans = planner.generatePickingPlan(60.0, "FFD");
