@@ -4,36 +4,55 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class MainMenuUI {
+
     /**
-     * Shows the main menu and asks for an option. Also, connects the option to the respective UI.
+     * Shows the main menu and asks for an option.
+     * Connects the option to the respective UI.
      */
     public void showMainMenu() throws FileNotFoundException {
-        DisplayHeader();
+        displayHeader();
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();
-        while (option > 0){
-            switch (option){
-                case 1:
+        scanner.nextLine(); // consumir newline
+
+        while (option > 0) {
+            switch (option) {
+                case 1 -> {
                     WagonUI wagonUI = new WagonUI();
                     wagonUI.run();
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     AllocationUI allocationUI = new AllocationUI();
                     allocationUI.run();
-                    break;
+                }
+                case 3 -> {
+                    // Exemplo de outro módulo (se já existir)
+                    System.out.println("Station Storage Manager ainda não implementado.");
+                }
+                case 4 -> {
+                    // Aqui chamamos o módulo da USPL02
+                    CargoHandlingUI cargoUI = new CargoHandlingUI();
+                    cargoUI.showMenu();
+                }
+                default -> System.out.println("Opção inválida.");
             }
-            DisplayHeader();
-            scanner.nextLine();
+
+            displayHeader();
             option = scanner.nextInt();
+            scanner.nextLine();
         }
+
+        System.out.println("A sair do programa...");
     }
 
-    private void DisplayHeader()
-    {
-        System.out.println("Main Menu:");
+    private void displayHeader() {
+        System.out.println("\n=== MAIN MENU ===");
         System.out.println("1. Show Wagons");
         System.out.println("2. Order Eligibility & Allocation");
+        System.out.println("3. As a Station Storage Manager");
+        System.out.println("4. Cargo Handling Operations (USPL02)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
+        System.out.print("Escolha uma opção: ");
     }
 }
