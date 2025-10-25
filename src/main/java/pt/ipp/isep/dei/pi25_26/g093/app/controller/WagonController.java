@@ -45,7 +45,7 @@ public class WagonController {
      * @param expiryDate The Expiry Date of the items
      * @param receivedAt The Date the items were received
      */
-    public void addWagon(int wagonID, int boxID, int sku, int quantity, String expiryDate, String receivedAt){
+    public void addWagon(String wagonID, String boxID, String sku, int quantity, String expiryDate, String receivedAt){
         Wagon newWagon = new Wagon(wagonID, boxID, sku, quantity, expiryDate, receivedAt);
         this.addWagon(newWagon);
     }
@@ -76,7 +76,7 @@ public class WagonController {
                     DateTime r2 = new DateTime(list.get(j + 1).getCargo().getReceivedAt());
                     int cmp = r1.compareTo(r2);
                     if (cmp > 0 || (cmp == 0 &&
-                            list.get(j).getCargo().getBoxID() > list.get(j + 1).getCargo().getBoxID())) {
+                            list.get(j).getCargo().getBoxID().compareTo(list.get(j + 1).getCargo().getBoxID()) > 0)) {
                         Wagon temp = list.get(j);
                         list.set(j, list.get(j + 1));
                         list.set(j + 1, temp);
@@ -148,12 +148,12 @@ public class WagonController {
     private void sortWagonsByBoxID(List<Wagon> wagons) {
         for (int i = 0; i < wagons.size() - 1; i++) {
             for (int j = 0; j < wagons.size() - i - 1; j++) {
-                int id1 = wagons.get(j).getCargo().getBoxID();
-                int id2 = wagons.get(j + 1).getCargo().getBoxID();
-                if (id1 > id2) {
-                    Wagon temp = wagons.get(j);
+                String id1 = wagons.get(j).getCargo().getBoxID();
+                String id2 = wagons.get(j + 1).getCargo().getBoxID();
+                if (id1.compareTo(id2) > 0) {
+                    Wagon tmp = wagons.get(j);
                     wagons.set(j, wagons.get(j + 1));
-                    wagons.set(j + 1, temp);
+                    wagons.set(j + 1, tmp);
                 }
             }
         }
