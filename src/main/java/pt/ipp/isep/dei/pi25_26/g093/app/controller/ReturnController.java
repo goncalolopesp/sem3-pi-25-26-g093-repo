@@ -12,8 +12,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Controller responsible for managing return items in the terminal.
+ * Handles the quarantine process, classification, inspection,
+ * restocking, and discard operations, including audit logging.
+ *
+ * This functionality corresponds to USEI05 - Returns & Quarantine.
+ */
 public class ReturnController {
 
+    /** File path for the audit logs. */
     private static final String LOG_PATH = "logs/audit_log.txt";
 
     private final WagonController wagonController;
@@ -23,12 +31,26 @@ public class ReturnController {
     private PriorityQueue<ReturnItem> quarantine;
     private List<ReturnItem> discarded = new ArrayList<>();
 
+    /**
+     * Creates a new ReturnController with dependencies on warehouse
+     * and wagon controllers.
+     *
+     * @param wagonController controller responsible for wagon operations
+     * @param warehouseController controller responsible for warehouse operations
+     */
     public ReturnController(WagonController wagonController, WarehouseController warehouseController) {
         this.wagonController = wagonController;
         this.warehouseController = warehouseController;
         this.quarantine = new PriorityQueue<>();
     }
 
+    /**
+     * Loads return items from a predefined CSV file.
+     * Invalid records are ignored with warning output.
+     *
+     * @return list of valid ReturnItem objects
+     * @throws FileNotFoundException if the CSV file cannot be found
+     */
     public List<ReturnItem> loadReturnItems() throws FileNotFoundException {
         String path = "train_station_dataset/returns.csv";
         List<ReturnItem> returnItems = new ArrayList<>();
@@ -47,6 +69,12 @@ public class ReturnController {
         return returnItems;
     }
 
+    /**
+     * Processes a list of return items by classifying them into restockable,
+     * quarantined, or discarded groups based on return reason.
+     *
+     * @param returns list of returns to process
+     */
     public void processReturns(List<ReturnItem> returns) {
         restocked.clear();
         quarantine.clear();
@@ -57,26 +85,34 @@ public class ReturnController {
         }
     }
 
+    /**
+     * Classifies an item into discarded or quarantined based on its return reason.
+     * Expired and damaged items are discarded immediately.
+     * Customer-remorse and cycle-count are quarantined.
+     *
+     * @param item return item to classify
+     */
     private void classifyReturn(ReturnItem item) {
         String reason = normalizeReason(item.getReason());
 
-        // Expired or damaged items go directly to quarantine? No! Directly to discard!
         if (reason.equals("expired") || reason.equals("damaged")) {
             discarded.add(item);
             writeAuditLog(item, "Discarded", 0, item.getQuantity());
             return;
         }
 
-        // Customer remorse and cycle count go into quarantine
         if (reason.equals("customer-remorse") || reason.equals("cycle-count")) {
             quarantine.add(item);
         } else {
-            // Unknown reasons -> discard
             discarded.add(item);
             writeAuditLog(item, "Discarded", 0, item.getQuantity());
         }
     }
 
+    /**
+     * Inspects all items in quarantine, evaluating expiration and SKU existence,
+     * and deciding whether to restock or discard each item.
+     */
     public void inspectQuarantine() {
         while (!quarantine.isEmpty()) {
             ReturnItem item = quarantine.poll();
@@ -84,10 +120,15 @@ public class ReturnController {
         }
     }
 
+    /**
+     * Decides whether an item should be restocked or discarded, and performs
+     * warehouse insertion using FEFO rules if possible.
+     *
+     * @param item item to inspect
+     */
     private void restockOrDiscard(ReturnItem item) {
         int qty = item.getQuantity();
 
-        // If SKU does not exist -> discard all
         if (!warehouseController.skuExists(item.getSku())) {
             discarded.add(item);
             writeAuditLog(item, "Discarded", 0, qty);
@@ -116,8 +157,8 @@ public class ReturnController {
         if (stored) {
             restocked.add(item);
         } else {
-            qtyDiscard = qty;
             qtyRestock = 0;
+            qtyDiscard = qty;
             discarded.add(item);
         }
 
@@ -128,16 +169,37 @@ public class ReturnController {
         );
     }
 
+    /**
+     * Normalizes return reasons for comparison.
+     *
+     * @param r reason input
+     * @return normalized string representing the reason
+     */
     private String normalizeReason(String r) {
         if (r == null) return "";
         return r.toLowerCase().trim().replace(" ", "-").replace("_", "-");
     }
 
+    /**
+     * Verifies if the returned product has expired.
+     *
+     * @param item return item to check
+     * @return true if expired, false otherwise
+     */
     private boolean isExpired(ReturnItem item) {
         if (item.getExpiryDate() == null) return false;
         return item.getExpiryDate().isBefore(LocalDate.now());
     }
 
+    /**
+     * Writes the result of the inspection to an audit log file.
+     * Includes return ID, SKU, quantities processed, and timestamp.
+     *
+     * @param item processed return item
+     * @param action type of outcome: Restocked or Discarded
+     * @param qtyRestocked quantity successfully reinserted into stock
+     * @param qtyDiscarded quantity discarded due to expired or invalid conditions
+     */
     private void writeAuditLog(ReturnItem item, String action, int qtyRestocked, int qtyDiscarded) {
         try (FileWriter writer = new FileWriter(LOG_PATH, true)) {
             String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -159,9 +221,15 @@ public class ReturnController {
         }
     }
 
+    /** @return warehouse controller used by this component */
     public WarehouseController getWarehouseController() {return warehouseController;}
 
+    /** @return list of items successfully restocked */
     public List<ReturnItem> getRestocked() { return restocked; }
+
+    /** @return priority queue of quarantined items pending inspection */
     public PriorityQueue<ReturnItem> getQuarantine() { return quarantine; }
+
+    /** @return list of items discarded during processing */
     public List<ReturnItem> getDiscarded() { return discarded; }
 }

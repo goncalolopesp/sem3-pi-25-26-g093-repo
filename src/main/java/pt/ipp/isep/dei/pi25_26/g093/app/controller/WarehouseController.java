@@ -11,44 +11,67 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller responsible for managing warehouse operations including inventory storage and
+ * warehouse structure loading. This controller interacts with the WarehouseRepository to retrieve
+ * and store information.
+ *
+ * This functionality supports cargo unloading, restocking and validation rules applied in USEI01,
+ * USEI02, USEI03 and USEI05 user stories.
+ */
 public class WarehouseController {
+
+    /** Singleton access to repositories */
     Repositories repositories = Repositories.getInstance();
 
     /**
-     * Constructor of the WarehouseController class
+     * Creates a new WarehouseController instance.
      */
-    public WarehouseController(){
-    }
+    public WarehouseController(){ }
 
     /**
-     * Gets the WarehouseRepository
-     * @return WarehouseRepository
+     * Retrieves the WarehouseRepository instance.
+     *
+     * @return the WarehouseRepository holding all warehouse data
      */
     public WarehouseRepository getRepo(){
         return repositories.getWarehouseRepository();
     }
 
     /**
-     * Gets all the stored warehouses
-     * @return Stored Warehouses in the WarehouseRepository
+     * Retrieves all warehouses currently stored in the system.
+     *
+     * @return list of warehouses
      */
     public List<Warehouse> getWarehouses(){
         return getRepo().getWarehouseList();
     }
 
     /**
-     * Adds a new warehouse to the WarehouseRepository
-     * @param w Warehouse to be added to the WarehouseRepository
+     * Adds a new warehouse to the repository.
+     *
+     * @param w warehouse to add
      */
     public void addWarehouse(Warehouse w){
         getRepo().add(w);
     }
 
+    /**
+     * Stores cargo according to FEFO (First-Expired-First-Out) rules.
+     * Cargo with the same SKU should be inserted in the same bay when possible.
+     * Cargo ordering inside the bay is based first on earliest expiry date then by received date.
+     *
+     * If no bay contains the SKU, the cargo is stored in the first empty bay with available capacity.
+     *
+     * @param cargo cargo to be stored
+     * @return true if successfully stored, false if no capacity available
+     */
     public boolean storeCargoFEFO(Cargo cargo) {
 
         String targetSku = cargo.getSku();
         List<Bay> candidateBays = new ArrayList<>();
 
+        // Search for bays already storing the SKU
         for (Warehouse wh : getWarehouses()) {
             if (wh.getAisles() != null) {
                 for (Aisle aisle : wh.getAisles()) {
@@ -66,6 +89,7 @@ public class WarehouseController {
             }
         }
 
+        // Store in first compatible empty bay if no SKU-matching bay found
         if (candidateBays.isEmpty()) {
             for (Warehouse wh : getWarehouses()) {
                 for (Aisle aisle : wh.getAisles()) {
@@ -80,6 +104,7 @@ public class WarehouseController {
             return false;
         }
 
+        // Insert cargo in FEFO order if SKU-matching bay found
         for (Bay bay : candidateBays) {
             if (bay.getCargo().size() < bay.getCapacity()) {
 
@@ -100,10 +125,19 @@ public class WarehouseController {
         return false;
     }
 
+    /**
+     * Loads a warehouse structure from CSV dataset containing the following fields:
+     * warehouseId, aisle, bay, capacityBoxes.
+     *
+     * Warehouses are constructed dynamically using the input data.
+     *
+     * @param csvData list of CSV rows parsed into key-value mappings
+     */
     public void loadWarehouses(List<Map<String, String>> csvData) {
 
         List<Integer> warehouseIds = new ArrayList<>();
 
+        // Identify unique warehouse IDs
         for (Map<String, String> line : csvData) {
             int whId = Integer.parseInt(line.get("warehouseId").replaceAll("[^0-9]", ""));
             if (!warehouseIds.contains(whId)) {
@@ -111,6 +145,7 @@ public class WarehouseController {
             }
         }
 
+        // Create aisles and bays for each warehouse
         for (int whId : warehouseIds) {
             List<Aisle> aisles = new ArrayList<>();
 
@@ -138,10 +173,15 @@ public class WarehouseController {
             addWarehouse(warehouse);
         }
 
-        System.out.println("Warehouses carregados: " + getWarehouses().size());
+        System.out.println("Warehouses loaded: " + getWarehouses().size());
     }
 
-
+    /**
+     * Checks whether a given SKU exists in any bay in the warehouse structure.
+     *
+     * @param sku SKU code to search for
+     * @return true if any bay contains the SKU, false otherwise
+     */
     public boolean skuExists(String sku) {
         for (Warehouse wh : getWarehouses()) {
             if (wh.getAisles() != null) {
