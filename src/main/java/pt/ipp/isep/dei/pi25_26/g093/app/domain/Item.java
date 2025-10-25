@@ -18,7 +18,7 @@ public class Item {
         Box
     }
 
-    private int sku;
+    private String sku;
     private String name;
     private Category category;
     private Unit unit;
@@ -34,7 +34,7 @@ public class Item {
      * @param volume Volume of the item
      * @param unitWeight Weight of the item
      */
-    public Item(int sku, String name, String category, String unit, double volume, double unitWeight){
+    public Item(String sku, String name, String category, String unit, double volume, double unitWeight){
         this.sku = sku;
         this.name = name;
         switch (category){
@@ -57,8 +57,8 @@ public class Item {
                 this.category = Category.Grocery;
                 break;
             default:
-               System.err.println("SKU " + sku + " has an invalid category: " + category);
-               return;
+                System.err.println("SKU " + sku + " has an invalid category: " + category);
+                return;
         }
 
         switch(unit){
