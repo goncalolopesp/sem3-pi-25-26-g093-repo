@@ -1,7 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 public class Wagon {
-    private int wagonID;
+    private String wagonID;
     private Cargo cargo;
 
     /**
@@ -9,7 +9,7 @@ public class Wagon {
      * @param wagonID ID of the Wagon
      * @param cargo Cargo of the Wagon.
      */
-    public Wagon(int wagonID, Cargo cargo) {
+    public Wagon(String wagonID, Cargo cargo) {
         this.wagonID = wagonID;
         this.cargo = cargo;
     }
@@ -23,7 +23,7 @@ public class Wagon {
      * @param expiryDate Date of expiry (YYYY-MM-DD)
      * @param receivedAt Date of arrival (YYYY-MM-DDTHH:MM:SS)
      */
-    public Wagon(int wagonID, int boxID, int sku, int quantity, String expiryDate, String receivedAt){
+    public Wagon(String wagonID, String boxID, String sku, int quantity, String expiryDate, String receivedAt){
         Cargo newCargo = new Cargo(boxID, sku, quantity, expiryDate, receivedAt);
         this.wagonID = wagonID;
         this.cargo = newCargo;
@@ -33,7 +33,7 @@ public class Wagon {
      * Gets the ID of the Wagon
      * @return ID of the Wagon
      */
-    public int getwagonID(){
+    public String getwagonID(){
         return wagonID;
     }
 
@@ -49,7 +49,8 @@ public class Wagon {
      * Gets a String representation of the Wagon.
      * @return a String representation of the Wagon.
      */
-    public String toString(){
-        return "Wagon " + wagonID;
+    @Override
+    public String toString() {
+        return String.format("Wagon %s -> %s", wagonID, cargo.toString());
     }
 }

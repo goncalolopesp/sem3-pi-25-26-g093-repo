@@ -45,7 +45,7 @@ public class ReturnItem implements Comparable<ReturnItem>{
 
         String expiryRaw = data.get("expiryDate");
 
-         if (expiryRaw == null || expiryRaw.isBlank()) {
+        if (expiryRaw == null || expiryRaw.isBlank()) {
             expiry = null;
         } else {
             expiry = LocalDate.parse(expiryRaw, dateFmt);
@@ -90,4 +90,3 @@ public class ReturnItem implements Comparable<ReturnItem>{
                 returnID, sku, quantity, reason, timeStamp, expiryDate);
     }
 }
-
