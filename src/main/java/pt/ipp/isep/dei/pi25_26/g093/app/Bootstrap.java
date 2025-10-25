@@ -207,9 +207,9 @@ public class Bootstrap {
 
             for (Map<String, String> csvLine : csvData) {
                 int qty = Integer.parseInt(csvLine.get("qty").trim());
-                int wagonId = Integer.parseInt(csvLine.get("wagonId").substring(3).trim());
-                int boxId = Integer.parseInt(csvLine.get("boxId").substring(3).trim());
-                int sku = Integer.parseInt(csvLine.get("sku").substring(3).trim());
+                String wagonId = csvLine.get("wagonId").trim();
+                String boxId = csvLine.get("boxId").trim();
+                String sku = csvLine.get("sku").trim();
                 String expiryDate = csvLine.get("expiryDate").trim();
                 String receivedAt = csvLine.get("receivedAt").trim();
 
@@ -259,12 +259,11 @@ public class Bootstrap {
 
             for (Map<String, String> csvLine : csvData) {
                 int qty = Integer.parseInt(csvLine.get("qty").trim());
-                int wagonId = Integer.parseInt(csvLine.get("wagonId").substring(3).trim());
-                int boxId = Integer.parseInt(csvLine.get("boxId").substring(3).trim());
-                int sku = Integer.parseInt(csvLine.get("sku").substring(3).trim());
+                String wagonId = csvLine.get("wagonId").trim();
+                String boxId = csvLine.get("boxId").trim();
+                String sku = csvLine.get("sku").trim();
                 String expiryDate = csvLine.get("expiryDate").trim();
                 String receivedAt = csvLine.get("receivedAt").trim();
-
                 wagons.add(new Wagon(wagonId, boxId, sku, qty, expiryDate, receivedAt));
             }
 
