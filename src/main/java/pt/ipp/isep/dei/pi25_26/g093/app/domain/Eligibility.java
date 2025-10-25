@@ -69,7 +69,7 @@ public class Eligibility {
 
     @Override
     public String toString() {
-        return String.format("Eligibility{orderId=%s, lineNo=%s, sku=%s, requestedQty=%d, allocatedQty=%d, status=%s}",
+        return String.format("Eligibility: orderId=%s | lineNo=%s | sku=%s | requestedQty=%d | allocatedQty=%d | status=%s}",
                 orderId, lineNo, sku, requestedQty, allocatedQty, status);
     }
 }

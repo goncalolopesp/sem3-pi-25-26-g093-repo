@@ -120,12 +120,12 @@ public class EligibilityAllocationController {
 
         System.out.println("=== Eligibility ===");
         for(Eligibility e : eligibilities) {
-            System.out.printf(e.toString());
+            System.out.println(e.toString());
         }
 
         System.out.println("\n=== Allocations ===");
         for(Allocation a : allocations) {
-            System.out.printf(a.toString());
+            System.out.println(a.toString());
         }
 
         return true;

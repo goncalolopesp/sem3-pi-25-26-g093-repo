@@ -78,7 +78,7 @@ public class Allocation {
 
     @Override
     public String toString() {
-        return String.format("Allocation{orderId=%s, lineNo=%s, sku=%s, qty=%d, boxId=%s, aisle=%s, bay=%s}",
+        return String.format("Allocation: orderId=%s | lineNo=%s | sku=%s | qty=%d | boxId=%s | aisle=%s | bay=%s}",
                 orderId, lineNo, sku, qty, boxId, aisle, bay);
     }
 }
