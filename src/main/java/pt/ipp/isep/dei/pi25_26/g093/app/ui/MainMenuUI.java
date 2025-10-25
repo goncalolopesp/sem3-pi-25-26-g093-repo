@@ -25,7 +25,12 @@ public class MainMenuUI {
                     break;
                 case 3:
                     PickingPlanner pickingPlanner = new PickingPlanner();
-                    pickingPlanner.run();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + option);
+                case 4:
+                    ReturnUI returnUI = new ReturnUI();
+                    returnUI.run();
                     break;
             }
             DisplayHeader();
