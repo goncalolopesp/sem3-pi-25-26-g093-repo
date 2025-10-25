@@ -1,6 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.Bootstrap;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Allocation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.DateTime;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
@@ -10,17 +11,7 @@ import java.util.*;
 
 public class EligibilityAllocationController {
 
-    private List<Allocation> allocations = new ArrayList<>();// adicionado para usar na usei03
-
-    public static class Allocation {
-        public String orderId;
-        public int lineNo;
-        public String sku;
-        public int qty;
-        public String boxId;
-        public int aisle;
-        public int bay;
-    }
+    private List<Allocation> allocations = new ArrayList<>();
 
     static class Eligibility {
         String orderId;
@@ -37,7 +28,6 @@ public class EligibilityAllocationController {
         CSVParser csvOrderLines = new CSVParser("train_station_dataset/order_lines.csv");
         CSVParser csvWagons = new CSVParser("train_station_dataset/wagons.csv");
         CSVParser csvBays = new CSVParser("train_station_dataset/bays.csv");
-
 
         List<Map<String, String>> mapOrders = csvOrders.getCSVData();
         List<Map<String, String>> mapOrderLines = csvOrderLines.getCSVData();
@@ -78,14 +68,10 @@ public class EligibilityAllocationController {
 
                                 if(capacity > 0 && allocated > 0)
                                 {
-                                    Allocation allocation = new Allocation();
-                                    allocation.orderId = order;
-                                    allocation.lineNo = lineNo;
-                                    allocation.sku = sku;
-                                    allocation.qty = allocated;
-                                    allocation.boxId = mapWagons.get(w).get("boxId");
-                                    allocation.aisle = Integer.parseInt(mapBays.get(b).get("aisle"));
-                                    allocation.bay = Integer.parseInt(mapBays.get(b).get("bay"));
+                                    String boxID = mapWagons.get(w).get("boxId");
+                                    int aisle = Integer.parseInt(mapBays.get(b).get("aisle"));
+                                    int bay = Integer.parseInt(mapBays.get(b).get("bay"));
+                                    Allocation allocation = new Allocation(order, lineNo, sku, allocated, boxID, aisle, bay);
 
                                     //Update Bay
                                     Object[] bayData = mapBays.get(b).values().toArray();

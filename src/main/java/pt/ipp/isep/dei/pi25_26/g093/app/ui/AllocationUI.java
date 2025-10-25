@@ -14,7 +14,7 @@ public class AllocationUI {
     }
 
     /**
-     * Adds wagons to Bays in Aisles in Warehouses and outputs the success or failure of the operation.
+     * Allocates orders based on capacity and quantity
      */
     private void ElibilityAllocation() throws FileNotFoundException {
 
