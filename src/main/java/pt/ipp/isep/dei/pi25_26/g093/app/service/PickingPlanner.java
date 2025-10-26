@@ -3,27 +3,47 @@ package pt.ipp.isep.dei.pi25_26.g093.app.service;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Allocation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyItem;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyPlan;
+import pt.ipp.isep.dei.pi25_26.g093.app.controller.EligibilityAllocationController;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import pt.ipp.isep.dei.pi25_26.g093.app.controller.EligibilityAllocationController;
-import java.io.FileNotFoundException;
 
+/**
+ * Service class responsible for generating picking plans (USEI03).
+ * <p>
+ * This class receives order allocations from USEI02 and distributes them
+ * into trolleys according to a chosen heuristic algorithm:
+ * <ul>
+ *     <li>FF - First Fit</li>
+ *     <li>FFD - First Fit Decreasing</li>
+ *     <li>BFD - Best Fit Decreasing</li>
+ * </ul>
+ * Each generated trolley plan respects the defined weight capacity.
+ */
+public class PickingPlanner {
 
-public class PickingPlanner { //Cria um plano de picking segundo a heurística escolhida. "FF", "FFD" ou "BFD
-
+    /**
+     * Generates a picking plan using the selected heuristic mode.
+     *
+     * @param trolleyCapacity the maximum capacity (in kilograms) of each trolley
+     * @param mode the algorithm to apply: "FF", "FFD" or "BFD"
+     * @return a list of {@link TrolleyPlan} objects representing each loaded trolley
+     * @throws FileNotFoundException if any required CSV file cannot be found
+     */
     public List<TrolleyPlan> generatePickingPlan(double trolleyCapacity, String mode) throws FileNotFoundException {
-        //cria um controlador e corre o allocate
+        // Create controller and execute order allocation (USEI02)
         EligibilityAllocationController controller = new EligibilityAllocationController();
-        controller.Allocate("partial"); // ou "strict" se quiseres modo total
+        controller.Allocate("partial");
 
-        //localizar as allocacions geradas
+        // Retrieve generated allocations
         List<Allocation> allocations = controller.getAllocations();
 
-        //converter allocations em TrolleyItem
+        // Convert allocations into TrolleyItems
         List<TrolleyItem> items = new ArrayList<>();
         for (Allocation alloc : allocations) {
-            double unitWeight = 2.0; // Exemplo temporário, muda quando tiveres peso real
+            double unitWeight = 2.0; // Temporary example value until real data is available
             double totalWeight = alloc.getQty() * unitWeight;
 
             TrolleyItem item = new TrolleyItem(
@@ -38,15 +58,15 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
             items.add(item);
         }
 
-        //mantém o algoritmo de heurística exatamente igual
+        // Apply heuristic sorting if necessary
         List<TrolleyItem> itemsCopy = new ArrayList<>(items);
-
         if (mode.equalsIgnoreCase("FFD") || mode.equalsIgnoreCase("BFD")) {
             itemsCopy.sort(Comparator.comparingDouble(TrolleyItem::getWeight).reversed());
         }
 
         List<TrolleyPlan> trolleys = new ArrayList<>();
 
+        // Distribute items into trolleys
         for (TrolleyItem item : itemsCopy) {
             boolean placed = false;
 
@@ -75,6 +95,7 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
                 }
             }
 
+            // Create a new trolley if the item did not fit anywhere
             if (!placed) {
                 TrolleyPlan newTrolley = new TrolleyPlan(trolleys.size() + 1, trolleyCapacity);
                 newTrolley.tryAdd(item);
@@ -85,9 +106,11 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
         return trolleys;
     }
 
-
-    //mostra um relatório simples dos trolleys
-
+    /**
+     * Displays a summary of the generated picking plans in the console.
+     *
+     * @param trolleys the list of trolley plans to display
+     */
     public void displayPlan(List<TrolleyPlan> trolleys) {
         System.out.println("=== Picking Plan Summary ===");
         for (TrolleyPlan trolley : trolleys) {
@@ -97,15 +120,8 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
             }
         }
     }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        PickingPlanner planner = new PickingPlanner();
-
-        List<TrolleyPlan> plans = planner.generatePickingPlan(60.0, "FFD");
-
-        System.out.println("\n--- Picking Plan (dados reais da USEI02) ---");
-        planner.displayPlan(plans);
-    }
 }
+
+
 
 
