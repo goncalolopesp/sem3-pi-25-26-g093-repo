@@ -1,6 +1,5 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.service;
 
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.Allocation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyItem;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyPlan;
 import java.util.ArrayList;
@@ -18,21 +17,21 @@ public class PickingPlanner { //Cria um plano de picking segundo a heurística e
         controller.Allocate("partial"); // ou "strict" se quiseres modo total
 
         //localizar as allocacions geradas
-        List<Allocation> allocations = controller.getAllocations();
+        List<EligibilityAllocationController.Allocation> allocations = controller.getAllocations();
 
         //converter allocations em TrolleyItem
         List<TrolleyItem> items = new ArrayList<>();
-        for (Allocation alloc : allocations) {
+        for (EligibilityAllocationController.Allocation alloc : allocations) {
             double unitWeight = 2.0; // Exemplo temporário, muda quando tiveres peso real
-            double totalWeight = alloc.getQty() * unitWeight;
+            double totalWeight = alloc.qty * unitWeight;
 
             TrolleyItem item = new TrolleyItem(
-                    alloc.getOrderId(),
-                    alloc.getSku(),
-                    alloc.getQty(),
+                    alloc.orderId,
+                    alloc.sku,
+                    alloc.qty,
                     totalWeight,
-                    alloc.getAisle(),
-                    alloc.getBay()
+                    alloc.aisle,
+                    alloc.bay
             );
 
             items.add(item);
