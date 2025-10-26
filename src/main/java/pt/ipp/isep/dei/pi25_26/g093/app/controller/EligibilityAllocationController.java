@@ -10,7 +10,7 @@ import java.util.*;
 
 public class EligibilityAllocationController {
 
-    private List<Allocation> allocations = new ArrayList<>();
+    private List<Allocation> allocations = new ArrayList<>();// adicionado para usar na usei03
 
     public static class Allocation {
         public String orderId;
@@ -33,10 +33,11 @@ public class EligibilityAllocationController {
 
     public boolean Allocate(String mode) throws FileNotFoundException {
 
-        CSVParser csvOrders = new CSVParser("train_station_dataset/orders.csv");
+        CSVParser csvOrders = new CSVParser("train_station_dataset/orders.csv"); // later switch to bootstrap
         CSVParser csvOrderLines = new CSVParser("train_station_dataset/order_lines.csv");
         CSVParser csvWagons = new CSVParser("train_station_dataset/wagons.csv");
         CSVParser csvBays = new CSVParser("train_station_dataset/bays.csv");
+
 
         List<Map<String, String>> mapOrders = csvOrders.getCSVData();
         List<Map<String, String>> mapOrderLines = csvOrderLines.getCSVData();
@@ -249,8 +250,8 @@ public class EligibilityAllocationController {
 
                 if(!data[0].toString().isEmpty() && !data2[0].toString().isEmpty())
                 {
-                    Date date1 = new Date(data[0].toString());
-                    Date date2 = new Date(data2[0].toString());
+                    pt.ipp.isep.dei.pi25_26.g093.app.domain.Date date1 = new pt.ipp.isep.dei.pi25_26.g093.app.domain.Date(data[0].toString());
+                    pt.ipp.isep.dei.pi25_26.g093.app.domain.Date date2 = new Date(data2[0].toString());
 
                     if(date1.compareTo(date2) == -1)
                     {
