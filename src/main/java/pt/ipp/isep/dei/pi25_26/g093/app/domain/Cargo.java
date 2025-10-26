@@ -41,6 +41,39 @@ public class Cargo {
         this.receivedAt = LocalDateTime.parse(receivedAt, dateTimeFormatter);
     }
 
+    /**
+     * Constructor for returned goods support (USEI05).
+     * boxID and sku are strings because they may contain prefixes such as "RET-" or alphanumeric codes.
+     */
+    public Cargo(String boxID, String sku, int quantity, String expiryDate, String receivedAt) {
+
+        try {
+            this.boxID = Integer.parseInt(boxID.replaceAll("\\D+", ""));
+        } catch (NumberFormatException e) {
+            this.boxID = -1;
+        }
+
+        try {
+            this.sku = Integer.parseInt(sku.replaceAll("\\D+", ""));
+        } catch (NumberFormatException e) {
+            this.sku = -1;
+        }
+
+        this.quantity = quantity;
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        if (expiryDate == null || expiryDate.isBlank()) {
+            this.expiryDate = LocalDate.parse("9999-12-31", dateFormatter);
+        } else {
+            this.expiryDate = LocalDate.parse(expiryDate, dateFormatter);
+        }
+
+        this.receivedAt = LocalDateTime.parse(receivedAt, dateTimeFormatter);
+    }
+
+
     public int getBoxID() {
         return boxID;
     }

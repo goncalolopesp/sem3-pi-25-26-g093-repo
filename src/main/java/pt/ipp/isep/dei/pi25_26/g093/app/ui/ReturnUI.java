@@ -2,7 +2,6 @@ package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.ReturnController;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.ReturnItem;
-import pt.ipp.isep.dei.pi25_26.g093.app.service.ReturnService;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -10,13 +9,14 @@ import java.util.Scanner;
 
 public class ReturnUI {
 
+
+    Scanner sc = new Scanner(System.in);
+
     private final ReturnController controller;
-    private final ReturnService service;
 
     public ReturnUI() {
         this.controller = new ReturnController();
-        this.service = new ReturnService();
-    }
+     }
 
     public void run() {
         Scanner sc = new Scanner(System.in);
@@ -26,6 +26,7 @@ public class ReturnUI {
             System.out.println("\n=== RETURNS & QUARANTINE MENU ===");
             System.out.println("1. Process returns from file");
             System.out.println("2. Show summary of last processing");
+            System.out.println("3. Process quarantine items");
             System.out.println("0. Exit");
             System.out.print("Option: ");
 
@@ -37,6 +38,9 @@ public class ReturnUI {
                     break;
                 case "2":
                     showSummary();
+                    break;
+                case "3":
+                    handleQuarantine();
                     break;
                 case "0":
                     exit = true;
@@ -58,7 +62,7 @@ public class ReturnUI {
                 return;
             }
 
-            service.processReturns(returns);
+            controller.processReturns(returns);
             System.out.println("\nReturns processed successfully!");
             System.out.println("Audit log written to logs/audit_log.txt.");
 
@@ -69,11 +73,35 @@ public class ReturnUI {
         }
     }
 
+    private void handleQuarantine() {
+        ReturnItem item = controller.popQuarantineItem();
+
+        if (item == null) {
+            System.out.println("No items to inspect in quarantine.");
+            return;
+        }
+
+        System.out.println("\nInspecting quarantined return:");
+        System.out.println(item);
+
+        System.out.println("1. Restock");
+        System.out.println("2. Discard");
+        System.out.print("Option: ");
+        String option = sc.nextLine();
+
+        boolean restock = option.equals("1");
+
+        String action = controller.inspectItem(item, restock);
+
+        System.out.println("Completed. Action: " + action);
+    }
+
+
     private void showSummary() {
         System.out.println("\n---- RETURN PROCESSING SUMMARY ----");
-        System.out.println("Restocked items:   " + service.getRestocked().size());
-        System.out.println("Quarantined items: " + service.getQuarantine().size());
-        System.out.println("Discarded items:   " + service.getDiscarded().size());
+        System.out.println("Restocked items:   " + controller.getRestocked().size());
+        System.out.println("Quarantined items: " + controller.getQuarantine().size());
+        System.out.println("Discarded items:   " + controller.getDiscarded().size());
         System.out.println("-----------------------------------");
     }
 
