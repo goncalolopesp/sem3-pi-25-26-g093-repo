@@ -1,9 +1,11 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.Bootstrap;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Allocation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.DateTime;
-import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Eligibility;
+import pt.ipp.isep.dei.pi25_26.g093.app.utilities.*;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -11,25 +13,6 @@ import java.util.*;
 public class EligibilityAllocationController {
 
     private List<Allocation> allocations = new ArrayList<>();
-
-    public static class Allocation {
-        public String orderId;
-        public int lineNo;
-        public String sku;
-        public int qty;
-        public String boxId;
-        public int aisle;
-        public int bay;
-    }
-
-    static class Eligibility {
-        String orderId;
-        int lineNo;
-        String sku;
-        int requestedQty;
-        int allocatedQty;
-        String status;
-    }
 
     public boolean Allocate(String mode) throws FileNotFoundException {
 
@@ -77,14 +60,10 @@ public class EligibilityAllocationController {
 
                                 if(capacity > 0 && allocated > 0)
                                 {
-                                    Allocation allocation = new Allocation();
-                                    allocation.orderId = order;
-                                    allocation.lineNo = lineNo;
-                                    allocation.sku = sku;
-                                    allocation.qty = allocated;
-                                    allocation.boxId = mapWagons.get(w).get("boxId");
-                                    allocation.aisle = Integer.parseInt(mapBays.get(b).get("aisle"));
-                                    allocation.bay = Integer.parseInt(mapBays.get(b).get("bay"));
+                                    String boxID = mapWagons.get(w).get("boxId");
+                                    int aisle = Integer.parseInt(mapBays.get(b).get("aisle"));
+                                    int bay = Integer.parseInt(mapBays.get(b).get("bay"));
+                                    Allocation allocation = new Allocation(order, lineNo, sku, allocated, boxID, aisle, bay);
 
                                     //Update Bay
                                     Object[] bayData = mapBays.get(b).values().toArray();
@@ -117,26 +96,21 @@ public class EligibilityAllocationController {
                     }
                 }
 
-                Eligibility eligibility = new Eligibility();
-                eligibility.orderId = lineOrder;
-                eligibility.lineNo = lineNo;
-                eligibility.sku = mapOrderLines.get(l).get("sku");
-                eligibility.requestedQty = requested;
-                eligibility.allocatedQty = requested - remaining;
+                Eligibility eligibility = new Eligibility(lineOrder, lineNo, mapOrderLines.get(l).get("sku"), requested, requested - remaining);
 
                 if(remaining == 0)
                 {
-                    eligibility.status = "ELIGIBLE";
+                    eligibility.setStatus("ELIGIBLE");
                     allocations.addAll(lineAllocations);
                 }else
                 {
                     if(remaining < requested && mode.equals("partial"))
                     {
-                        eligibility.status = "PARTIAL";
+                        eligibility.setStatus("PARTIAL");
                         allocations.addAll(lineAllocations);
                     }else
                     {
-                        eligibility.status = "UNDISPATCHABLE";
+                        eligibility.setStatus("UNDISPATCHABLE");
                     }
                 }
 
@@ -146,14 +120,12 @@ public class EligibilityAllocationController {
 
         System.out.println("=== Eligibility ===");
         for(Eligibility e : eligibilities) {
-            System.out.printf("%s | line %d | %s | %d/%d | %s%n",
-                    e.orderId, e.lineNo, e.sku, e.allocatedQty, e.requestedQty, e.status);
+            System.out.println(e.toString());
         }
 
         System.out.println("\n=== Allocations ===");
         for(Allocation a : allocations) {
-            System.out.printf("%s | line %d | %s | qty=%d | box=%s | aisle=%s | bay=%s%n",
-                    a.orderId, a.lineNo, a.sku, a.qty, a.boxId, a.aisle, a.bay);
+            System.out.println(a.toString());
         }
 
         return true;
