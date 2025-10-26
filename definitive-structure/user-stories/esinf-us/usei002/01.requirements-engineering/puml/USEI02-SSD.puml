@@ -1,0 +1,24 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Warehouse\nPlanner" as Employee
+participant ":System" as System
+
+activate Employee
+
+    Employee -> System : asks for orders eligibility and allocation
+    activate System
+
+        System --> Employee : asks if mode is strict or partial
+    deactivate System
+
+    Employee -> System : selects mode
+    activate System
+
+        System --> Employee : returns the orders eligibility and allocation
+    deactivate System
+@enduml

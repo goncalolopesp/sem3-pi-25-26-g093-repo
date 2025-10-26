@@ -1,0 +1,29 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+class Allocation {
+    orderId;
+    lineNo;
+    sku;
+    qty;
+    boxId;
+    aisle;
+    bay;
+}
+
+class Eligibility {
+    orderId;
+    lineNo;
+    sku;
+    requestedQty;
+    allocatedQty;
+    status;
+}
+
+@enduml
