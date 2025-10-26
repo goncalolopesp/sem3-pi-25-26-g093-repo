@@ -5,10 +5,10 @@ import java.util.Scanner;
 
 /**
  * Main Menu of the application.
- * Provides access to the different modules:
- *  - USEI01: WagonUI (Show Wagons)
- *  - USEI02: AllocationUI (Order Allocation)
- *  - USEI03–05 via CargoHandlingUI (USPL02)
+ * Simplified to include only:
+ *  1. Team Presentation
+ *  2. Cargo Handling Operations (USPL02)
+ *  0. Exit
  */
 public class MainMenuUI {
 
@@ -24,10 +24,8 @@ public class MainMenuUI {
             option = readOption(scanner);
 
             switch (option) {
-                case 1 -> runWagonUI();
-                case 2 -> runAllocationUI();
-                case 3 -> showStationStorageManagerInfo();
-                case 4 -> runCargoHandlingUI();
+                case 1 -> showTeamPresentation();
+                case 2 -> runCargoHandlingUI();
                 case 0 -> System.out.println("A sair do programa...");
                 default -> System.out.println("❌ Opção inválida. Tente novamente.");
             }
@@ -40,10 +38,8 @@ public class MainMenuUI {
      */
     private void displayHeader() {
         System.out.println("\n=== MAIN MENU ===");
-        System.out.println("1. Show Wagons (USEI01)");
-        System.out.println("2. Order Eligibility & Allocation (USEI02)");
-        System.out.println("3. As a Station Storage Manager");
-        System.out.println("4. Cargo Handling Operations (USPL02)");
+        System.out.println("1. Apresentação da Equipa");
+        System.out.println("2. Cargo Handling Operations (USPL02)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Escolha uma opção: ");
@@ -59,46 +55,20 @@ public class MainMenuUI {
             System.out.print("Escolha uma opção: ");
         }
         int option = scanner.nextInt();
-        scanner.nextLine(); // limpar newline
+        scanner.nextLine(); // limpa newline
         return option;
     }
 
     /**
-     * Executes USEI01 – Show Wagons.
+     * Option 1 – Displays team presentation.
      */
-    private void runWagonUI() {
-        System.out.println("\n=== USEI01 - Show Wagons ===");
-        try {
-            WagonUI wagonUI = new WagonUI();
-            wagonUI.run();
-        } catch (Exception e) {
-            System.out.println("❌ Erro ao executar WagonUI: " + e.getMessage());
-        }
+    private void showTeamPresentation() {
+        TeamPresentationUI teamUI = new TeamPresentationUI();
+        teamUI.show();
     }
 
     /**
-     * Executes USEI02 – Order Allocation.
-     */
-    private void runAllocationUI() {
-        System.out.println("\n=== USEI02 - Order Allocation ===");
-        try {
-            AllocationUI allocationUI = new AllocationUI();
-            allocationUI.run();
-        } catch (Exception e) {
-            System.out.println("❌ Erro ao executar AllocationUI: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Placeholder for Station Storage Manager functionality.
-     */
-    private void showStationStorageManagerInfo() {
-        System.out.println("\n=== Station Storage Manager ===");
-        System.out.println("Esta opção será usada para funcionalidades futuras.");
-    }
-
-    /**
-     * Executes USPL02 – Cargo Handling Operations (USEI01→USEI05).
+     * Option 2 – Executes USPL02 (Cargo Handling Operations menu).
      */
     private void runCargoHandlingUI() {
         System.out.println("\n=== USPL02 - Cargo Handling Operations ===");
