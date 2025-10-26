@@ -10,13 +10,13 @@ public class AllocationUI {
      * Runs the code
      */
     public void run() throws FileNotFoundException {
-        ElibilityAllocation();
+        EligibilityAllocation();
     }
 
     /**
      * Adds wagons to Bays in Aisles in Warehouses and outputs the success or failure of the operation.
      */
-    private void ElibilityAllocation() throws FileNotFoundException {
+    private void EligibilityAllocation() throws FileNotFoundException {
 
         String mode;
 
