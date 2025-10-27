@@ -40,7 +40,7 @@ public class MainMenuUI {
      */
     private void displayHeader() {
         System.out.println("\n=== MAIN MENU ===");
-        System.out.println("1. Show Wagons (USEI01)");
+        System.out.println("1. Cargo Unloading to Warehouses (USEI01)");
         System.out.println("2. Order Eligibility & Allocation (USEI02)");
         System.out.println("3. As a Station Storage Manager");
         System.out.println("4. Cargo Handling Operations (USPL02)");
@@ -67,12 +67,12 @@ public class MainMenuUI {
      * Executes USEI01 – Show Wagons.
      */
     private void runWagonUI() {
-        System.out.println("\n=== USEI01 - Show Wagons ===");
-        try {
-            WagonUI wagonUI = new WagonUI();
-            wagonUI.run();
+        System.out.println("\n=== USEI01 - Cargo Unloading to Warehouses ===");
+        try{
+            WagonCargoUI wagonCargoUI = new WagonCargoUI();
+            wagonCargoUI.showMenu();
         } catch (Exception e) {
-            System.out.println("❌ Erro ao executar WagonUI: " + e.getMessage());
+            System.err.println("❌ Error executing WagonCargoUI: " + e.getMessage());
         }
     }
 
