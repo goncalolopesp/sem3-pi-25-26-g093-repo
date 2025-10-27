@@ -12,8 +12,11 @@ public class Cargo {
     private int boxID;
     private int sku;
     private int quantity;
-    private LocalDate expiryDate;     // YYYY-MM-DD
-    private LocalDateTime receivedAt; // YYYY-MM-DDTHH:MM:SS
+    private Date expiryDate;     // YYYY-MM-DD
+    private DateTime receivedAt; // YYYY-MM-DDTHH:MM:SS
+
+    // Flag indicating whether the cargo has a meaningful expiry date
+    private boolean hasExpiry;
 
     /**
      * Creates a new Cargo with the given parameters.
@@ -29,16 +32,15 @@ public class Cargo {
         this.sku = sku;
         this.quantity = quantity;
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
         if (expiryDate == null || expiryDate.isBlank()) {
-            this.expiryDate = LocalDate.parse("9999-12-31", dateFormatter);
+            this.expiryDate = new Date("9999-12-31");
+            this.hasExpiry = false;
         } else {
-            this.expiryDate = LocalDate.parse(expiryDate, dateFormatter);
+            this.expiryDate = new Date(expiryDate);
+            this.hasExpiry = true;
         }
 
-        this.receivedAt = LocalDateTime.parse(receivedAt, dateTimeFormatter);
+        this.receivedAt = new DateTime(receivedAt);
     }
 
     /**
@@ -61,18 +63,38 @@ public class Cargo {
 
         this.quantity = quantity;
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
         if (expiryDate == null || expiryDate.isBlank()) {
-            this.expiryDate = LocalDate.parse("9999-12-31", dateFormatter);
+            this.expiryDate = new Date("9999-12-31");
+            this.hasExpiry = false;
         } else {
-            this.expiryDate = LocalDate.parse(expiryDate, dateFormatter);
+            this.expiryDate = new Date(expiryDate);
+            this.hasExpiry = true;
         }
 
-        this.receivedAt = LocalDateTime.parse(receivedAt, dateTimeFormatter);
+        this.receivedAt = new DateTime(receivedAt);
     }
 
+    /**
+     * Returns the Date object representing the expiry date (internal object).
+     */
+    public Date getExpiryDateObj() {
+        return expiryDate;
+    }
+
+    /**
+     * Returns the DateTime object representing when the cargo was received.
+     */
+    public DateTime getReceivedAtObj() {
+        return receivedAt;
+    }
+
+    /**
+     * Indicates whether this cargo has an explicit expiry date.
+     * Cargo created with an empty expiry uses 9999-12-31 as a placeholder.
+     */
+    public boolean hasExpiry() {
+        return hasExpiry;
+    }
 
     public int getBoxID() {
         return boxID;
