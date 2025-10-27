@@ -132,7 +132,6 @@ public class Bootstrap {
                 }
                 Warehouse warehouse = new Warehouse(warehouseId, aisles);
                 warehouseController.addWarehouse(warehouse);
-                warehouseRepo.add(warehouse);
             }
         } catch (FileNotFoundException e) {
             System.err.println("Error reading warehouse data: " + e.getMessage());
