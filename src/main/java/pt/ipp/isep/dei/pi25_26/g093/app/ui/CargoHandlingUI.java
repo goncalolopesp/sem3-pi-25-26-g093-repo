@@ -56,8 +56,8 @@ public class CargoHandlingUI {
     private void executeUSEI01() {
         System.out.println("\n=== USEI01 - Unloading Wagons ===");
         try {
-            WagonUI wagonUI = new WagonUI();
-            wagonUI.run();
+            WagonCargoUI wagonUI = new WagonCargoUI();
+            wagonUI.showMenu();
         } catch (Exception e) {
             System.out.println("❌ Erro ao executar USEI01: " + e.getMessage());
         }
