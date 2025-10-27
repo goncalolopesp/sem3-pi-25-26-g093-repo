@@ -24,12 +24,29 @@ public class TravelTimeService {
     public void loadFromExcel(String filePath) throws IOException {
         ExcelDataReader reader = new ExcelDataReader(filePath);
 
-        loadStations(reader.readSheet("facility"));
-        loadLocomotives(reader.readSheet("locomotives"));
-        loadLineSegments(reader.readSheet("line"));
+        // tenta várias alternativas de nomes para compatibilidade
+        List<Map<String, String>> facilities = tryReadSheet(reader, "facility", "Facility", "Facilities");
+        List<Map<String, String>> locos = tryReadSheet(reader, "locomotives", "Locomotive", "Locomotives");
+        List<Map<String, String>> lines = tryReadSheet(reader, "line", "Line", "Lines");
+
+        loadStations(facilities);
+        loadLocomotives(locos);
+        loadLineSegments(lines);
 
         reader.close();
     }
+
+    private List<Map<String, String>> tryReadSheet(ExcelDataReader reader, String... possibleNames) throws IOException {
+        for (String name : possibleNames) {
+            try {
+                return reader.readSheet(name);
+            } catch (IOException e) {
+                // tenta o próximo nome
+            }
+        }
+        throw new IOException("Nenhuma das folhas encontradas: " + Arrays.toString(possibleNames));
+    }
+
 
     private void loadStations(List<Map<String, String>> sheetData) {
         stationsById.clear();
