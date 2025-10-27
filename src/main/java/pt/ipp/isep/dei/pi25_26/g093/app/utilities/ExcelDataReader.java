@@ -12,9 +12,11 @@ import java.util.*;
  * First row is treated as header. Uses DataFormatter to get
  * uniform string values independent of the cell's type.
  */
-public class ExcelDataReader {
+public class ExcelDataReader implements AutoCloseable {
 
     private final String filePath;
+    private FileInputStream fis;
+    private Workbook workbook;
 
     public ExcelDataReader(String filePath) {
         this.filePath = Objects.requireNonNull(filePath, "Excel file path is required");
@@ -24,52 +26,51 @@ public class ExcelDataReader {
      * Reads a sheet by name and returns rows as maps: header -> value.
      */
     public List<Map<String, String>> readSheet(String sheetName) throws IOException {
-        try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        fis = new FileInputStream(filePath);
+        workbook = new XSSFWorkbook(fis);
 
-            Sheet sheet = workbook.getSheet(sheetName);
-            if (sheet == null) {
-                throw new IOException("Sheet not found: " + sheetName);
-            }
-
-            DataFormatter formatter = new DataFormatter();
-            List<Map<String, String>> rows = new ArrayList<>();
-
-            int firstRow = sheet.getFirstRowNum();
-            int lastRow = sheet.getLastRowNum();
-            if (firstRow > lastRow) return rows;
-
-            // Read header
-            Row headerRow = sheet.getRow(firstRow);
-            if (headerRow == null) return rows;
-
-            int lastCol = headerRow.getLastCellNum();
-            List<String> headers = new ArrayList<>(lastCol);
-            for (int c = 0; c < lastCol; c++) {
-                Cell cell = headerRow.getCell(c, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                String h = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
-                headers.add(h);
-            }
-
-            // Read data rows
-            for (int r = firstRow + 1; r <= lastRow; r++) {
-                Row row = sheet.getRow(r);
-                if (row == null || isRowEmpty(row)) continue;
-
-                Map<String, String> map = new LinkedHashMap<>();
-                for (int c = 0; c < headers.size(); c++) {
-                    String key = headers.get(c);
-                    if (key == null || key.isBlank()) continue; // ignora colunas sem header
-
-                    Cell cell = row.getCell(c, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                    String value = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
-                    map.put(key, value);
-                }
-                rows.add(map);
-            }
-
-            return rows;
+        Sheet sheet = workbook.getSheet(sheetName);
+        if (sheet == null) {
+            throw new IOException("Sheet not found: " + sheetName);
         }
+
+        DataFormatter formatter = new DataFormatter();
+        List<Map<String, String>> rows = new ArrayList<>();
+
+        int firstRow = sheet.getFirstRowNum();
+        int lastRow = sheet.getLastRowNum();
+        if (firstRow > lastRow) return rows;
+
+        // Read header
+        Row headerRow = sheet.getRow(firstRow);
+        if (headerRow == null) return rows;
+
+        int lastCol = headerRow.getLastCellNum();
+        List<String> headers = new ArrayList<>(lastCol);
+        for (int c = 0; c < lastCol; c++) {
+            Cell cell = headerRow.getCell(c, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            String h = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
+            headers.add(h);
+        }
+
+        // Read data rows
+        for (int r = firstRow + 1; r <= lastRow; r++) {
+            Row row = sheet.getRow(r);
+            if (row == null || isRowEmpty(row)) continue;
+
+            Map<String, String> map = new LinkedHashMap<>();
+            for (int c = 0; c < headers.size(); c++) {
+                String key = headers.get(c);
+                if (key == null || key.isBlank()) continue; // ignora colunas sem header
+
+                Cell cell = row.getCell(c, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                String value = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
+                map.put(key, value);
+            }
+            rows.add(map);
+        }
+
+        return rows;
     }
 
     private static boolean isRowEmpty(Row row) {
@@ -82,5 +83,18 @@ public class ExcelDataReader {
             }
         }
         return true;
+    }
+
+    /**
+     * Closes the underlying workbook and input stream safely.
+     */
+    @Override
+    public void close() throws IOException {
+        if (workbook != null) {
+            workbook.close();
+        }
+        if (fis != null) {
+            fis.close();
+        }
     }
 }
