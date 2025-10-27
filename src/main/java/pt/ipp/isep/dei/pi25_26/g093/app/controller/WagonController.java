@@ -190,17 +190,12 @@ public class WagonController {
      */
     private boolean placeCargoInFirstAvailableBay(Cargo cargo, WarehouseController wc) {
         for (Warehouse wh : wc.getWarehouses()) {
-            List<Aisle> aisles = wh.getAisles();
-            if (aisles == null) continue;
-            for (Aisle aisle : aisles) {
-                List<Bay> bays = aisle.getBays();
-                if (bays == null) continue;
-                for (Bay bay : bays) {
-                    int used = bay.getCargo() == null ? 0 : bay.getCargo().size();
-                    if (used < bay.getCapacity()) {
-                        if (bay.getCargo() == null) {
-                            bay.setCargo(new java.util.ArrayList<>());
-                        }
+            for (Aisle aisle : wh.getAisles()) {
+                for (Bay bay : aisle.getBays()) {
+                    if (bay.getCargo() == null) {
+                        bay.setCargo(new ArrayList<>());
+                    }
+                    if (bay.getCargo().size() < bay.getCapacity()) {
                         bay.addCargo(cargo);
                         return true;
                     }
@@ -210,21 +205,120 @@ public class WagonController {
         return false;
     }
 
+
+
+
     /**
      * Acts as a medium between the WagonUI and the WagonController. Will Call methods related to adding the Cargo from the Wagons to the Bays in the Aisles in the Warehouses.
      * @return true if success; false if failure.
      */
-    public boolean storeAllCargoInWarehouses(){
-        WagonController wg = new WagonController();
-        WarehouseController wc = new WarehouseController();
-        Map<String, List<Wagon>> wagonsByExpiryStr = groupWagonsByExpiry(wg.getWagons());
-        sortWagonsByReceivedDate(wagonsByExpiryStr);
-        Map<String, Map<String, List<Wagon>>> nested = nestWagonsByReceivedDate(wagonsByExpiryStr);
-        sortNestedWagons(nested);
-        return storeAllCargoInOrder(nested, wc);
+    public boolean storeAllCargoInWarehouses() {
+        WarehouseController warehouseController = new WarehouseController();
+        List<Wagon> wagons = this.getWagons();
+
+        List<Cargo> sortedCargo = getSortedCargoFEFO_FIFO(wagons);
+
+        boolean allStored = true;
+        for (Cargo cargo : sortedCargo) {
+            boolean placed = placeCargoInWarehouseOrder(cargo, warehouseController);
+            if (!placed) {
+                allStored = false;
+                System.out.println("Unable to store Cargo boxID="
+                        + cargo.getBoxID() + " sku=" + cargo.getSku()
+                        + " — no free bay space available.");
+            }
+        }
+
+        return allStored;
+    }
+
+    private boolean placeCargoInWarehouseOrder(Cargo cargo, WarehouseController wc) {
+        for (Warehouse wh : wc.getWarehouses()) {
+            for (Aisle aisle : wh.getAisles()) {
+                for (Bay bay : aisle.getBays()) {
+                    if (bay.getCargo() == null) {
+                        bay.setCargo(new ArrayList<>());
+                    }
+                    if (bay.getCargo().size() < bay.getCapacity()) {
+                        bay.addCargo(cargo);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public boolean storeCargoDirectly(Cargo cargo, WarehouseController wc) {
         return placeCargoInFirstAvailableBay(cargo, wc);
     }
+
+    private List<Cargo> getSortedCargoFEFO_FIFO(List<Wagon> wagons) {
+        List<Cargo> withExpiry = new ArrayList<>();
+        List<Cargo> withoutExpiry = new ArrayList<>();
+
+        for (Wagon w : wagons) {
+            Cargo c = w.getCargo();
+            String expiry = c.getExpiryDate();
+            if (expiry != null && !expiry.trim().isEmpty() && !expiry.equals("9999-12-31")) {
+                withExpiry.add(c);
+            } else {
+                withoutExpiry.add(c);
+            }
+        }
+
+        // FEFO
+        withExpiry.sort((c1, c2) -> {
+            Date d1 = new Date(c1.getExpiryDate());
+            Date d2 = new Date(c2.getExpiryDate());
+            int cmp = d1.compareTo(d2);
+            return (cmp != 0) ? cmp : Integer.compare(c1.getBoxID(), c2.getBoxID());
+        });
+
+        // FIFO
+        withoutExpiry.sort((c1, c2) -> {
+            DateTime r1 = new DateTime(c1.getReceivedAt());
+            DateTime r2 = new DateTime(c2.getReceivedAt());
+            int cmp = r1.compareTo(r2);
+            return (cmp != 0) ? cmp : Integer.compare(c1.getBoxID(), c2.getBoxID());
+        });
+
+        List<Cargo> sorted = new ArrayList<>();
+        sorted.addAll(withExpiry);
+        sorted.addAll(withoutExpiry);
+        return sorted;
+    }
+
+    private boolean storeSortedCargo(List<Cargo> cargos, WarehouseController wc) {
+        boolean allStored = true;
+
+        for (Cargo cargo : cargos) {
+            boolean placed = false;
+
+            for (Warehouse wh : wc.getWarehouses()) {
+                for (Aisle aisle : wh.getAisles()) {
+                    for (Bay bay : aisle.getBays()) {
+                        if (bay.getCargo() == null) bay.setCargo(new ArrayList<>());
+                        if (bay.getCargo().size() < bay.getCapacity()) {
+                            bay.addCargo(cargo);
+                            placed = true;
+                            break;
+                        }
+                    }
+                    if (placed) break;
+                }
+                if (placed) break;
+            }
+
+            if (!placed) {
+                allStored = false;
+                System.out.println("Unable to store Cargo boxID=" + cargo.getBoxID() + " sku=" + cargo.getSku() + " — no free bay space available.");
+            }
+        }
+
+        return allStored;
+    }
+
+
+
 }
