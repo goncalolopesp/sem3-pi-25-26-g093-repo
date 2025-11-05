@@ -27,10 +27,6 @@ JOIN ROLLINGSTOCK_SUPPORTED_GAUGE rsg
     ON rsm.id = rsg.rollingstockmodelid
 JOIN GAUGE g 
     ON rsg.gaugeid = g.id
--- 👇 Filtros opcionais (descomenta se quiseres limitar a pesquisa)
--- WHERE wt.typename = 'Generic wagon'
---   AND g.width_mm = 1668
---   AND o.name = 'Medway - Operador Ferroviário de Mercadorias, S.A'
 ORDER BY o.name, wt.typename, wm.rollingstockmodelid;
 
 --------------------------------------------------------------------------------
