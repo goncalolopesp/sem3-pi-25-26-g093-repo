@@ -115,4 +115,6 @@ public class Cargo {
     public String getReceivedAt() {
         return receivedAt.toString();
     }
+
+    public void setQuantity(int quantity) {this.quantity = quantity;}
 }
