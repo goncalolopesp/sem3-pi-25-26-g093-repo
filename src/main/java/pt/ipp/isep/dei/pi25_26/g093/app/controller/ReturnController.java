@@ -2,6 +2,8 @@ package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Cargo;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.ReturnItem;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.ReturnItemRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
 
 import java.io.FileWriter;
@@ -29,6 +31,8 @@ public class ReturnController {
     private static final String PATH = "train_station_dataset/returns.csv";
     private static final String LOG_PATH = "logs/audit_log.txt";
 
+    ReturnItemRepository repo = Repositories.getInstance().getReturnItemRepository();
+    private List<ReturnItem> returnItems;
     private final List<ReturnItem> restocked = new ArrayList<>();
     private final List<ReturnItem> quarantine = new ArrayList<>();
     private final List<ReturnItem> discarded = new ArrayList<>();
@@ -39,15 +43,10 @@ public class ReturnController {
      * @return list of ReturnItem objects
      * @throws FileNotFoundException if the CSV file cannot be found
      */
-    public List<ReturnItem> loadReturnItems() throws FileNotFoundException {
-        CSVParser parser = new CSVParser(PATH);
-        List<Map<String, String>> data = parser.getCSVData();
-        List<ReturnItem> items = new ArrayList<>();
+    public void loadReturnItems(){
 
-        for (Map<String, String> row : data) {
-            items.add(ReturnItem.fromCSV(row));
-        }
-        return items;
+        returnItems = repo.getReturnItems();
+
     }
 
     /**
@@ -115,7 +114,7 @@ public class ReturnController {
      * @param qtyRestocked quantity restocked
      */
     private void restockItem(ReturnItem item, int qtyRestocked) {
-        String boxId = "RET-" + item.getReturnId();
+        String boxId = item.getReturnId();
         String expiry = (item.getExpiryDate() == null ? "9999-12-31" : item.getExpiryDate().toString());
         String receivedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 

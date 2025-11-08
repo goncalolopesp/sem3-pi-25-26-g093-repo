@@ -7,11 +7,15 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 import java.io.File;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.ReturnItemRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.WagonRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.WarehouseRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
 
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,7 @@ public class Bootstrap {
     Repositories repo;
     WagonRepository wagonRepo;
     WarehouseRepository warehouseRepo;
+    ReturnItemRepository returnItemRepo;
     String baysCsv;
     String itemsCsv;
     String order_linesCsv;
@@ -39,6 +44,7 @@ public class Bootstrap {
         repo = Repositories.getInstance();
         wagonRepo = repo.getWagonRepository();
         warehouseRepo = repo.getWarehouseRepository();
+        returnItemRepo = repo.getReturnItemRepository();
     }
 
     public static Bootstrap getInstance() {
@@ -85,6 +91,7 @@ public class Bootstrap {
         completeCSVFiles();
         addWarehousesToRepository();
         addWagonsToRepository();
+        addReturnItemsToRepository();
     }
 
     /**
@@ -102,6 +109,44 @@ public class Bootstrap {
                     }
                 }
             }
+        }
+    }
+
+        public void addReturnItemsToRepository() throws FileNotFoundException {
+
+        try {
+
+            CSVParser csvParser = new CSVParser(path + "/returns.csv");
+            List<Map<String, String>> csvData = csvParser.getCSVData();
+            List<ReturnItem> returnItems = new ArrayList<>();
+            DateTimeFormatter dateTimeFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            for(Map<String, String> data : csvData) {
+
+                String id = data.get("returnId");
+                if (id == null) id = data.get("\uFEFFreturnId");
+
+                String sku = data.get("sku");
+                int quantity = Integer.parseInt(data.get("qty"));
+                String reason = data.get("reason");
+                LocalDateTime timestamp = LocalDateTime.parse(data.get("timestamp"), dateTimeFmt);
+
+                LocalDate expiryDate = null;
+                String expiryRaw = data.get("expiryDate");
+                if (expiryRaw != null && !expiryRaw.isBlank()) {
+                    expiryDate = LocalDate.parse(expiryRaw, dateFmt);
+                }
+                ReturnItem returnItem = new ReturnItem(id, sku, quantity, reason, timestamp, expiryDate);
+
+                returnItems.add(returnItem);
+
+            }
+            returnItemRepo.addReturnItems(returnItems);
+        }catch (FileNotFoundException e){
+
+            System.out.println("File returns.csv not found");
+            throw e;
         }
     }
 

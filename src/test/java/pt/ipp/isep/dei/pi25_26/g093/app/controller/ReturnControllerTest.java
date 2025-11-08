@@ -34,7 +34,6 @@ public class ReturnControllerTest {
     public void testProcessReturns() {
         controller.processReturns(returns);
 
-        // Verificar se os itens foram corretamente classificados
         assertEquals(1, controller.getDiscarded().size());
         assertEquals(1, controller.getRestocked().size());
         assertEquals(1, controller.getQuarantine().size());
@@ -59,12 +58,4 @@ public class ReturnControllerTest {
         assertTrue(controller.getRestocked().contains(quarantinedItem));
     }
 
-    @Test
-    public void testLoadReturnItems() throws Exception {
-
-        List<ReturnItem> loadedItems = controller.loadReturnItems();
-
-        assertNotNull(loadedItems);
-        assertTrue(loadedItems.size() > 0);
-    }
 }

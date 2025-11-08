@@ -2,6 +2,8 @@ package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.ReturnController;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.ReturnItem;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.ReturnItemRepository;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -9,14 +11,15 @@ import java.util.Scanner;
 
 public class ReturnUI {
 
-
     Scanner sc = new Scanner(System.in);
 
     private final ReturnController controller;
+    ReturnItemRepository itemRepository;
 
     public ReturnUI() {
         this.controller = new ReturnController();
-     }
+        this.itemRepository = Repositories.getInstance().getReturnItemRepository();
+    }
 
     public void run() {
         Scanner sc = new Scanner(System.in);
@@ -54,8 +57,8 @@ public class ReturnUI {
     }
 
     private void processReturns() {
-        try {
-            List<ReturnItem> returns = controller.loadReturnItems();
+
+            List<ReturnItem> returns = itemRepository.getReturnItems();
 
             if (returns.isEmpty()) {
                 System.out.println("No return items found in CSV file.");
@@ -65,12 +68,6 @@ public class ReturnUI {
             controller.processReturns(returns);
             System.out.println("\nReturns processed successfully!");
             System.out.println("Audit log written to logs/audit_log.txt.");
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: returns.csv file not found.");
-        } catch (Exception e) {
-            System.out.println("Unexpected error: " + e.getMessage());
-        }
     }
 
     private void handleQuarantine() {
@@ -105,7 +102,7 @@ public class ReturnUI {
         System.out.println("-----------------------------------");
     }
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         new ReturnUI().run();
     }
 }

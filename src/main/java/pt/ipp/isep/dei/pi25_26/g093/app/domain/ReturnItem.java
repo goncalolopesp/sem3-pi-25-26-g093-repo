@@ -41,32 +41,6 @@ public class ReturnItem implements Comparable<ReturnItem> {
         this.expiryDate = expiryDate;
     }
 
-    /**
-     * Creates a ReturnItem from a parsed CSV row.
-     *
-     * @param data key-value column mapping from CSV
-     * @return constructed ReturnItem object
-     */
-    public static ReturnItem fromCSV(Map<String, String> data) {
-        DateTimeFormatter dateTimeFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        String id = data.get("returnId");
-        if (id == null) id = data.get("\uFEFFreturnId");
-
-        String sku = data.get("sku");
-        int quantity = Integer.parseInt(data.get("qty"));
-        String reason = data.get("reason");
-        LocalDateTime timestamp = LocalDateTime.parse(data.get("timestamp"), dateTimeFmt);
-
-        LocalDate expiryDate = null;
-        String expiryRaw = data.get("expiryDate");
-        if (expiryRaw != null && !expiryRaw.isBlank()) {
-            expiryDate = LocalDate.parse(expiryRaw, dateFmt);
-        }
-
-        return new ReturnItem(id, sku, quantity, reason, timestamp, expiryDate);
-    }
 
     public String getReturnId() { return returnID; }
     public String getSku() { return sku; }
@@ -84,7 +58,7 @@ public class ReturnItem implements Comparable<ReturnItem> {
     @Override
     public int compareTo(ReturnItem other) {
         int cmp = other.timeStamp.compareTo(this.timeStamp);
-        return (cmp != 0) ? cmp : this.returnID.compareTo(other.returnID);
+         return (cmp != 0) ? cmp : this.returnID.compareTo(other.returnID);
     }
 
     /**

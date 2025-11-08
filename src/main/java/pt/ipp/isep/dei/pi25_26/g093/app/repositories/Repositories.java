@@ -6,6 +6,7 @@ public class Repositories {
     private static Repositories instance;
     private WagonRepository wagonRepository;
     private WarehouseRepository warehouseRepository;
+    private ReturnItemRepository returnItemRepository;
 
     /**
      * Creates a new Repositories object with WagonRepository and WarehouseRepository.
@@ -13,6 +14,7 @@ public class Repositories {
     public Repositories(){
         wagonRepository = new WagonRepository();
         warehouseRepository = new WarehouseRepository();
+        returnItemRepository = new ReturnItemRepository();
     }
 
     /**
@@ -30,6 +32,14 @@ public class Repositories {
     public WarehouseRepository getWarehouseRepository(){
         return warehouseRepository;
     }
+
+
+    public ReturnItemRepository getReturnItemRepository(){
+
+        return returnItemRepository;
+
+    }
+
 
     /**
      * Gets the instance of the Repositories class.
