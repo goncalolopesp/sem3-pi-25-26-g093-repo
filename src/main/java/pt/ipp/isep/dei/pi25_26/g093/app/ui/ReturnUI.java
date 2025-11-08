@@ -101,8 +101,4 @@ public class ReturnUI {
         System.out.println("Discarded items:   " + controller.getDiscarded().size());
         System.out.println("-----------------------------------");
     }
-
-    public static void main(String[] args) {
-        new ReturnUI().run();
-    }
 }

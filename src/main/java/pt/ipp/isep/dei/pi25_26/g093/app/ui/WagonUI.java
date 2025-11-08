@@ -14,7 +14,6 @@ public class WagonUI {
      * Runs the code
      */
     public void run() {
-        System.out.println("WagonUI");
         addWagonsToWarehouses();
     }
 

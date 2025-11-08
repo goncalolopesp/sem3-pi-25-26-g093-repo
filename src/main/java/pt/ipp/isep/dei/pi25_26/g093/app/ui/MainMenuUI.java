@@ -29,7 +29,7 @@ public class MainMenuUI {
                 case 2 -> runCargoHandlingUI();
                 case 3 -> runTravelTimeUI();
                 case 0 -> System.out.println("Exiting program...");
-                default -> System.out.println("❌ Invalid option. Please try again.");
+                default -> System.out.println("Invalid option. Please try again.");
             }
 
         } while (option != 0);
@@ -53,12 +53,12 @@ public class MainMenuUI {
      */
     private int readOption(Scanner scanner) {
         while (!scanner.hasNextInt()) {
-            System.out.println("❌ Please enter a valid number.");
+            System.out.println("Please enter a valid number.");
             scanner.nextLine();
             System.out.print("Select an option: ");
         }
         int option = scanner.nextInt();
-        scanner.nextLine(); // clear newline
+        scanner.nextLine();
         return option;
     }
 
@@ -79,7 +79,7 @@ public class MainMenuUI {
             CargoHandlingUI cargoUI = new CargoHandlingUI();
             cargoUI.showMenu();
         } catch (Exception e) {
-            System.out.println("❌ Error executing CargoHandlingUI: " + e.getMessage());
+            System.out.println("Error executing CargoHandlingUI: " + e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class MainMenuUI {
             TravelTimeUI travelTimeUI = new TravelTimeUI();
             travelTimeUI.run();
         } catch (Exception e) {
-            System.out.println("❌ Error executing TravelTimeUI: " + e.getMessage());
+            System.out.println("Error executing TravelTimeUI: " + e.getMessage());
         }
     }
 }

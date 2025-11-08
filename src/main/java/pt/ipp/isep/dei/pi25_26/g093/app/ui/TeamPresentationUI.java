@@ -13,11 +13,11 @@ public class TeamPresentationUI {
         System.out.println("Integrative Project 2025/26");
         System.out.println("Class: G093");
         System.out.println("\nTeam Members:");
-        System.out.println(" - Tomas Pinho 1240731");
-        System.out.println(" - Gonçalo Afonso 1240674)");
-        System.out.println(" - Gonçalo Pinto 1241232");
-        System.out.println(" - Jose Cardoso 1241323" );
-        System.out.println(" - Rafael Capao (456789)");
+        System.out.println(" - Tomas Pinho: 1240731");
+        System.out.println(" - Gonçalo Afonso: 1240674");
+        System.out.println(" - Gonçalo Pinto: 1241232");
+        System.out.println(" - Jose Cardoso: 1241323" );
+        System.out.println(" - Rafael Capao: 1241285");
         System.out.println("------------------------------");
     }
 }

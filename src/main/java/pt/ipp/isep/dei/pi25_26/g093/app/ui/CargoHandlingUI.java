@@ -14,14 +14,13 @@ import java.util.Scanner;
  */
 public class CargoHandlingUI {
 
-    // Guarda os planos de picking gerados na USEI03 para serem usados na USEI04
-    private List<TrolleyPlan> lastGeneratedPlans;
+
+    static Scanner sc = new Scanner(System.in);
 
     /**
      * Shows the menu for Cargo Handling operations.
      */
     public void showMenu() {
-        Scanner sc = new Scanner(System.in);
         int option;
 
         do {
@@ -31,20 +30,20 @@ public class CargoHandlingUI {
             System.out.println("3. USEI03 - Picking Plans");
             System.out.println("4. USEI04 - Pick Path Sequencing");
             System.out.println("5. USEI05 - Returns & Quarantine");
-            System.out.println("0. Voltar ao menu principal");
-            System.out.print("Escolha uma opção: ");
+            System.out.println("0. Back to the main menu");
+            System.out.print("Choose a option: ");
 
             option = sc.nextInt();
-            sc.nextLine(); // limpa newline
+            sc.nextLine();
 
             switch (option) {
                 case 1 -> executeUSEI01();
                 case 2 -> executeUSEI02();
-                case 3 -> executeUSEI03(sc);
+                case 3 -> executeUSEI03();
                 case 4 -> executeUSEI04();
                 case 5 -> executeUSEI05();
-                case 0 -> System.out.println("A regressar ao menu principal...");
-                default -> System.out.println("Opção inválida.");
+                case 0 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid option.");
             }
 
         } while (option != 0);
@@ -59,7 +58,7 @@ public class CargoHandlingUI {
             WagonCargoUI wagonUI = new WagonCargoUI();
             wagonUI.showMenu();
         } catch (Exception e) {
-            System.out.println("❌ Erro ao executar USEI01: " + e.getMessage());
+            System.out.println("Error executing USEI01: " + e.getMessage());
         }
     }
 
@@ -72,28 +71,20 @@ public class CargoHandlingUI {
             AllocationUI allocationUI = new AllocationUI();
             allocationUI.run();
         } catch (Exception e) {
-            System.out.println("❌ Erro ao executar USEI02: " + e.getMessage());
+            System.out.println("Error executing USEI02: " + e.getMessage());
         }
     }
 
     /**
      * USEI03 - Picking Plans
      */
-    private void executeUSEI03(Scanner sc) {
+    private void executeUSEI03() {
         System.out.println("\n=== USEI03 - Picking Plans ===");
-        System.out.print("Capacidade do trolley (kg): ");
-        double capacity = sc.nextDouble();
-        sc.nextLine();
-        System.out.print("Modo (FF, FFD, BFD): ");
-        String mode = sc.nextLine();
-
-        try {
-            PickingPlanner planner = new PickingPlanner();
-            lastGeneratedPlans = planner.generatePickingPlan(capacity, mode);
-            planner.displayPlan(lastGeneratedPlans);
-            System.out.println("✔ Planos de picking gerados e guardados para o sequenciamento (USEI04).");
+        try{
+            PickingPlansUI pickingPlansUI = new PickingPlansUI();
+            pickingPlansUI.run();
         } catch (Exception e) {
-            System.out.println("❌ Erro ao gerar planos de picking: " + e.getMessage());
+            System.out.println("Error executing USEI03: " + e.getMessage());
         }
     }
 
@@ -101,23 +92,19 @@ public class CargoHandlingUI {
      * USEI04 - Pick Path Sequencing
      */
     private void executeUSEI04() {
+
         System.out.println("\n=== USEI04 - Pick Path Sequencing ===");
 
-        if (lastGeneratedPlans == null || lastGeneratedPlans.isEmpty()) {
-            System.out.println("⚠️  Nenhum plano de picking disponível. Execute primeiro a USEI03.");
-            return;
+        try{
+            PickPathUI pickPathUI = new PickPathUI();
+            pickPathUI.run();
+
+        } catch (Exception e) {
+
+            System.out.println("Error executing USEI04: " + e.getMessage());
+
         }
 
-        try {
-            PickPathService pickPathService = new PickPathService();
-            for (TrolleyPlan plan : lastGeneratedPlans) {
-                System.out.println("\n--- Sequenciamento para " + plan + " ---");
-                String report = pickPathService.generateDetailedReport(plan);
-                System.out.println(report);
-            }
-        } catch (Exception e) {
-            System.out.println("❌ Erro ao gerar sequenciamento: " + e.getMessage());
-        }
     }
 
     /**
@@ -129,7 +116,7 @@ public class CargoHandlingUI {
             ReturnUI returnUI = new ReturnUI();
             returnUI.run();
         } catch (Exception e) {
-            System.out.println("❌ Erro ao executar USEI05: " + e.getMessage());
+            System.out.println("Error executing USEI05 - Returns & Quarantine: " + e.getMessage());
         }
     }
 }

@@ -34,7 +34,7 @@ public class WagonCargoUI {
             WagonUI wagonUI = new WagonUI();
             wagonUI.run();
         } catch (Exception e) {
-            System.out.println("❌ Error executing WagonUI: " + e.getMessage());
+            System.out.println("Error executing WagonUI: " + e.getMessage());
         }
     }
 
@@ -44,7 +44,7 @@ public class WagonCargoUI {
             WagonUI wagonUI = new WagonUI();
             wagonUI.displayCargoInBay();
         } catch (Exception e){
-            System.out.println("❌ Error executing WagonUI: " + e.getMessage());
+            System.out.println("Error executing WagonUI: " + e.getMessage());
         }
     }
 
