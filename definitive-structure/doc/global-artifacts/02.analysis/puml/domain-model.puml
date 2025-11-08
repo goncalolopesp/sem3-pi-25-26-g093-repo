@@ -65,11 +65,14 @@ abstract class LocomotiveModel {
   +power
   +acceleration
   +startYear
+  +gauge
 }
 class DieselLocomotive {
   +fuelCapacity
 }
 class ElectricLocomotive {
++voltage
++frequency
 }
 LocomotiveModel <|-- DieselLocomotive
 LocomotiveModel <|-- ElectricLocomotive
@@ -82,6 +85,7 @@ end note
 abstract class WagonModel {
   +payloadCapacity
   +volumeCapacity
+  +dimensions
 }
 class Boxcar {}
 class Flatcar {}
@@ -109,16 +113,6 @@ enum CargoType {
 Cargo --> CargoType : ofType >
 WagonModel --> "1" Cargo : transports >
 
-class Route {
-  +name
-  +isComplex
-  +description
-}
-class RouteFacility {
-  +sequenceOrder
-}
-Route *-- "2..*" RouteFacility : includes >
-RouteFacility --> "1" Facility : Facility >
 
 class Building {
   +name
@@ -135,7 +129,6 @@ Building <|-- RefrigeratedArea
 
 
 Facility "1" --> "0..*" Building : includes >
-Operator "1" --> "0..*" Route : defines >
 Cargo --> Building : storedIn >
 
 note right of RailwayLine
@@ -160,15 +153,51 @@ class Siding {
 
 class Locomotive{
 +name
-startYear
++startYear
 }
 
 class Wagon{
 +name
 }
+
+class Freight{
+}
+
+class Train{
++name
+}
+
+Freight --> "1" Facility : origin >
+Freight --> "1" Facility : destination >
+
+Train *-- "1..*" Locomotive : consists of >
+Train *-- "1..*" Freight : carries >
+Operator "1" --> "0..*" Route : defines >
+Operator "1" --> "0..*" Train : operates >
+
+
+Freight *-- "1..*" Wagon : consists of a set of >
+
+class Route {
+  +name
+  +isComplex
+  +description
+}
+
+class RouteFacility {
+  +sequenceOrder
+  +isStop
+}
+
+Route *-- "1..*" RouteFacility : composedOf >
+RouteFacility --> "1" Facility : refersTo >
+
+Train --> "1" Route : follows >
+
 note right of RailwaySegment
   Sidings only exist on single-track segments.
   Use 'hasSiding' = true only if trackConfiguration = "Single".
 end note
 RailwaySegment "1" --> "0..*" Siding : includes >
+
 @enduml

@@ -27,7 +27,7 @@ public class TravelTimeUI {
         try {
             service.loadFromExcel(filePath);
         } catch (IOException e) {
-            System.out.println("❌ Error reading Excel file: " + e.getMessage());
+            System.out.println("Error reading Excel file: " + e.getMessage());
             return;
         }
 
@@ -36,7 +36,7 @@ public class TravelTimeUI {
         String sA = sc.nextLine().trim();
         Optional<Station> originOpt = service.findStationByIdOrName(sA);
         if (originOpt.isEmpty()) {
-            System.out.println("❌ Station not found: " + sA);
+            System.out.println("Station not found: " + sA);
             return;
         }
 
@@ -45,7 +45,7 @@ public class TravelTimeUI {
         String sB = sc.nextLine().trim();
         Optional<Station> destOpt = service.findStationByIdOrName(sB);
         if (destOpt.isEmpty()) {
-            System.out.println("❌ Station not found: " + sB);
+            System.out.println("Station not found: " + sB);
             return;
         }
 
@@ -57,7 +57,7 @@ public class TravelTimeUI {
         String locoId = sc.nextLine().trim();
         Optional<Locomotive> locoOpt = service.findLocoById(locoId);
         if (locoOpt.isEmpty()) {
-            System.out.println("❌ Locomotive not found: " + locoId);
+            System.out.println("Locomotive not found: " + locoId);
             return;
         }
         Locomotive loco = locoOpt.get();
@@ -65,7 +65,7 @@ public class TravelTimeUI {
         // Find direct segment
         Optional<LineSegment> segOpt = service.findDirectSegment(origin, destination);
         if (segOpt.isEmpty()) {
-            System.out.println("⚠️  No direct connection between " + origin + " and " + destination + ".");
+            System.out.println("No direct connection between " + origin + " and " + destination + ".");
             System.out.println("Only direct connections are supported in USPL03.");
             return;
         }
@@ -87,7 +87,7 @@ public class TravelTimeUI {
             System.out.println("--------------");
 
         } catch (IllegalArgumentException ex) {
-            System.out.println("❌ " + ex.getMessage());
+            System.out.println(ex.getMessage());
         }
     }
 }

@@ -72,10 +72,10 @@ public class Bootstrap {
         baysCsv = scanner.nextLine();
         System.out.print("Path to the items csv file: ");
         itemsCsv = scanner.nextLine();
-        System.out.print("Path to the order_lines csv file: ");
-        order_linesCsv = scanner.nextLine();
         System.out.print("Path to the order csv file: ");
         orderCsv = scanner.nextLine();
+        System.out.print("Path to the order_lines csv file: ");
+        order_linesCsv = scanner.nextLine();
         System.out.print("Path to the returns csv file: ");
         returnsCsv = scanner.nextLine();
         System.out.print("Path to the wagons csv file: ");

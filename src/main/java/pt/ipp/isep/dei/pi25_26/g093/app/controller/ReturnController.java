@@ -32,22 +32,11 @@ public class ReturnController {
     private static final String LOG_PATH = "logs/audit_log.txt";
 
     ReturnItemRepository repo = Repositories.getInstance().getReturnItemRepository();
-    private List<ReturnItem> returnItems;
+    private List<ReturnItem> returnItems = repo.getReturnItems();
     private final List<ReturnItem> restocked = new ArrayList<>();
     private final List<ReturnItem> quarantine = new ArrayList<>();
     private final List<ReturnItem> discarded = new ArrayList<>();
 
-    /**
-     * Loads return records from a CSV file.
-     *
-     * @return list of ReturnItem objects
-     * @throws FileNotFoundException if the CSV file cannot be found
-     */
-    public void loadReturnItems(){
-
-        returnItems = repo.getReturnItems();
-
-    }
 
     /**
      * Sorts and evaluates all return items according to the defined rules.
