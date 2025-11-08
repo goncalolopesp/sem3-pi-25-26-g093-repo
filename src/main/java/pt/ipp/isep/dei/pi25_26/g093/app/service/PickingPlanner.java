@@ -125,20 +125,5 @@ public class PickingPlanner {
 
         return trolleys;
     }
-
-    /**
-     * Displays a summary of all generated picking plans in the console.
-     *
-     * @param trolleys list of generated trolley plans
-     */
-    public void displayPlan(List<TrolleyPlan> trolleys) {
-        System.out.println("=== Picking Plan Summary ===");
-        for (TrolleyPlan trolley : trolleys) {
-            System.out.println(trolley);
-            for (TrolleyItem item : trolley.getItems()) {
-                System.out.println("   -> " + item);
-            }
-        }
-    }
 }
 
