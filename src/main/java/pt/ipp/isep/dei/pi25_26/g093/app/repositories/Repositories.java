@@ -7,14 +7,19 @@ public class Repositories {
     private WagonRepository wagonRepository;
     private WarehouseRepository warehouseRepository;
     private ReturnItemRepository returnItemRepository;
+    private TrolleyPlanRepository trolleyPlanRepository;
+
 
     /**
      * Creates a new Repositories object with WagonRepository and WarehouseRepository.
      */
     public Repositories(){
+
         wagonRepository = new WagonRepository();
         warehouseRepository = new WarehouseRepository();
         returnItemRepository = new ReturnItemRepository();
+        trolleyPlanRepository = new TrolleyPlanRepository();
+
     }
 
     /**
@@ -39,6 +44,11 @@ public class Repositories {
         return returnItemRepository;
 
     }
+
+    public TrolleyPlanRepository getTrolleyPlanRepository(){
+        return trolleyPlanRepository;
+    }
+
 
 
     /**
