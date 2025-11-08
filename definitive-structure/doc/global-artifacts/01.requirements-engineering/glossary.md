@@ -103,3 +103,6 @@
 | **Warehouse Management System (WMS)** | **Sistema de Gestão de Armazém**  | Tool supporting inventory and dispatch operations.                      |
 | **Weight on Track**                   | **Peso na Via**                   | Weight distribution of rail vehicles over bogies.                       |
 | **Year of Entry into Service**        | **Ano de Entrada ao Serviço**     | Year a locomotive begins operational use.                               |
+| **Wagon**                             | **Vagão**                         | A machinery that transports cargo.                                      |
+
+
