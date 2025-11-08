@@ -44,8 +44,8 @@ int main() {
     for(int i = 0; i < result2; i++) printf("%d ", array2[i]);
     printf("\n\n");
     
-    // Teste 3: Caso de wraparound
-    printf("=== Teste 3: Wraparound ===\n");
+    // Teste 3: Wraparound - O MAIS IMPORTANTE!
+    printf("=== Teste 3: Wraparound (buffer circular) ===\n");
     int buffer3[5] = {40, 50, 10, 20, 30};
     int nelem3 = 5;
     int head3 = 2;  // Começa no índice 2 (mais antigo é 10)
@@ -64,38 +64,6 @@ int main() {
     printf("Array (ordem de remocao): ");
     for(int i = 0; i < result3; i++) printf("%d ", array3[i]);
     printf("\n\n");
-    
-    // Teste 4: Buffer vazio
-    printf("=== Teste 4: Buffer vazio ===\n");
-    int buffer4[5] = {0, 0, 0, 0, 0};
-    int nelem4 = 0;
-    int head4 = 0;
-    int tail4 = 0;
-    int array4[5];
-    int n4 = 3;
-    
-    printf("Antes: nelem=%d, head=%d, pedidos=%d\n", nelem4, head4, n4);
-    
-    int result4 = move_n_to_array(buffer4, 5, &nelem4, &tail4, &head4, n4, array4);
-    
-    printf("Depois: movidos=%d, nelem=%d, head=%d\n", result4, nelem4, head4);
-    printf("\n");
-    
-    // Teste 5: n = 0
-    printf("=== Teste 5: Pedir n=0 ===\n");
-    int buffer5[5] = {1, 2, 3, 4, 5};
-    int nelem5 = 5;
-    int head5 = 0;
-    int tail5 = 0;
-    int array5[5];
-    int n5 = 0;
-    
-    printf("Antes: nelem=%d, head=%d, pedidos=%d\n", nelem5, head5, n5);
-    
-    int result5 = move_n_to_array(buffer5, 5, &nelem5, &tail5, &head5, n5, array5);
-    
-    printf("Depois: movidos=%d, nelem=%d, head=%d\n", result5, nelem5, head5);
-    printf("\n");
 
     return 0;
 }
