@@ -7,15 +7,16 @@
 --   (número de linhas/trilhos) em cada linha ferroviária registada.
 --------------------------------------------------------------------------------
 
-SELECT 
+SELECT
     rl.name AS railway_line_name,
-    rs.numbertracks AS track_type,
+    rs.numberTracks AS track_type,
     COUNT(rs.id) AS total_segments
 FROM RAILWAY_SEGMENT rs
-JOIN RAILWAY_LINE rl 
-    ON rs.railwaylineid = rl.id
-GROUP BY rl.name, rs.numbertracks
-ORDER BY rl.name, rs.numbertracks;
+         JOIN RAILWAY_LINE rl
+              ON rs.railwayLineID = rl.id
+WHERE rl.name = 'Ramal Viana - Caminha'
+GROUP BY rl.name, rs.numberTracks
+ORDER BY rl.name, rs.numberTracks;
 
 --------------------------------------------------------------------------------
 -- Fim da Query
