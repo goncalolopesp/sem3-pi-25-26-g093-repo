@@ -8,7 +8,7 @@ public class Repositories {
     private WarehouseRepository warehouseRepository;
     private ReturnItemRepository returnItemRepository;
     private TrolleyPlanRepository trolleyPlanRepository;
-
+    private OrderRepository orderRepository;
 
     /**
      * Creates a new Repositories object with WagonRepository and WarehouseRepository.
@@ -19,7 +19,7 @@ public class Repositories {
         warehouseRepository = new WarehouseRepository();
         returnItemRepository = new ReturnItemRepository();
         trolleyPlanRepository = new TrolleyPlanRepository();
-
+        orderRepository = new OrderRepository();
     }
 
     /**
@@ -49,7 +49,7 @@ public class Repositories {
         return trolleyPlanRepository;
     }
 
-
+    public OrderRepository getOrderRepository() {return orderRepository;}
 
     /**
      * Gets the instance of the Repositories class.

@@ -6,10 +6,7 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 
 import java.io.File;
 
-import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
-import pt.ipp.isep.dei.pi25_26.g093.app.repositories.ReturnItemRepository;
-import pt.ipp.isep.dei.pi25_26.g093.app.repositories.WagonRepository;
-import pt.ipp.isep.dei.pi25_26.g093.app.repositories.WarehouseRepository;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.*;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
 
 import java.io.FileNotFoundException;
@@ -92,6 +89,7 @@ public class Bootstrap {
         addWarehousesToRepository();
         addWagonsToRepository();
         addReturnItemsToRepository();
+        addOrdersToRepository();
     }
 
     /**
@@ -112,7 +110,7 @@ public class Bootstrap {
         }
     }
 
-        public void addReturnItemsToRepository() throws FileNotFoundException {
+    public void addReturnItemsToRepository() throws FileNotFoundException {
 
         try {
 
@@ -181,6 +179,30 @@ public class Bootstrap {
         } catch (FileNotFoundException e) {
             System.err.println("Error reading warehouse data: " + e.getMessage());
             throw e;
+        }
+    }
+
+    /**
+     * Adds the orders from the .csv file to the order repository.
+     * @throws FileNotFoundException if there is no file with the name "orders.csv" in the directory "train_station_dataset"
+     */
+    public void addOrdersToRepository() throws FileNotFoundException{
+        try{
+            CSVParser csvParser = new CSVParser(path + "/" + orderCsv);
+            List<Map<String, String>> csvData = csvParser.getCSVData();
+            OrderRepository orderRepository = Repositories.getInstance().getOrderRepository();
+
+            for(Map<String, String> line : csvData)
+            {
+                int orderId = Integer.parseInt(line.get("orderId").substring(3));
+                String dueDate = line.get("dueDate");
+                int priority = Integer.parseInt(line.get("priority"));
+
+                Order order = new Order(orderId, dueDate, priority);
+                orderRepository.add(order);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
