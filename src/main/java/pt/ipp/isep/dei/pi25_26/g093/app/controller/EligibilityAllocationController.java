@@ -58,47 +58,43 @@ public class EligibilityAllocationController {
         for (Order order : orders) {
             String orderID = order.getId();
 
-            for (Map<String, String> mapOrderLine : mapOrderLines) {
-                String lineOrder = mapOrderLine.get("orderId");
-                int lineOrderID = Integer.parseInt(lineOrder.substring(3));
-                int lineNo = Integer.parseInt(mapOrderLine.get("lineNo"));
+            for (OrderLine line : order.getLines()) {
+                int lineNo = line.getLineNo();
                 List<Allocation> lineAllocations = new ArrayList<>();
-                int requested = Integer.parseInt(mapOrderLine.get("qty"));
+                int requested = line.getQty();
                 int remaining = requested;
 
-                if (orderID == lineOrderID) {
-                    String sku = mapOrderLine.get("sku");
+                String sku = line.getSku();
 
-                    for (Warehouse warehouse : warehouses) {
-                        for(Aisle aisle : warehouse.getAisles())
+                for (Warehouse warehouse : warehouses) {
+                    for(Aisle aisle : warehouse.getAisles())
+                    {
+                        for(Bay bay : aisle.getBays())
                         {
-                            for(Bay bay : aisle.getBays())
+                            for(Cargo cargo : bay.getCargo())
                             {
-                                for(Cargo cargo : bay.getCargo())
+                                if(cargo.getSku() == Integer.parseInt(sku.substring(3)))
                                 {
-                                    if(cargo.getSku() == Integer.parseInt(sku.substring(3)))
+                                    int cargoQty = cargo.getQuantity();
+                                    int capacity = bay.getCapacity();
+                                    int allocated = Math.min(remaining, cargoQty);
+
+                                    if(capacity > 0 && allocated > 0)
                                     {
-                                        int cargoQty = cargo.getQuantity();
-                                        int capacity = bay.getCapacity();
-                                        int allocated = Math.min(remaining, cargoQty);
+                                        Allocation allocation = new Allocation();
+                                        allocation.orderId = orderID;
+                                        allocation.lineNo = lineNo;
+                                        allocation.sku = sku;
+                                        allocation.qty = allocated;
+                                        allocation.boxId = String.valueOf(cargo.getBoxID());
+                                        allocation.aisle = aisle.getId();
+                                        allocation.bay = bay.getId();
 
-                                        if(capacity > 0 && allocated > 0)
-                                        {
-                                            Allocation allocation = new Allocation();
-                                            allocation.orderId = orderID;
-                                            allocation.lineNo = lineNo;
-                                            allocation.sku = sku;
-                                            allocation.qty = allocated;
-                                            allocation.boxId = String.valueOf(cargo.getBoxID());
-                                            allocation.aisle = aisle.getId();
-                                            allocation.bay = bay.getId();
+                                        bay.setCapacity(capacity - 1);
+                                        cargo.setQuantity(cargoQty - allocated);
 
-                                            bay.setCapacity(capacity - 1);
-                                            cargo.setQuantity(cargoQty - allocated);
-
-                                            remaining -= allocated;
-                                            lineAllocations.add(allocation);
-                                        }
+                                        remaining -= allocated;
+                                        lineAllocations.add(allocation);
                                     }
                                 }
                             }
@@ -107,9 +103,9 @@ public class EligibilityAllocationController {
                 }
 
                 Eligibility eligibility = new Eligibility();
-                eligibility.orderId = lineOrder;
+                eligibility.orderId = orderID;
                 eligibility.lineNo = lineNo;
-                eligibility.sku = mapOrderLine.get("sku");
+                eligibility.sku = sku;
                 eligibility.requestedQty = requested;
                 eligibility.allocatedQty = requested - remaining;
 

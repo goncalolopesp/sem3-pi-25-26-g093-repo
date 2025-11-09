@@ -188,17 +188,34 @@ public class Bootstrap {
      */
     public void addOrdersToRepository() throws FileNotFoundException{
         try{
-            CSVParser csvParser = new CSVParser(path + "/" + orderCsv);
-            List<Map<String, String>> csvData = csvParser.getCSVData();
+            CSVParser csvOrderParser = new CSVParser(path + "/" + orderCsv);
+            CSVParser csvOrderLineParser = new CSVParser(path + "/" + order_linesCsv);
+            List<Map<String, String>> csvOrderData = csvOrderParser.getCSVData();
+            List<Map<String, String>> csvOrderLineData = csvOrderLineParser.getCSVData();
             OrderRepository orderRepository = Repositories.getInstance().getOrderRepository();
 
-            for(Map<String, String> line : csvData)
+            for(Map<String, String> orderData : csvOrderData)
             {
-                String orderId = line.get("orderId");
-                String dueDate = line.get("dueDate");
-                int priority = Integer.parseInt(line.get("priority"));
+                String orderId = orderData.get("orderId");
+                String dueDate = orderData.get("dueDate");
+                int priority = Integer.parseInt(orderData.get("priority"));
 
                 Order order = new Order(orderId, dueDate, priority);
+
+                for(Map<String, String> orderLineData : csvOrderLineData)
+                {
+                    String lineOrderId = orderLineData.get("orderId");
+                    if(lineOrderId.equalsIgnoreCase(orderId))
+                    {
+                        int lineNo = Integer.parseInt(orderLineData.get("lineNo"));
+                        String sku = orderLineData.get("sku");
+                        int qty = Integer.parseInt(orderLineData.get("qty"));
+
+                        OrderLine line = new OrderLine(lineNo, sku, qty);
+                        order.addNewLine(line);
+                    }
+                }
+
                 orderRepository.add(order);
             }
         } catch (FileNotFoundException e) {
