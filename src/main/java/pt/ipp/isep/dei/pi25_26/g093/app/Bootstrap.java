@@ -194,7 +194,7 @@ public class Bootstrap {
 
             for(Map<String, String> line : csvData)
             {
-                int orderId = Integer.parseInt(line.get("orderId").substring(3));
+                String orderId = line.get("orderId");
                 String dueDate = line.get("dueDate");
                 int priority = Integer.parseInt(line.get("priority"));
 

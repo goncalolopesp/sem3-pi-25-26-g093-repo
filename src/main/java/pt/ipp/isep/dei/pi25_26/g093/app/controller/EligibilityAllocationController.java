@@ -3,6 +3,7 @@ package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 import pt.ipp.isep.dei.pi25_26.g093.app.Bootstrap;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.OrderRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.WarehouseRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
@@ -37,17 +38,16 @@ public class EligibilityAllocationController {
 
         CSVParser csvOrders = new CSVParser("train_station_dataset/orders.csv");
         CSVParser csvOrderLines = new CSVParser("train_station_dataset/order_lines.csv");
-        CSVParser csvWagons = new CSVParser("train_station_dataset/wagons.csv");
-        CSVParser csvBays = new CSVParser("train_station_dataset/bays.csv");
 
         List<Map<String, String>> mapOrders = csvOrders.getCSVData();
         List<Map<String, String>> mapOrderLines = csvOrderLines.getCSVData();
-        //List<Map<String, String>> mapWagons = csvWagons.getCSVData();
-        //List<Map<String, String>> mapBays = csvBays.getCSVData();
 
         Repositories repositories = Repositories.getInstance();
         WarehouseRepository warehouseRepository = repositories.getWarehouseRepository();
+        OrderRepository orderRepository = repositories.getOrderRepository();
+
         List<Warehouse> warehouses = warehouseRepository.getWarehouseList();
+        List<Order> orders = orderRepository.getOrders();
 
         SetOrders(mapOrders);
         SetOrderLines(mapOrderLines);
@@ -55,9 +55,8 @@ public class EligibilityAllocationController {
         allocations.clear();
         List<Eligibility> eligibilities = new ArrayList<>();
 
-        for (Map<String, String> mapOrder : mapOrders) {
-            String order = mapOrder.get("orderId");
-            int orderID = Integer.parseInt(order.substring(3));
+        for (Order order : orders) {
+            String orderID = order.getId();
 
             for (Map<String, String> mapOrderLine : mapOrderLines) {
                 String lineOrder = mapOrderLine.get("orderId");
@@ -86,7 +85,7 @@ public class EligibilityAllocationController {
                                         if(capacity > 0 && allocated > 0)
                                         {
                                             Allocation allocation = new Allocation();
-                                            allocation.orderId = order;
+                                            allocation.orderId = orderID;
                                             allocation.lineNo = lineNo;
                                             allocation.sku = sku;
                                             allocation.qty = allocated;
@@ -145,7 +144,7 @@ public class EligibilityAllocationController {
         return true;
 
     }
-    
+
     public List<Allocation> getAllocations() {
         return allocations;
     }
@@ -184,7 +183,6 @@ public class EligibilityAllocationController {
                 }
             }
         }
-
     }
 
     private static void SetOrderLines(List<Map<String, String>> orderLines)
@@ -213,32 +211,5 @@ public class EligibilityAllocationController {
             }
         }
 
-    }
-
-    private static void SetWagons(List<Map<String, String>> wagons)
-    {
-        for (int i = 0; i < wagons.size(); i++) {
-            for (int j = 0; j < i; j++) {
-                Date date1 = new Date(wagons.get(i).get("expiryDate"));
-                Date date2 = new Date(wagons.get(j).get("expiryDate"));
-
-                if(!date1.toString().isEmpty() && date2.toString().isEmpty())
-                {
-                    Map<String, String> aux = wagons.get(i);
-                    wagons.set(i, wagons.get(j));
-                    wagons.set(j, aux);
-                }
-
-                if(!date1.toString().isEmpty() && !date2.toString().isEmpty())
-                {
-                    if(date1.compareTo(date2) == -1)
-                    {
-                        Map<String, String> aux = wagons.get(i);
-                        wagons.set(i, wagons.get(j));
-                        wagons.set(j, aux);
-                    }
-                }
-            }
-        }
     }
 }

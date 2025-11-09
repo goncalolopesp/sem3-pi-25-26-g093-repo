@@ -20,7 +20,7 @@ public class OrderRepository {
      * Gets the orders in the OrderRepository
      * @return orders in the OrderRepository
      */
-    public List<Order> getWagons(){
+    public List<Order> getOrders(){
         return orders;
     }
 
