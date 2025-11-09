@@ -14,6 +14,7 @@ import java.util.*;
 public class EligibilityAllocationController {
 
     private List<Allocation> allocations = new ArrayList<>();
+    private List<Eligibility> eligibilities = new ArrayList<>();
 
     public static class Allocation {
         public String orderId;
@@ -25,22 +26,16 @@ public class EligibilityAllocationController {
         public int bay;
     }
 
-    static class Eligibility {
-        String orderId;
-        int lineNo;
-        String sku;
-        int requestedQty;
-        int allocatedQty;
-        String status;
+    public static class Eligibility {
+        public String orderId;
+        public int lineNo;
+        public String sku;
+        public int requestedQty;
+        public int allocatedQty;
+        public String status;
     }
 
-    public boolean Allocate(String mode) throws FileNotFoundException {
-
-        CSVParser csvOrders = new CSVParser("train_station_dataset/orders.csv");
-        CSVParser csvOrderLines = new CSVParser("train_station_dataset/order_lines.csv");
-
-        List<Map<String, String>> mapOrders = csvOrders.getCSVData();
-        List<Map<String, String>> mapOrderLines = csvOrderLines.getCSVData();
+    public boolean Allocate(String mode) {
 
         Repositories repositories = Repositories.getInstance();
         WarehouseRepository warehouseRepository = repositories.getWarehouseRepository();
@@ -49,11 +44,15 @@ public class EligibilityAllocationController {
         List<Warehouse> warehouses = warehouseRepository.getWarehouseList();
         List<Order> orders = orderRepository.getOrders();
 
-        SetOrders(mapOrders);
-        SetOrderLines(mapOrderLines);
+        if(orders == null || orders.isEmpty())
+            return false;
+
+        SetOrders(orders);
+
+        for(Order order : orders)
+            SetOrderLines(order);
 
         allocations.clear();
-        List<Eligibility> eligibilities = new ArrayList<>();
 
         for (Order order : orders) {
             String orderID = order.getId();
@@ -125,55 +124,48 @@ public class EligibilityAllocationController {
             }
         }
 
-        System.out.println("=== Eligibility ===");
-        for(Eligibility e : eligibilities) {
-            System.out.printf("%s | line %d | %s | %d/%d | %s%n",
-                    e.orderId, e.lineNo, e.sku, e.allocatedQty, e.requestedQty, e.status);
-        }
-
-        System.out.println("\n=== Allocations ===");
-        for(Allocation a : allocations) {
-            System.out.printf("%s | line %d | %s | qty=%d | box=%s | aisle=%s | bay=%s%n",
-                    a.orderId, a.lineNo, a.sku, a.qty, a.boxId, a.aisle, a.bay);
-        }
-
         return true;
-
     }
 
     public List<Allocation> getAllocations() {
         return allocations;
     }
 
-    private static void SetOrders(List<Map<String, String>> orders)
+    public List<Eligibility> getEligibilities() {
+        return eligibilities;
+    }
+
+    private static void SetOrders(List<Order> orders)
     {
         for (int i = 0; i < orders.size(); i++) {
-            DateTime date = new DateTime(orders.get(i).get("dueDate"));
-            int priority = Integer.parseInt(orders.get(i).get("priority"));
-            int order = Integer.parseInt(orders.get(i).get("orderId").substring(3));
+            Order order1 = orders.get(i);
+            int priority = order1.getPriority();
+            Date date = order1.getDueDate();
+            int orderId = order1.getIntId();
 
             for (int j = 0; j < i; j++) {
-                DateTime date2 = new DateTime(orders.get(j).get("dueDate"));
-                int priority2 = Integer.parseInt(orders.get(j).get("priority"));
-                int order2 = Integer.parseInt(orders.get(j).get("orderId").substring(3));
+                Order order2 = orders.get(j);
+                int priority2 = order2.getPriority();
+                Date date2 = order2.getDueDate();
+                int orderId2 = order2.getIntId();
 
                 if(priority2 > priority)
                 {
-                    Map<String, String> aux = orders.get(i);
+                    Order aux = orders.get(i);
                     orders.set(i, orders.get(j));
                     orders.set(j, aux);
                 }
 
                 if(date.compareTo(date2) == -1 && priority2 == priority)
                 {
-                    Map<String, String> aux = orders.get(i);
+                    Order aux = orders.get(i);
                     orders.set(i, orders.get(j));
                     orders.set(j, aux);
                 }
 
-                if(date.compareTo(date2) == 0 && priority2 == priority && order < order2)
+                if(date.compareTo(date2) == 0 && priority2 == priority && orderId < orderId2)
                 {
-                    Map<String, String> aux = orders.get(i);
+                    Order aux = orders.get(i);
                     orders.set(i, orders.get(j));
                     orders.set(j, aux);
                 }
@@ -181,31 +173,21 @@ public class EligibilityAllocationController {
         }
     }
 
-    private static void SetOrderLines(List<Map<String, String>> orderLines)
+    private static void SetOrderLines(Order order)
     {
+        List<OrderLine> orderLines = order.getLines();
         for (int i = 0; i < orderLines.size(); i++) {
-            int lineNum = Integer.parseInt(orderLines.get(i).get("lineNo"));
-            int order = Integer.parseInt(orderLines.get(i).get("orderId").substring(3));
-
+            int lineNum = orderLines.get(i).getLineNo();
             for (int j = 0; j < i; j++) {
-                int lineNum2 = Integer.parseInt(orderLines.get(j).get("lineNo"));
-                int order2 = Integer.parseInt(orderLines.get(j).get("orderId").substring(3));
+                int lineNum2 = orderLines.get(j).getLineNo();
 
-                if(order2 > order)
+                if(lineNum2 > lineNum)
                 {
-                    Map<String, String> aux = orderLines.get(i);
-                    orderLines.set(i, orderLines.get(j));
-                    orderLines.set(j, aux);
-                }
-
-                if(lineNum2 > lineNum && order2 == order)
-                {
-                    Map<String, String> aux = orderLines.get(i);
+                    OrderLine aux = orderLines.get(i);
                     orderLines.set(i, orderLines.get(j));
                     orderLines.set(j, aux);
                 }
             }
         }
-
     }
 }

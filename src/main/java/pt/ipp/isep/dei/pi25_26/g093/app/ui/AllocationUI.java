@@ -27,11 +27,23 @@ public class AllocationUI {
         if(mode.equalsIgnoreCase("P") || mode.equalsIgnoreCase("partial"))
             mode = "partial";
 
-        EligibilityAllocationController a = new EligibilityAllocationController();
-        boolean allocated = a.Allocate(mode);
+        EligibilityAllocationController controller = new EligibilityAllocationController();
+        boolean allocated = controller.Allocate(mode);
 
         if (allocated){
             System.out.println("Orders have been allocated successfully!");
+
+            System.out.println("=== Eligibility ===");
+            for(EligibilityAllocationController.Eligibility e : controller.getEligibilities()) {
+                System.out.printf("%s | line %d | %s | %d/%d | %s%n",
+                        e.orderId, e.lineNo, e.sku, e.allocatedQty, e.requestedQty, e.status);
+            }
+
+            System.out.println("\n=== Allocations ===");
+            for(EligibilityAllocationController.Allocation a : controller.getAllocations()) {
+                System.out.printf("%s | line %d | %s | qty=%d | box=%s | aisle=%s | bay=%s%n",
+                        a.orderId, a.lineNo, a.sku, a.qty, a.boxId, a.aisle, a.bay);
+            }
         } else {
             System.out.println("An error has occurred while allocating orders.");
         }

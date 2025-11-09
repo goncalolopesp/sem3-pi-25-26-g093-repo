@@ -27,6 +27,7 @@ public class Order {
     }
 
     public String getId() {return id;}
+    public int getIntId() {return Integer.parseInt(id.substring(3));}
     public Date getDueDate() {return dueDate;}
     public int getPriority() {return priority;}
     public List<OrderLine> getLines() {return lines;}
