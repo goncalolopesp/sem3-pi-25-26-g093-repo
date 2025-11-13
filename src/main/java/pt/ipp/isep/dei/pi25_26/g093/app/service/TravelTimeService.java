@@ -139,4 +139,21 @@ public class TravelTimeService {
         String v = nonNull(s).toLowerCase();
         return v.equals("1") || v.equals("true") || v.equals("yes") || v.equals("y");
     }
+
+    public Map<String, Station> getStationsById() {
+        return stationsById;
+    }
+
+    public Map<String, Station> getStationsByNameLower() {
+        return stationsByNameLower;
+    }
+
+    public Map<String, Locomotive> getLocomotivesById() {
+        return locomotivesById;
+    }
+
+    public List<LineSegment> getSegments() {
+        return segments;
+    }
+
 }
