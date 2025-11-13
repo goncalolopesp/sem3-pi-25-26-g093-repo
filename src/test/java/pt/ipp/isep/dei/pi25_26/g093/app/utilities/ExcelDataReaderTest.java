@@ -1,58 +1,66 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.utilities;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.Test;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for the ExcelDataReader class (USPL02).
+ * Unit tests for the ExcelDataReader class (USPL02) — JUnit 4 version.
  */
-class ExcelDataReaderTest {
+public class ExcelDataReaderTest {
 
-    @Test
-    void ensureConstructorThrowsExceptionForNullPath() {
-        assertThrows(NullPointerException.class, () -> new ExcelDataReader(null));
+    @Test(expected = NullPointerException.class)
+    public void ensureConstructorThrowsExceptionForNullPath() throws IOException {
+        new ExcelDataReader(null);
     }
 
     @Test
-    void ensureFileNotFoundThrowsException() {
-        assertThrows(IOException.class, () -> {
+    public void ensureFileNotFoundThrowsException() {
+        try {
             ExcelDataReader reader = new ExcelDataReader("nonexistent/file.xlsx");
             try {
                 reader.readSheet("test");
+                fail("Expected IOException due to missing file");
+            } catch (IOException e) {
+                // expected
             } finally {
                 reader.close();
             }
-        });
+        } catch (IOException e) {
+            // também aceitável — o construtor pode lançar
+        }
     }
 
     @Test
-    void ensureSheetNotFoundThrowsException() throws IOException {
-        File tempFile = File.createTempFile("test", ".xlsx");
-        tempFile.deleteOnExit();
-
-        // Criar um ficheiro Excel vazio (ou usar biblioteca POI para criar um real)
-        ExcelDataReader reader = new ExcelDataReader(tempFile.getAbsolutePath());
-        assertThrows(IOException.class, () -> reader.readSheet("nonexistent"));
-        reader.close();
-    }
-
-    @Test
-    void ensureCloseDoesNotThrowExceptionWhenCalledMultipleTimes() throws IOException {
+    public void ensureSheetNotFoundThrowsException() throws IOException {
         File tempFile = File.createTempFile("test", ".xlsx");
         tempFile.deleteOnExit();
 
         ExcelDataReader reader = new ExcelDataReader(tempFile.getAbsolutePath());
+        try {
+            reader.readSheet("nonexistent");
+            fail("Expected IOException for missing sheet");
+        } catch (IOException e) {
+            // expected
+        } finally {
+            reader.close();
+        }
+    }
+
+    @Test
+    public void ensureCloseDoesNotThrowExceptionWhenCalledMultipleTimes() throws IOException {
+        File tempFile = File.createTempFile("test", ".xlsx");
+        tempFile.deleteOnExit();
+
+        ExcelDataReader reader = new ExcelDataReader(tempFile.getAbsolutePath());
         reader.close();
-        assertDoesNotThrow(() -> reader.close());
+        try {
+            reader.close(); // segunda chamada
+        } catch (Exception e) {
+            fail("close() should not throw an exception when called multiple times");
+        }
     }
 }
-

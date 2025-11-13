@@ -1,19 +1,19 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for the PickPathComparison class (USEI04).
+ * Unit tests for the PickPathComparison class (USEI04) — JUnit 4 version.
  */
-class PickPathComparisonTest {
+public class PickPathComparisonTest {
 
     @Test
-    void ensureConstructorAndGettersWork() {
+    public void ensureConstructorAndGettersWork() {
         List<Coordinate> pathA = Arrays.asList(
                 new Coordinate(1, 2),
                 new Coordinate(3, 4)
@@ -35,7 +35,7 @@ class PickPathComparisonTest {
     }
 
     @Test
-    void ensureBestStrategySelectsShorterDistance() {
+    public void ensureBestStrategySelectsShorterDistance() {
         List<Coordinate> pathA = Arrays.asList(new Coordinate(1, 2));
         List<Coordinate> pathB = Arrays.asList(new Coordinate(2, 3));
 
@@ -45,11 +45,11 @@ class PickPathComparisonTest {
         PickPathComparison comparison = new PickPathComparison(resultA, resultB);
 
         assertEquals("Strategy B", comparison.getBestStrategy().getStrategyName());
-        assertEquals(10, comparison.getBestStrategy().getTotalDistance());
+        assertEquals(10, comparison.getBestStrategy().getTotalDistance(), 0.001);
     }
 
     @Test
-    void ensureDistanceImprovementIsCalculatedCorrectly() {
+    public void ensureDistanceImprovementIsCalculatedCorrectly() {
         List<Coordinate> pathA = Arrays.asList(new Coordinate(1, 2));
         List<Coordinate> pathB = Arrays.asList(new Coordinate(2, 3));
 
@@ -58,11 +58,11 @@ class PickPathComparisonTest {
 
         PickPathComparison comparison = new PickPathComparison(resultA, resultB);
 
-        assertEquals(10, comparison.getDistanceImprovement());
+        assertEquals(10, comparison.getDistanceImprovement(), 0.001);
     }
 
     @Test
-    void ensureImprovementPercentageIsCalculatedCorrectly() {
+    public void ensureImprovementPercentageIsCalculatedCorrectly() {
         List<Coordinate> pathA = Arrays.asList(new Coordinate(1, 2));
         List<Coordinate> pathB = Arrays.asList(new Coordinate(2, 3));
 
@@ -71,12 +71,12 @@ class PickPathComparisonTest {
 
         PickPathComparison comparison = new PickPathComparison(resultA, resultB);
 
-        // Expected: (100-80)/100 * 100 = 20%
+        // Expected: (100 - 80) / 100 * 100 = 20%
         assertEquals(20.0, comparison.getImprovementPercentage(), 0.1);
     }
 
     @Test
-    void ensureImprovementPercentageReturnsZeroWhenBothEqual() {
+    public void ensureImprovementPercentageReturnsZeroWhenBothEqual() {
         List<Coordinate> path = Arrays.asList(new Coordinate(1, 2));
 
         PickPathResult resultA = new PickPathResult("Strategy A", path, 50);
@@ -84,11 +84,11 @@ class PickPathComparisonTest {
 
         PickPathComparison comparison = new PickPathComparison(resultA, resultB);
 
-        assertEquals(0.0, comparison.getImprovementPercentage());
+        assertEquals(0.0, comparison.getImprovementPercentage(), 0.001);
     }
 
     @Test
-    void ensureToStringContainsAllSections() {
+    public void ensureToStringContainsAllSections() {
         List<Coordinate> pathA = Arrays.asList(new Coordinate(1, 2));
         List<Coordinate> pathB = Arrays.asList(new Coordinate(2, 3));
 
@@ -103,4 +103,3 @@ class PickPathComparisonTest {
         assertTrue(report.contains("Best Strategy"));
     }
 }
-
