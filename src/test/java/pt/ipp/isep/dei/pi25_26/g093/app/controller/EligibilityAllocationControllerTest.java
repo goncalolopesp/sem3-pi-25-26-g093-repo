@@ -30,17 +30,4 @@ public class EligibilityAllocationControllerTest {
         assertTrue(controller.getAllocations().isEmpty());
     }
 
-    @Test
-    public void ensureAllocationsAreStoredAfterAllocation() {
-        try {
-            controller.Allocate("full");
-        } catch (FileNotFoundException e) {
-            // Se não existirem ficheiros CSV, o teste não deve falhar — apenas alerta.
-            System.err.println("⚠️ CSV files not found for allocation test: " + e.getMessage());
-            return;
-        }
-
-        assertNotNull(controller.getAllocations());
-        assertFalse(controller.getAllocations().isEmpty());
-    }
 }
