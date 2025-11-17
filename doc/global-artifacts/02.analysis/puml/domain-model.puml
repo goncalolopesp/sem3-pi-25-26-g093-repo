@@ -34,7 +34,6 @@ class RailwaySegment {
   +numberTracks
   +speedLimit
   +weightLimit
-  +gauge
 }
 
 class Owner {
