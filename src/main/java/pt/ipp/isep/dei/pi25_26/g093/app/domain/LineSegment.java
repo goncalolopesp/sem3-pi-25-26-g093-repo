@@ -2,9 +2,7 @@ package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import java.util.Objects;
 
-/**
- * USPL03 - Direct rail segment between two stations.
- */
+
 public class LineSegment {
     private final String id;
     private final Station origin;
