@@ -9,6 +9,9 @@ public class Repositories {
     private ReturnItemRepository returnItemRepository;
     private TrolleyPlanRepository trolleyPlanRepository;
     private OrderRepository orderRepository;
+    private FacilityRepository facilityRepository;
+    private RailwayLineRepository railwayLineRepository;
+    private RailwayLineSegmentRepository railwayLineSegmentRepository;
 
     /**
      * Creates a new Repositories object with WagonRepository and WarehouseRepository.
@@ -20,6 +23,10 @@ public class Repositories {
         returnItemRepository = new ReturnItemRepository();
         trolleyPlanRepository = new TrolleyPlanRepository();
         orderRepository = new OrderRepository();
+        facilityRepository = new FacilityRepository();
+        railwayLineRepository = new RailwayLineRepository();
+        railwayLineSegmentRepository = new RailwayLineSegmentRepository();
+
     }
 
     /**
@@ -50,6 +57,18 @@ public class Repositories {
     }
 
     public OrderRepository getOrderRepository() {return orderRepository;}
+
+    public FacilityRepository getFacilityRepository() {
+        return facilityRepository;
+    }
+
+    public RailwayLineRepository getRailwayLineRepository() {
+        return railwayLineRepository;
+    }
+
+    public RailwayLineSegmentRepository getRailwayLineSegmentRepository() {
+        return railwayLineSegmentRepository;
+    }
 
     /**
      * Gets the instance of the Repositories class.

@@ -90,6 +90,9 @@ public class Bootstrap {
         addWagonsToRepository();
         addReturnItemsToRepository();
         addOrdersToRepository();
+        addFacilities();
+        addRailwayLines();
+        addRailwayLineSegments();
     }
 
     /**
@@ -374,6 +377,118 @@ public class Bootstrap {
         } catch (Exception e) {
             System.err.println("Error reading wagon data: " + e.getMessage());
             throw new FileNotFoundException("Could not process wagon data file");
+        }
+    }
+
+    public void addFacilities() {
+
+        FacilityRepository repo = Repositories.getInstance().getFacilityRepository();
+
+        repo.add(new Facility(1,  "São Romão", FacilityType.STATION));
+        repo.add(new Facility(2,  "Tamel", FacilityType.STATION));
+        repo.add(new Facility(3,  "Senhora das Dores", FacilityType.STATION));
+        repo.add(new Facility(4,  "Lousado", FacilityType.STATION));
+        repo.add(new Facility(5,  "Porto Campanhã", FacilityType.STATION));
+        repo.add(new Facility(6,  "Leandro", FacilityType.STATION));
+        repo.add(new Facility(7,  "Porto São Bento", FacilityType.STATION));
+        repo.add(new Facility(8,  "Barcelos", FacilityType.STATION));
+        repo.add(new Facility(9,  "Vila Nova da Cerveira", FacilityType.STATION));
+        repo.add(new Facility(10, "Midões", FacilityType.STATION));
+        repo.add(new Facility(11, "Valença", FacilityType.STATION));
+        repo.add(new Facility(12, "Darque", FacilityType.STATION));
+        repo.add(new Facility(13, "Contumil", FacilityType.STATION));
+        repo.add(new Facility(14, "Ermesinde", FacilityType.STATION));
+        repo.add(new Facility(15, "São Frutuoso", FacilityType.STATION));
+        repo.add(new Facility(16, "São Pedro da Torre", FacilityType.STATION));
+        repo.add(new Facility(17, "Viana do Castelo", FacilityType.STATION));
+        repo.add(new Facility(18, "Famalicão", FacilityType.STATION));
+        repo.add(new Facility(19, "Barroselas", FacilityType.STATION));
+        repo.add(new Facility(20, "Nine", FacilityType.STATION));
+        repo.add(new Facility(21, "Caminha", FacilityType.STATION));
+        repo.add(new Facility(22, "Carvalha", FacilityType.STATION));
+        repo.add(new Facility(23, "Carreço", FacilityType.STATION));
+        repo.add(new Facility(50, "Leixões", FacilityType.STATION));
+        repo.add(new Facility(45, "São Mamede de Infesta", FacilityType.STATION));
+        repo.add(new Facility(48, "Leça do Balio", FacilityType.STATION));
+        repo.add(new Facility(43, "São Gemil", FacilityType.STATION));
+    }
+
+
+
+
+    public void addRailwayLines() {
+        FacilityRepository facRepo = Repositories.getInstance().getFacilityRepository();
+        RailwayLineRepository lineRepo = Repositories.getInstance().getRailwayLineRepository();
+
+        lineRepo.add(new RailwayLine(1, "Ramal São Bento - Campanhã", "IP", 1668, facRepo.getById(7), facRepo.getById(5)));
+        lineRepo.add(new RailwayLine(2, "Ramal Campanhã - Contumil", "IP", 1668, facRepo.getById(5), facRepo.getById(13)));
+        lineRepo.add(new RailwayLine(3, "Ramal Contumil - Nine", "IP", 1668, facRepo.getById(13), facRepo.getById(20)));
+        lineRepo.add(new RailwayLine(4, "Ramal Nine - Barcelos", "IP", 1668, facRepo.getById(20), facRepo.getById(8)));
+        lineRepo.add(new RailwayLine(5, "Ramal Barcelos - Darque", "IP", 1668, facRepo.getById(8), facRepo.getById(12)));
+        lineRepo.add(new RailwayLine(6, "Ramal Darque - Viana do Castelo", "IP", 1668, facRepo.getById(12), facRepo.getById(17)));
+        lineRepo.add(new RailwayLine(7, "Ramal Viana do Castelo - Caminha", "IP", 1668, facRepo.getById(17), facRepo.getById(21)));
+        lineRepo.add(new RailwayLine(8, "Ramal Caminha - São Pedro da Torre", "IP", 1668, facRepo.getById(21), facRepo.getById(16)));
+        lineRepo.add(new RailwayLine(9, "Ramal São Pedro da Torre - Valença", "IP", 1668, facRepo.getById(16), facRepo.getById(11)));
+        lineRepo.add(new RailwayLine(23, "São Gemil - São Mamede de Infesta", "IP", 1668, facRepo.getById(43), facRepo.getById(45)));
+        lineRepo.add(new RailwayLine(24, "São Mamede de Infesta - Leça do Balio", "IP", 1668, facRepo.getById(45), facRepo.getById(48)));
+        lineRepo.add(new RailwayLine(21, "Leça do Balio - Leixões", "IP", 1668, facRepo.getById(48), facRepo.getById(50)));
+    }
+
+    public void addRailwayLineSegments() {
+
+        RailwayLineRepository lineRepo = Repositories.getInstance().getRailwayLineRepository();
+        RailwayLineSegmentRepository segRepo = Repositories.getInstance().getRailwayLineSegmentRepository();
+
+        RailwayLine l1 = lineRepo.getById(1);
+        l1.addSegment(new RailwayLineSegment(1, l1, 1, true, 8000, 2618, 4, null, null, 120));
+
+        RailwayLine l2 = lineRepo.getById(2);
+        l2.addSegment(new RailwayLineSegment(3, l2, 1, true, 8000, 2443, 4, null, null, 120));
+
+        RailwayLine l3 = lineRepo.getById(3);
+        l3.addSegment(new RailwayLineSegment(10, l3, 1, true, 8000, 26560, 2, null, null, 120));
+        l3.addSegment(new RailwayLineSegment(11, l3, 2, true, 8000, 10000, 2, null, null, 120));
+
+        RailwayLine l4 = lineRepo.getById(4);
+        l4.addSegment(new RailwayLineSegment(15, l4, 1, true, 8000, 5286, 2, null, null, 120));
+        l4.addSegment(new RailwayLineSegment(16, l4, 2, true, 8000, 6000, 2, null, null, 120));
+
+        RailwayLine l5 = lineRepo.getById(5);
+        l5.addSegment(new RailwayLineSegment(14, l5, 1, true, 8000, 10387, 2, null, null, 120));
+        l5.addSegment(new RailwayLineSegment(12, l5, 2, true, 8000, 12000, 2, null, null, 120));
+        l5.addSegment(new RailwayLineSegment(13, l5, 3, true, 8000, 3100, 2, null, null, 120));
+
+        RailwayLine l6 = lineRepo.getById(6);
+        l6.addSegment(new RailwayLineSegment(20, l6, 1, true, 6400, 4890, 2, null, null, 120));
+
+        RailwayLine l7 = lineRepo.getById(7);
+        l7.addSegment(new RailwayLineSegment(18, l7, 1, true, 8000, 6000, 1, null, null, 120));
+        l7.addSegment(new RailwayLineSegment(21, l7, 2, true, 8000, 5000, 1, 2000.0, 864.0, 120));
+        l7.addSegment(new RailwayLineSegment(22, l7, 3, true, 8000, 12000, 2, null, null, 120));
+
+        RailwayLine l8 = lineRepo.getById(8);
+        l8.addSegment(new RailwayLineSegment(25, l8, 1, true, 8000, 20829, 1, 11000.0, 266.0, 120));
+
+        RailwayLine l9 = lineRepo.getById(9);
+        l9.addSegment(new RailwayLineSegment(26, l9, 1, true, 8000, 4264, 1, null, null, 120));
+
+        RailwayLine l21 = lineRepo.getById(21);
+        l21.addSegment(new RailwayLineSegment(30, l21, 1, true, 8000, 3883, 2, null, null, 120));
+
+        RailwayLine l22 = lineRepo.getById(22);
+        l22.addSegment(new RailwayLineSegment(31, l22, 1, true, 8400, 1174, 2, null, null, 120));
+        l22.addSegment(new RailwayLineSegment(32, l22, 2, true, 8000, 2534, 2, null, null, 120));
+
+        RailwayLine l23 = lineRepo.getById(23);
+        l23.addSegment(new RailwayLineSegment(33, l23, 1, true, 8000, 1566, 2, null, null, 120));
+        l23.addSegment(new RailwayLineSegment(34, l23, 2, true, 8000, 1453, 2, null, null, 120));
+
+        RailwayLine l24 = lineRepo.getById(24);
+        l24.addSegment(new RailwayLineSegment(35, l24, 1, true, 8100, 3597, 2, null, null, 120));
+        l24.addSegment(new RailwayLineSegment(36, l24, 2, true, 8000, 4334, 2, null, null, 120));
+
+        for (RailwayLine line : lineRepo.getAll()) {
+            line.sortSegmentsByOrder();
         }
     }
 
