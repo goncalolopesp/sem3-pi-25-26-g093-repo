@@ -31,7 +31,6 @@ public class TravelTimeUI {
             return;
         }
 
-        // Input: origin
         System.out.print("Origin station (id or name): ");
         String sA = sc.nextLine().trim();
         Optional<Station> originOpt = service.findStationByIdOrName(sA);
@@ -40,7 +39,6 @@ public class TravelTimeUI {
             return;
         }
 
-        // Input: destination
         System.out.print("Destination station (id or name): ");
         String sB = sc.nextLine().trim();
         Optional<Station> destOpt = service.findStationByIdOrName(sB);
@@ -52,7 +50,6 @@ public class TravelTimeUI {
         Station origin = originOpt.get();
         Station destination = destOpt.get();
 
-        // Input: locomotive
         System.out.print("Locomotive id: ");
         String locoId = sc.nextLine().trim();
         Optional<Locomotive> locoOpt = service.findLocoById(locoId);
@@ -62,7 +59,6 @@ public class TravelTimeUI {
         }
         Locomotive loco = locoOpt.get();
 
-        // Find direct segment
         Optional<LineSegment> segOpt = service.findDirectSegment(origin, destination);
         if (segOpt.isEmpty()) {
             System.out.println("No direct connection between " + origin + " and " + destination + ".");
@@ -71,7 +67,6 @@ public class TravelTimeUI {
         }
         LineSegment seg = segOpt.get();
 
-        // Compute time
         try {
             double hours = service.calculateTravelTimeHours(origin, destination, loco, seg);
             String pretty = TravelTimeService.formatH(hours);

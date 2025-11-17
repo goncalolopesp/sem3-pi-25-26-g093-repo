@@ -87,7 +87,6 @@ public class MainMenuUI {
      * Option 3 – Runs the Travel Time Between Stations module (USPL03).
      */
     private void runTravelTimeUI() {
-        System.out.println("\n=== USPL03 - Travel Time Between Stations ===");
         try {
             TravelTimeUI travelTimeUI = new TravelTimeUI();
             travelTimeUI.run();

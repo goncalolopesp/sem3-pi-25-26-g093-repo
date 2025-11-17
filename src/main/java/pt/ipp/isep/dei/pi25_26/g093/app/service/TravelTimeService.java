@@ -24,7 +24,6 @@ public class TravelTimeService {
     public void loadFromExcel(String filePath) throws IOException {
         ExcelDataReader reader = new ExcelDataReader(filePath);
 
-        // tenta várias alternativas de nomes para compatibilidade
         List<Map<String, String>> facilities = tryReadSheet(reader, "facility", "Facility", "Facilities");
         List<Map<String, String>> locos = tryReadSheet(reader, "locomotives", "Locomotive", "Locomotives");
         List<Map<String, String>> lines = tryReadSheet(reader, "line", "Line", "Lines");
@@ -41,7 +40,6 @@ public class TravelTimeService {
             try {
                 return reader.readSheet(name);
             } catch (IOException e) {
-                // tenta o próximo nome
             }
         }
         throw new IOException("Nenhuma das folhas encontradas: " + Arrays.toString(possibleNames));
