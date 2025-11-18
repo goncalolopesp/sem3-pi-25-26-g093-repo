@@ -2,21 +2,21 @@ package pt.ipp.isep.dei.pi25_26.g093.app;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WagonController;
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WarehouseController;
+import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.AVL;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 
 import java.io.File;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Date;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.*;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser;
+import pt.ipp.isep.dei.pi25_26.g093.app.utilities.CSVParser1;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Bootstrap {
 
@@ -30,6 +30,7 @@ public class Bootstrap {
     String orderCsv;
     String returnsCsv;
     String wagonsCsv;
+    String europeStationsCsv;
 
     String path = "train_station_dataset";
 
@@ -53,12 +54,34 @@ public class Bootstrap {
         return instance;
     }
 
+    /**
+     * Returns the path to the bays csv file.
+     */
     public String getBaysCsv() {return path + "/" + baysCsv;}
+    /**
+     * Returns the path to the items csv file.
+     */
     public String getItemsCsv() {return path + "/" + itemsCsv;}
+    /**
+     * Returns the path to the order lines csv file.
+     */
     public String getOrder_linesCsv() {return path + "/" + order_linesCsv;}
+    /**
+     * Returns the path to the orders csv file.
+     */
     public String getOrderCsv() {return path + "/" + orderCsv;}
+    /**
+     * Returns the path to the returns csv file.
+     */
     public String getReturnsCsv() {return path + "/" + returnsCsv;}
+    /**
+     * Returns the path to the wagons csv file.
+     */
     public String getWagonsCsv() {return path + "/" + wagonsCsv;}
+    /**
+     * Returns the path to the Europe train stations csv file.
+     */
+    public String getEuropeStationsCsv() { return path + "/" + europeStationsCsv; }
 
     /**
      * Prompts the user to enter the path to the CSV files.
@@ -77,6 +100,8 @@ public class Bootstrap {
         returnsCsv = scanner.nextLine();
         System.out.print("Path to the wagons csv file: ");
         wagonsCsv = scanner.nextLine();
+        System.out.print("Path to the europe stations csv file: ");
+        europeStationsCsv = scanner.nextLine();
     }
 
     /**
@@ -92,7 +117,8 @@ public class Bootstrap {
         addOrdersToRepository();
         addFacilities();
         addRailwayLines();
-        addRailwayLineSegments();
+        //addRailwayLineSegments();
+        addCompleteStations();
     }
 
     /**
@@ -413,9 +439,6 @@ public class Bootstrap {
         repo.add(new Facility(43, "São Gemil", FacilityType.STATION));
     }
 
-
-
-
     public void addRailwayLines() {
         FacilityRepository facRepo = Repositories.getInstance().getFacilityRepository();
         RailwayLineRepository lineRepo = Repositories.getInstance().getRailwayLineRepository();
@@ -490,6 +513,90 @@ public class Bootstrap {
         for (RailwayLine line : lineRepo.getAll()) {
             line.sortSegmentsByOrder();
         }
+    }
+
+    public void addCompleteStations() throws FileNotFoundException {
+
+        CompleteStationRepository repo = Repositories.getInstance().getCompleteStationRepository();
+
+        CSVParser1 parser = new CSVParser1(path + "/" + europeStationsCsv);
+        List<Map<String, String>> rows = parser.getCSVData();
+
+        int total = rows.size();
+        int validCount = 0;
+        int invalidCount = 0;
+        int processed = 0;
+        int lastPercent = -1;
+
+        for (Map<String, String> r : rows) {
+            processed++;
+
+            try {
+                String country = safeTrim(r.get("country"));
+                String tzg = safeTrim(r.get("time_zone_group"));
+                String name = safeTrim(r.get("station"));
+
+                String rawTZ = safeTrim(r.get("time_zone"));
+                String tz = normalizeTimeZone(rawTZ);
+
+                Double lat = parseNullableDouble(r.get("latitude"));
+                Double lon = parseNullableDouble(r.get("longitude"));
+
+                boolean isCity = Boolean.parseBoolean(safeTrim(r.get("is_city")));
+                boolean isMain = Boolean.parseBoolean(safeTrim(r.get("is_main_station")));
+                boolean isAirport = Boolean.parseBoolean(safeTrim(r.get("is_airport")));
+
+                CompleteStation cs = new CompleteStation(
+                        country, tz, tzg, name,
+                        lat, lon,
+                        isCity, isMain, isAirport
+                );
+
+                if (country.isEmpty() || tzg.isEmpty() || name.isEmpty()) {
+                    invalidCount++;
+                }else{
+                    if (lat == null || (lat < -90 || lat > 90))
+                        invalidCount++;
+                    else{
+                        if (lon == null || (lon < -180 || lon > 180))
+                            invalidCount++;
+                        else{
+                            repo.addStation(cs);
+                            validCount++;
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                invalidCount++;
+            }
+
+        }
+
+        System.out.println("\nLoaded stations: " + validCount + " (skipped " + invalidCount + ")");
+    }
+
+    private String safeTrim(String s) {
+        return s == null ? "" : s.trim();
+    }
+
+    private Double parseNullableDouble(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        if (s.isEmpty() || s.equalsIgnoreCase("none") || s.equalsIgnoreCase("null")) {
+            return null;
+        }
+        return Double.parseDouble(s);
+    }
+
+    // Converts "('Europe/Paris',)" -> "Europe/Paris"
+    private String normalizeTimeZone(String rawTZ) {
+        if (rawTZ == null) return "";
+        return rawTZ
+                .replaceAll("[()'\\[\\]{}]", "")
+                .replace(",", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
 }
