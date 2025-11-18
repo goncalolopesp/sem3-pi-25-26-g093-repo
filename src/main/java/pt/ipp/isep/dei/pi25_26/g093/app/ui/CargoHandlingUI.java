@@ -1,5 +1,6 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.PickingPlanner;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.PickPathService;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyPlan;
@@ -30,6 +31,7 @@ public class CargoHandlingUI {
             System.out.println("3. USEI03 - Picking Plans");
             System.out.println("4. USEI04 - Pick Path Sequencing");
             System.out.println("5. USEI05 - Returns & Quarantine");
+            System.out.println("6. USEI06 - Time-Zone Index and Windowed Queries");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
 
@@ -42,6 +44,7 @@ public class CargoHandlingUI {
                 case 3 -> executeUSEI03();
                 case 4 -> executeUSEI04();
                 case 5 -> executeUSEI05();
+                case 6 -> executeUSEI06();
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option.");
             }
@@ -117,6 +120,19 @@ public class CargoHandlingUI {
             returnUI.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI05 - Returns & Quarantine: " + e.getMessage());
+        }
+    }
+
+    /**
+     * USEI06 - Time-Zone Index and Windowed Queries
+     */
+    private void executeUSEI06(){
+        System.out.println("\n=== USEI06 - Time-Zone Index and Windowed Queries ===");
+        try {
+            CompleteStationUI stationUI = new CompleteStationUI();
+            stationUI.run();
+        } catch (Exception e) {
+            System.out.println("Error executing USEI06: " + e.getMessage());
         }
     }
 }
