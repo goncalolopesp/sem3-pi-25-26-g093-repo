@@ -12,6 +12,8 @@ public class Repositories {
     private FacilityRepository facilityRepository;
     private RailwayLineRepository railwayLineRepository;
     private RailwayLineSegmentRepository railwayLineSegmentRepository;
+    private CompleteStationRepository completeStationRepository;
+
 
     /**
      * Creates a new Repositories object with WagonRepository and WarehouseRepository.
@@ -26,6 +28,7 @@ public class Repositories {
         facilityRepository = new FacilityRepository();
         railwayLineRepository = new RailwayLineRepository();
         railwayLineSegmentRepository = new RailwayLineSegmentRepository();
+        completeStationRepository = new CompleteStationRepository();
 
     }
 
@@ -68,6 +71,10 @@ public class Repositories {
 
     public RailwayLineSegmentRepository getRailwayLineSegmentRepository() {
         return railwayLineSegmentRepository;
+    }
+
+    public CompleteStationRepository getCompleteStationRepository() {
+        return completeStationRepository;
     }
 
     /**
