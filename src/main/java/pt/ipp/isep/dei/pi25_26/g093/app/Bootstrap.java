@@ -562,6 +562,7 @@ public class Bootstrap {
                             invalidCount++;
                         else{
                             repo.addStation(cs);
+                            addToTrees(cs);
                             validCount++;
                         }
                     }
@@ -574,6 +575,17 @@ public class Bootstrap {
         }
 
         System.out.println("\nLoaded stations: " + validCount + " (skipped " + invalidCount + ")");
+    }
+
+    public void addToTrees(CompleteStation cs) {
+        CompleteStationRepository repo = Repositories.getInstance().getCompleteStationRepository();
+        if (cs.getLatitude() != null)
+            repo.addLatKey(new LatKey(cs));
+
+        if (cs.getLongitude() != null)
+            repo.addLonKey(new LonKey(cs));
+
+        repo.addTzgKey(new TzgKey(cs));
     }
 
     private String safeTrim(String s) {
