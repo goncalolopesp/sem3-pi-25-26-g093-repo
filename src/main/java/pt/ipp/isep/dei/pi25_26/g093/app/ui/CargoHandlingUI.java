@@ -32,6 +32,7 @@ public class CargoHandlingUI {
             System.out.println("4. USEI04 - Pick Path Sequencing");
             System.out.println("5. USEI05 - Returns & Quarantine");
             System.out.println("6. USEI06 - Time-Zone Index and Windowed Queries");
+            System.out.println("7. USEI07 - Build a balanced 2D-Tree on Latitude/Longitude");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
 
@@ -45,6 +46,7 @@ public class CargoHandlingUI {
                 case 4 -> executeUSEI04();
                 case 5 -> executeUSEI05();
                 case 6 -> executeUSEI06();
+                case 7 -> executeUSEI07();
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option.");
             }
@@ -133,6 +135,19 @@ public class CargoHandlingUI {
             stationUI.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI06: " + e.getMessage());
+        }
+    }
+
+    /**
+     * USEI07 - Build a balanced 2D-Tree on Latitude/Longitude
+     */
+    private void executeUSEI07(){
+        System.out.println("\n=== USEI07 - Build a balanced 2D-Tree on Latitude/Longitude ===");
+        try {
+            BalancedTreeUI treeUI = new BalancedTreeUI();
+            treeUI.run();
+        } catch (Exception e) {
+            System.out.println("Error executing USEI07: " + e.getMessage());
         }
     }
 }
