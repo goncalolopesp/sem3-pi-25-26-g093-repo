@@ -11,12 +11,18 @@ public class BST<T extends Comparable<T>> implements BSTInterface<T> {
         root = insert(root, element);
     }
 
-    private BSTNode<T> insert(BSTNode<T> n, T e) {
-        if (n == null) return new BSTNode<>(e);
-        int cmp = e.compareTo(n.element);
-        if (cmp < 0) n.left = insert(n.left, e);
-        else if (cmp > 0) n.right = insert(n.right, e);
-        return n;
+    private BSTNode<T> insert(BSTNode<T> node, T element) {
+        if (node == null) {
+            return new BSTNode<>(element);
+        }
+        int cmp = element.compareTo(node.element);
+        if (cmp < 0) {
+            node.left = insert(node.left, element);
+        } else {
+            node.right = insert(node.right, element);
+        }
+
+        return node;
     }
 
     public boolean contains(T element) {
