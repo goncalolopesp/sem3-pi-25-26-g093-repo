@@ -96,25 +96,49 @@ public class Cargo {
         return hasExpiry;
     }
 
+    /**
+     * Returns the box ID.
+     * @return box ID
+     */
     public int getBoxID() {
         return boxID;
     }
 
+    /**
+     * Returns the SKU of the product.
+     * @return SKU
+     */
     public int getSku() {
         return sku;
     }
 
+    /**
+     * Returns the quantity of items in the cargo.
+     * @return quantity
+     */
     public int getQuantity() {
         return quantity;
     }
 
+    /**
+     * Returns the expiry date as a string in YYYY-MM-DD format.
+     * @return expiry date
+     */
     public String getExpiryDate() {
         return expiryDate.toString();
     }
 
+    /**
+     * Returns the received date-time as a string in YYYY-MM-DDTHH:MM:SS format.
+     * @return received date-time
+     */
     public String getReceivedAt() {
         return receivedAt.toString();
     }
 
+    /**
+     * Sets the quantity of items in the cargo.
+     * @param quantity new quantity
+     */
     public void setQuantity(int quantity) {this.quantity = quantity;}
 }

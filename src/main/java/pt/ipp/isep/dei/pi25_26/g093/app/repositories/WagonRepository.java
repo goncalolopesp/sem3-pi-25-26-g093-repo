@@ -5,6 +5,9 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.Wagon;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository class for managing Wagon objects
+ */
 public class WagonRepository {
 
     private List<Wagon> l;

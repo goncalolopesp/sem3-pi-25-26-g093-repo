@@ -11,6 +11,9 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that contains the main method to run the program.
+ */
 public class Main {
     /**
      *

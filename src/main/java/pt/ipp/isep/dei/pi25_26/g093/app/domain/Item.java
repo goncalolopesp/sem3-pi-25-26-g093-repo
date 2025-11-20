@@ -1,5 +1,8 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+/**
+ * Item class representing a product with various attributes.
+ */
 public class Item {
     private enum Category {
         Cleaning,
@@ -24,17 +27,23 @@ public class Item {
     private Unit unit;
     private double volume;
     private double unitWeight;
-
-    // Indica se o item é válido
     private boolean valid = true;
 
+    /**
+     * Constructor for Item.
+     * @param sku the identifier for the item
+     * @param name the name of the item
+     * @param category the category of the item
+     * @param unit the unit of the item
+     * @param volume the volume of the item
+     * @param unitWeight the weight per unit of the item
+     */
     public Item(int sku, String name, String category, String unit, double volume, double unitWeight) {
         this.sku = sku;
         this.name = name;
         this.volume = volume;
         this.unitWeight = unitWeight;
 
-        // Validar categoria
         try {
             this.category = Category.valueOf(category);
         } catch (Exception e) {
@@ -43,7 +52,6 @@ public class Item {
             return;
         }
 
-        // Validar unidade
         try {
             this.unit = Unit.valueOf(unit);
         } catch (Exception e) {
@@ -53,10 +61,18 @@ public class Item {
         }
     }
 
+    /**
+     * Checks if the item is valid.
+     * @return true if the item is valid, false otherwise
+     */
     public boolean isValid() {
         return valid;
     }
 
+    /**
+     * Returns the string representation of the item.
+     * @return the name of the item if valid, otherwise an empty string
+     */
     @Override
     public String toString() {
         if (!valid) return "";

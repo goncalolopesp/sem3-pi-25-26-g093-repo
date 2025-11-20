@@ -2,6 +2,9 @@ package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import java.util.List;
 
+/**
+ * Represents a Warehouse that contains multiple Aisles.
+ */
 public class Warehouse {
     private int id;
     private List<Aisle> aisles;

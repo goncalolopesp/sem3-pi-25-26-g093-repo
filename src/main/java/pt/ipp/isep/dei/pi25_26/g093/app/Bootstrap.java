@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Stores the data from the CSV files into the repositories for later use.
+ */
 public class Bootstrap {
 
     Repositories repo;

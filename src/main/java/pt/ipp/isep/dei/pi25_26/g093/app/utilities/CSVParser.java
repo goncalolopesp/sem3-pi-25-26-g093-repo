@@ -4,10 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * Class that Parses most CSV files into a List of Maps. (Non-usable with CSV files that include commas in the values)
+ */
 public class CSVParser {
 
     private List<Map<String, String>> csvData;
 
+    /**
+     * Constructor that parses the CSV file located in the given directory.
+     * @param csvDirectory the directory of the CSV file.
+     * @throws FileNotFoundException if the file is not found.
+     */
     public CSVParser(String csvDirectory) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File(csvDirectory));
         String headerData = scanner.nextLine();
@@ -29,6 +37,10 @@ public class CSVParser {
         }
     }
 
+    /**
+     * Returns the parsed CSV data as a List of Maps, with the key being the header and the value being the value.
+     * @return the CSV data.
+     */
     public List<Map<String, String>> getCSVData(){
         return csvData;
     }

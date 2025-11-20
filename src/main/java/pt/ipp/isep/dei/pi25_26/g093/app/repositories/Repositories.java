@@ -2,6 +2,9 @@ package pt.ipp.isep.dei.pi25_26.g093.app.repositories;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Warehouse;
 
+/**
+ * Class that represents all the repositories in the application.
+ */
 public class Repositories {
     private static Repositories instance;
     private WagonRepository wagonRepository;
@@ -48,31 +51,58 @@ public class Repositories {
         return warehouseRepository;
     }
 
-
+    /**
+     * Gets the ReturnItemRepository.
+     * @return the ReturnItemRepository.
+     */
     public ReturnItemRepository getReturnItemRepository(){
 
         return returnItemRepository;
 
     }
 
+    /**
+     * Gets the TrolleyPlanRepository.
+     * @return the TrolleyPlanRepository.
+     */
     public TrolleyPlanRepository getTrolleyPlanRepository(){
         return trolleyPlanRepository;
     }
 
+    /**
+     * Gets the OrderRepository.
+     * @return the OrderRepository.
+     */
     public OrderRepository getOrderRepository() {return orderRepository;}
 
+    /**
+     * Gets the FacilityRepository.
+     * @return the FacilityRepository.
+     */
     public FacilityRepository getFacilityRepository() {
         return facilityRepository;
     }
 
+    /**
+     * Gets the RailwayLineRepository.
+     * @return the RailwayLineRepository.
+     */
     public RailwayLineRepository getRailwayLineRepository() {
         return railwayLineRepository;
     }
 
+    /**
+     * Gets the RailwayLineSegmentRepository.
+     * @return the RailwayLineSegmentRepository.
+     */
     public RailwayLineSegmentRepository getRailwayLineSegmentRepository() {
         return railwayLineSegmentRepository;
     }
 
+    /**
+     * Gets the CompleteStationRepository.
+     * @return the CompleteStationRepository.
+     */
     public CompleteStationRepository getCompleteStationRepository() {
         return completeStationRepository;
     }

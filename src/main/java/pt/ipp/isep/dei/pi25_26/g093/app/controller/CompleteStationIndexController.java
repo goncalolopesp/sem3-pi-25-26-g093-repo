@@ -6,18 +6,35 @@ import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
 import java.util.*;
 
+
+/**
+ * Controller for the USEI06 - filters the data from the Repository to return to the UI.
+ */
 public class CompleteStationIndexController {
 
     private final CompleteStationRepository repo;
 
+    /**
+     * Gets the repository instance.
+     */
     public CompleteStationIndexController() {
         this.repo = Repositories.getInstance().getCompleteStationRepository();
     }
 
+    /**
+     * Checks if stations are loaded.
+     * @return true if stations are loaded, false otherwise.
+     */
     private boolean stationsLoaded() {
         return repo != null && repo.getStations() != null && !repo.getStations().isEmpty();
     }
 
+    /**
+     * Gets stations by latitude range.
+     * @param min the lower value of the range
+     * @param max the upper value of the range
+     * @return a map with the execution time as key and the list of stations as value
+     */
     public Map<Double,List<CompleteStation>> getByLatitudeRange(double min, double max) {
 
         long startTime = System.nanoTime();
@@ -56,6 +73,12 @@ public class CompleteStationIndexController {
         return resultado;
     }
 
+    /**
+     * Gets stations by longitude range.
+     * @param min the lower value of the range
+     * @param max the upper value of the range
+     * @return a map with the execution time as key and the list of stations as value
+     */
     public Map<Double,List<CompleteStation>> getByLongitudeRange(double min, double max) {
 
         long startTime = System.nanoTime();
@@ -94,7 +117,11 @@ public class CompleteStationIndexController {
         return resultado;
     }
 
-
+    /**
+     * Gets stations by time zone group.
+     * @param tzg the time zone group
+     * @return a map with the execution time as key and the list of stations as value
+     */
     public Map<Double, List<CompleteStation>> getByTimeZoneGroup(String tzg) {
 
         long startTime = System.nanoTime();
@@ -127,6 +154,12 @@ public class CompleteStationIndexController {
         return resultado;
     }
 
+    /**
+     * Gets stations within a TimeZone Group Window.
+     * @param start the start of the window
+     * @param end the end of the window
+     * @return a map with the execution time as key and the list of stations as value
+     */
     public Map<Double, List<CompleteStation>> getByTimeZoneGroupWindow(String start, String end) {
 
         long startTime = System.nanoTime();
@@ -168,7 +201,12 @@ public class CompleteStationIndexController {
         return resultado;
     }
 
-
+    /**
+     * Gets stations by time zone group and country.
+     * @param tzg the Time Zone Group
+     * @param country the Country
+     * @return a map with the execution time as key and the list of stations as value
+     */
     public Map<Double, List<CompleteStation>> getByTimeZoneGroupAndCountry(String tzg, String country) {
 
         long startTime = System.nanoTime();

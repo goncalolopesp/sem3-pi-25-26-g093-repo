@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Utility to read Excel sheets into List<Map<String,String>>.
+ * Utility to read Excel sheets into List&lt;Map&lt;String,String&gt;&gt;.
  * First row is treated as header. Uses DataFormatter to get
  * uniform string values independent of the cell's type.
  */
@@ -18,6 +18,10 @@ public class ExcelDataReader implements AutoCloseable {
     private FileInputStream fis;
     private Workbook workbook;
 
+    /**
+     * Checks the file path is not null.
+     * @param filePath Path to the Excel file.
+     */
     public ExcelDataReader(String filePath) {
         this.filePath = Objects.requireNonNull(filePath, "Excel file path is required");
     }
@@ -73,6 +77,11 @@ public class ExcelDataReader implements AutoCloseable {
         return rows;
     }
 
+    /**
+     * Checks if a row is empty (all cells are blank or null).
+     * @param row The row to check.
+     * @return True if the row is empty, false otherwise.
+     */
     private static boolean isRowEmpty(Row row) {
         if (row == null) return true;
         DataFormatter f = new DataFormatter();

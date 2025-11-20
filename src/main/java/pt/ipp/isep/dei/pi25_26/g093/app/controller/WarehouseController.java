@@ -24,9 +24,6 @@ public class WarehouseController {
 
     private final Repositories repositories = Repositories.getInstance();
 
-    public WarehouseController() {
-    }
-
     /**
      * Gets the warehouse repository instance.
      *

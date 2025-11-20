@@ -4,6 +4,9 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.Warehouse;
 
 import java.util.List;
 
+/**
+ * Stores the Warehouses
+ */
 public class WarehouseRepository {
 
     private List<Warehouse> warehouseList;

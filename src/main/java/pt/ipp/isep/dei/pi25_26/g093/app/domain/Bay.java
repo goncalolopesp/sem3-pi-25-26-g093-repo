@@ -3,6 +3,9 @@ package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a Bay in an Aisle.
+ */
 public class Bay {
     private int id;
     private int capacity;

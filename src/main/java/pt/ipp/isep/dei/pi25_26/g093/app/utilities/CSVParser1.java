@@ -4,10 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * Class that Parses most CSV files into a List of Maps. (Handles quoted values with commas)
+ */
 public class CSVParser1 {
 
     private final List<Map<String, String>> csvData = new ArrayList<>();
 
+    /**
+     * Constructor that parses the CSV file located in the given path.
+     * @param csvPath the path of the CSV file.
+     * @throws FileNotFoundException if the file is not found.
+     */
     public CSVParser1(String csvPath) throws FileNotFoundException {
 
         Scanner scanner = new Scanner(new File(csvPath));
@@ -38,6 +46,11 @@ public class CSVParser1 {
         scanner.close();
     }
 
+    /**
+     * Parses a single CSV line into tokens, handling quoted values.
+     * @param line the CSV line.
+     * @return the list of tokens.
+     */
     private List<String> parseCsvLine(String line) {
         List<String> tokens = new ArrayList<>();
         StringBuilder current = new StringBuilder();
@@ -62,6 +75,10 @@ public class CSVParser1 {
         return tokens;
     }
 
+    /**
+     * Returns the parsed CSV data as a List of Maps, with the key being the header and the value being the value.
+     * @return the CSV data.
+     */
     public List<Map<String, String>> getCSVData() {
         return csvData;
     }
