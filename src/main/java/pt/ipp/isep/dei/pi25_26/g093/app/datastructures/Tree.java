@@ -1,57 +1,69 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.datastructures;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Tree<T extends Comparable<T>> {
-    private static int K; //Dimension of the Tree
 
-    public static class TreeNode<T extends  Comparable<T>>
-    {
+    // Dimension of the Tree (k-d tree)
+    private final int k;
+
+    public static class TreeNode<T extends Comparable<T>> {
         private ArrayList<T> values;
         private TreeNode<T> left;
         private TreeNode<T> right;
+        private final List<Object> payloads;
 
-        public TreeNode(ArrayList<T> values)
-        {
+        public TreeNode(ArrayList<T> values) {
             this.values = new ArrayList<>(values);
             this.left = null;
             this.right = null;
+            this.payloads = new ArrayList<>();
         }
 
         public ArrayList<T> getElements() { return values; }
         public T getElement(int e) { return values.get(e); }
         public TreeNode<T> getLeft() { return left; }
         public TreeNode<T> getRight() { return right; }
+        public List<Object> getPayloads() { return Collections.unmodifiableList(payloads); }
 
-        public void setElements(ArrayList<T> values) { this.values = new ArrayList<>(values);}
+        public void addPayload(Object payload) {
+            if (payload != null) {
+                payloads.add(payload);
+            }
+        }
+
+        public void setElements(ArrayList<T> values) { this.values = new ArrayList<>(values); }
         public void setLeft(TreeNode<T> leftChild) { left = leftChild; }
         public void setRight(TreeNode<T> rightChild) { right = rightChild; }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder text = new StringBuilder("(");
-            for(int i = 0; i < values.size() - 1; i++)
-            {
+            for (int i = 0; i < values.size() - 1; i++) {
                 text.append(values.get(i)).append(", ");
             }
-
-            text.append(values.get(values.size()-1)).append(")");
-
+            text.append(values.get(values.size() - 1)).append(")");
             return text.toString();
         }
     }
 
     private TreeNode<T> root;
 
-    public Tree(int K)
-    {
-        Tree.K = K;
-        root = null;
+    public Tree(int k) {
+        if (k <= 0) {
+            throw new IllegalArgumentException("Dimension k must be > 0");
+        }
+        this.k = k;
+        this.root = null;
     }
 
-    public Tree(TreeNode<T> root)
-    {
+    public Tree(TreeNode<T> root, int k) {
+        if (k <= 0) {
+            throw new IllegalArgumentException("Dimension k must be > 0");
+        }
+        this.k = k;
         this.root = root;
     }
 
@@ -59,72 +71,80 @@ public class Tree<T extends Comparable<T>> {
         return root;
     }
 
-    public boolean isEmpty(){
-        return root==null;
+    public boolean isEmpty() {
+        return root == null;
     }
 
-    public void Insert(ArrayList<T> values)
-    {
-        root = Insert(root, values, 0);
+    public void Insert(ArrayList<T> values) {
+        root = Insert(root, values, null, 0);
     }
 
-    public TreeNode<T> Insert(TreeNode<T> node, ArrayList<T> values, int depth)
-    {
-        if(node == null)
-            return new TreeNode<>(values);
+    public void Insert(ArrayList<T> values, Object payload) {
+        root = Insert(root, values, payload, 0);
+    }
 
-        int dimension = depth % K;
+    public TreeNode<T> Insert(TreeNode<T> node, ArrayList<T> values, Object payload, int depth) {
+        if (node == null) {
+            TreeNode<T> newNode = new TreeNode<>(values);
+            if (payload != null) {
+                newNode.addPayload(payload);
+            }
+            return newNode;
+        }
+
+        if (node.getElements().equals(values)) {
+            if (payload != null) {
+                node.addPayload(payload);
+            }
+            return node;
+        }
+
+        int dimension = depth % k;
         int compare = node.getElement(dimension).compareTo(values.get(dimension));
 
-        if(compare > 0)
-            node.setLeft(Insert(node.getLeft(), values, depth + 1));
-        else
-            node.setRight(Insert(node.getRight(), values, depth + 1));
+        if (compare > 0) {
+            node.setLeft(Insert(node.getLeft(), values, payload, depth + 1));
+        } else {
+            node.setRight(Insert(node.getRight(), values, payload, depth + 1));
+        }
 
         return node;
     }
 
-    public int Size()
-    {
+    public int Size() {
         return Size(root);
     }
 
-    public int Size(TreeNode<T> node)
-    {
-        if(node == null)
+    public int Size(TreeNode<T> node) {
+        if (node == null)
             return 0;
 
         return 1 + Size(node.getLeft()) + Size(node.getRight());
     }
 
-    public int Height()
-    {
+    public int Height() {
         return Height(root, 0);
     }
 
-    public int Height(TreeNode<T> node, int depth)
-    {
-        if(node == null)
+    public int Height(TreeNode<T> node, int depth) {
+        if (node == null)
             return 0;
 
         depth++;
         return Math.max(depth, Math.max(Height(node.getRight(), depth), Height(node.getLeft(), depth)));
     }
 
-    public void ShowNodes()
-    {
+    public void ShowNodes() {
         ShowNode(root);
     }
 
-    public void ShowNode(TreeNode<T> node)
-    {
-        if(node != null)
-        {
+    public void ShowNode(TreeNode<T> node) {
+        if (node != null) {
             System.out.println("Node: " + node);
 
-            if(node.getLeft() != null)
+            if (node.getLeft() != null)
                 System.out.println("Node left: " + node.getLeft());
-            if(node.getRight() != null)
+            if (node.getRight() != null)
                 System.out.println("Node right: " + node.getRight());
 
             ShowNode(node.getLeft());
@@ -132,27 +152,19 @@ public class Tree<T extends Comparable<T>> {
         }
     }
 
-    public boolean Exists(ArrayList<T> values)
-    {
-        return Find(values) != null;
-    }
-
-    public TreeNode<T> Find(ArrayList<T> values)
-    {
+    public TreeNode<T> Find(ArrayList<T> values) {
         return Find(root, values, 0);
     }
 
-    public TreeNode<T> Find(TreeNode<T> node, ArrayList<T> values, int depth)
-    {
-        if(node != null)
-        {
-            if(node.values.equals(values))
+    public TreeNode<T> Find(TreeNode<T> node, ArrayList<T> values, int depth) {
+        if (node != null) {
+            if (node.values.equals(values))
                 return node;
 
-            int dimension = depth % K;
+            int dimension = depth % k;
             int compare = node.getElement(dimension).compareTo(values.get(dimension));
 
-            if(compare > 0)
+            if (compare > 0)
                 return Find(node.getLeft(), values, depth + 1);
 
             return Find(node.getRight(), values, depth + 1);
@@ -161,43 +173,38 @@ public class Tree<T extends Comparable<T>> {
         return null;
     }
 
-    public ArrayList<TreeNode<T>> RangeSearch(ArrayList<T> lower, ArrayList<T> upper)
-    {
-        ArrayList<TreeNode<T>> values = new ArrayList<>();
-        return RangeSearch(root, lower, upper, 0, values);
+    public List<TreeNode<T>> RangeSearch(ArrayList<T> lower, ArrayList<T> upper) {
+        ArrayList<TreeNode<T>> matches = new ArrayList<>();
+        RangeSearch(root, lower, upper, 0, matches);
+        return matches;
     }
 
-    public ArrayList<TreeNode<T>> RangeSearch(TreeNode<T> node, ArrayList<T> lower, ArrayList<T> upper, int depth, ArrayList<TreeNode<T>> values)
-    {
-        if(node != null)
-        {
+    private void RangeSearch(TreeNode<T> node, ArrayList<T> lower, ArrayList<T> upper, int depth, List<TreeNode<T>> matches) {
+        if (node != null) {
             boolean inside = true;
 
-            for(int i = 0; i < K; i++)
-            {
+            for (int i = 0; i < k; i++) {
                 int lowCompare = node.getElement(i).compareTo(lower.get(i));
                 int upCompare = node.getElement(i).compareTo(upper.get(i));
 
-                if(lowCompare < 0 || upCompare > 0)
-                {
+                if (lowCompare < 0 || upCompare > 0) {
                     inside = false;
+                    break;
                 }
             }
 
-            if(inside)
-                values.add(node);
+            if (inside)
+                matches.add(node);
 
-            int dimension = depth % K;
+            int dimension = depth % k;
             int lowCompare = node.getElement(dimension).compareTo(lower.get(dimension));
             int upCompare = node.getElement(dimension).compareTo(upper.get(dimension));
 
-            if(lowCompare > 0)
-                return RangeSearch(node.getLeft(), lower, upper, depth + 1, values);
+            if (lowCompare > 0)
+                RangeSearch(node.getLeft(), lower, upper, depth + 1, matches);
 
-            if(upCompare < 0)
-                return RangeSearch(node.getRight(), lower, upper, depth + 1, values);
+            if (upCompare < 0)
+                RangeSearch(node.getRight(), lower, upper, depth + 1, matches);
         }
-
-        return values;
     }
 }
