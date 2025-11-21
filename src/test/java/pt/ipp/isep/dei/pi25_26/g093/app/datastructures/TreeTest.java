@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -41,5 +42,18 @@ public class TreeTest {
         int actualHeight = tree.Height();
 
         assertEquals(expectedHeight, actualHeight);
+    }
+
+    @Test
+    public void ensureFind()
+    {
+        for(Integer[] i :values)
+        {
+            ArrayList<Integer> values = new ArrayList<>(Arrays.asList(i));
+            Tree.TreeNode<Integer> node = new Tree.TreeNode<>(values);
+
+            Tree.TreeNode<Integer> foundNode = tree.Find(values);
+            assertEquals(node.getElements(), foundNode.getElements());
+        }
     }
 }

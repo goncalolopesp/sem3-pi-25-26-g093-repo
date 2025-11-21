@@ -161,12 +161,13 @@ public class Tree<T extends Comparable<T>> {
         return null;
     }
 
-    public void RangeSearch(ArrayList<T> lower, ArrayList<T> upper)
+    public ArrayList<TreeNode<T>> RangeSearch(ArrayList<T> lower, ArrayList<T> upper)
     {
-        RangeSearch(root, lower, upper, 0);
+        ArrayList<TreeNode<T>> values = new ArrayList<>();
+        return RangeSearch(root, lower, upper, 0, values);
     }
 
-    public void RangeSearch(TreeNode<T> node, ArrayList<T> lower, ArrayList<T> upper, int depth)
+    public ArrayList<TreeNode<T>> RangeSearch(TreeNode<T> node, ArrayList<T> lower, ArrayList<T> upper, int depth, ArrayList<TreeNode<T>> values)
     {
         if(node != null)
         {
@@ -184,17 +185,19 @@ public class Tree<T extends Comparable<T>> {
             }
 
             if(inside)
-                System.out.println(node);
+                values.add(node);
 
             int dimension = depth % K;
             int lowCompare = node.getElement(dimension).compareTo(lower.get(dimension));
             int upCompare = node.getElement(dimension).compareTo(upper.get(dimension));
 
             if(lowCompare > 0)
-                RangeSearch(node.getLeft(), lower, upper, depth + 1);
+                return RangeSearch(node.getLeft(), lower, upper, depth + 1, values);
 
             if(upCompare < 0)
-                RangeSearch(node.getRight(), lower, upper, depth + 1);
+                return RangeSearch(node.getRight(), lower, upper, depth + 1, values);
         }
+
+        return values;
     }
 }
