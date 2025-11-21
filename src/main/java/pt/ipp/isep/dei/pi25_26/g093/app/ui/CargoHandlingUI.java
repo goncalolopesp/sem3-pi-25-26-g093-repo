@@ -1,11 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
-import pt.ipp.isep.dei.pi25_26.g093.app.service.PickingPlanner;
-import pt.ipp.isep.dei.pi25_26.g093.app.service.PickPathService;
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.TrolleyPlan;
+import pt.ipp.isep.dei.pi25_26.g093.app.controller.BalancedTreeController;
 
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -33,6 +29,7 @@ public class CargoHandlingUI {
             System.out.println("5. USEI05 - Returns & Quarantine");
             System.out.println("6. USEI06 - Time-Zone Index and Windowed Queries");
             System.out.println("7. USEI07 - Build a balanced 2D-Tree on Latitude/Longitude");
+            System.out.println("8. USEI08 - Search by Geographical Area");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
 
@@ -47,6 +44,7 @@ public class CargoHandlingUI {
                 case 5 -> executeUSEI05();
                 case 6 -> executeUSEI06();
                 case 7 -> executeUSEI07();
+                case 8 -> executeUSEI08();
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option.");
             }
@@ -148,6 +146,25 @@ public class CargoHandlingUI {
             treeUI.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI07: " + e.getMessage());
+        }
+    }
+
+    /**
+     * USEI08 - Search by Geographical Area
+     */
+    private void executeUSEI08() {
+        System.out.println("\n=== USEI08 - Search by Geographical Area ===");
+        try {
+            BalancedTreeController controller = new BalancedTreeController();
+            if (!controller.treeExists()) {
+                System.out.println("No KD-tree available. Please build it first via USEI07.");
+                return;
+            }
+
+            GeoAreaSearchUI searchUI = new GeoAreaSearchUI();
+            searchUI.run();
+        } catch (Exception e) {
+            System.out.println("Error executing USEI08: " + e.getMessage());
         }
     }
 }
