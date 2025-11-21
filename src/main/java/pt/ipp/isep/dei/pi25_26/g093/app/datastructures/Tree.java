@@ -132,6 +132,11 @@ public class Tree<T extends Comparable<T>> {
         }
     }
 
+    public boolean Exists(ArrayList<T> values)
+    {
+        return Find(values) != null;
+    }
+
     public TreeNode<T> Find(ArrayList<T> values)
     {
         return Find(root, values, 0);
