@@ -1,5 +1,9 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.datastructures;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class AVL<T extends Comparable<T>> {
 
     private class Node {
@@ -95,4 +99,18 @@ public class AVL<T extends Comparable<T>> {
     public boolean isEmpty() {
         return root == null;
     }
+
+    public List<T> inOrder() {
+        List<T> list = new ArrayList<>();
+        inOrder(root, list);
+        return list;
+    }
+
+    private void inOrder(Node n, List<T> l) {
+        if (n == null) return;
+        inOrder(n.left, l);
+        l.add(n.key);
+        inOrder(n.right, l);
+    }
+
 }
