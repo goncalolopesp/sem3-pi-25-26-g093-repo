@@ -36,6 +36,28 @@ public class GeoAreaSearchUI {
             double lonMin = readDouble("Longitude MIN [-180,180]");
             double lonMax = readDouble("Longitude MAX [-180,180]");
 
+            // Validate ranges before proceeding
+            if (latMin > latMax) {
+                System.out.println(RED + "ERROR: latMin cannot be greater than latMax." + RESET);
+                pause();
+                return;
+            }
+            if (lonMin > lonMax) {
+                System.out.println(RED + "ERROR: lonMin cannot be greater than lonMax." + RESET);
+                pause();
+                return;
+            }
+            if (latMin < -90 || latMax > 90) {
+                System.out.println(RED + "ERROR: Latitude must be within [-90, 90]." + RESET);
+                pause();
+                return;
+            }
+            if (lonMin < -180 || lonMax > 180) {
+                System.out.println(RED + "ERROR: Longitude must be within [-180, 180]." + RESET);
+                pause();
+                return;
+            }
+
             printlnSeparator();
 
             Boolean isCity = readOptionalBoolean("Filter only CITY stations (true/false, blank = no filter)");
