@@ -6,7 +6,6 @@ import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BalancedTreeController {
     private final CompleteStationRepository repo;
@@ -40,7 +39,9 @@ public class BalancedTreeController {
                 continue;
             }
 
-            ArrayList<Double> values = new ArrayList<>(Arrays.asList(lat, lon));
+            ArrayList<Double> values = new ArrayList<>(2);
+            values.add(lat);
+            values.add(lon);
             tree.Insert(values, s);
             inserted++;
         }
