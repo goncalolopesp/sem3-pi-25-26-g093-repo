@@ -67,7 +67,29 @@ public class GeoAreaCircleSearchUI {
             System.out.print(YELLOW + msg + RESET);
             String input = sc.nextLine().trim();
             try {
-                return Double.parseDouble(input);
+                double value = Double.parseDouble(input);
+                // Validate latitude range if message contains "LATITUDE"
+                if (msg.toUpperCase().contains("LATITUDE")) {
+                    if (value < -90 || value > 90) {
+                        System.out.println(RED + "Latitude must be within [-90, 90]. Try again.\n" + RESET);
+                        continue;
+                    }
+                }
+                // Validate longitude range if message contains "LONGITUDE"
+                if (msg.toUpperCase().contains("LONGITUDE")) {
+                    if (value < -180 || value > 180) {
+                        System.out.println(RED + "Longitude must be within [-180, 180]. Try again.\n" + RESET);
+                        continue;
+                    }
+                }
+                // Validate radius if message contains "RADIUS"
+                if (msg.toUpperCase().contains("RADIUS")) {
+                    if (value <= 0) {
+                        System.out.println(RED + "Radius must be greater than 0. Try again.\n" + RESET);
+                        continue;
+                    }
+                }
+                return value;
             } catch (NumberFormatException e) {
                 System.out.println(RED + "Invalid number. Try again.\n" + RESET);
             }

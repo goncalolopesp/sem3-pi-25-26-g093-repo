@@ -36,7 +36,7 @@ public class GeoAreaSearchUI {
             double lonMin = readDouble("Longitude MIN [-180,180]");
             double lonMax = readDouble("Longitude MAX [-180,180]");
 
-            // Validate ranges before proceeding
+            // Validate range ordering before proceeding
             if (latMin > latMax) {
                 System.out.println(RED + "ERROR: latMin cannot be greater than latMax." + RESET);
                 pause();
@@ -44,16 +44,6 @@ public class GeoAreaSearchUI {
             }
             if (lonMin > lonMax) {
                 System.out.println(RED + "ERROR: lonMin cannot be greater than lonMax." + RESET);
-                pause();
-                return;
-            }
-            if (latMin < -90 || latMax > 90) {
-                System.out.println(RED + "ERROR: Latitude must be within [-90, 90]." + RESET);
-                pause();
-                return;
-            }
-            if (lonMin < -180 || lonMax > 180) {
-                System.out.println(RED + "ERROR: Longitude must be within [-180, 180]." + RESET);
                 pause();
                 return;
             }
@@ -108,7 +98,22 @@ public class GeoAreaSearchUI {
             System.out.print(YELLOW + msg + ": " + RESET);
             String input = sc.nextLine().trim();
             try {
-                return Double.parseDouble(input);
+                double value = Double.parseDouble(input);
+                // Validate latitude range if message contains "Latitude"
+                if (msg.contains("Latitude")) {
+                    if (value < -90 || value > 90) {
+                        System.out.println(RED + "Latitude must be within [-90, 90]. Try again." + RESET);
+                        continue;
+                    }
+                }
+                // Validate longitude range if message contains "Longitude"
+                if (msg.contains("Longitude")) {
+                    if (value < -180 || value > 180) {
+                        System.out.println(RED + "Longitude must be within [-180, 180]. Try again." + RESET);
+                        continue;
+                    }
+                }
+                return value;
             } catch (NumberFormatException e) {
                 System.out.println(RED + "Invalid number. Try again." + RESET);
             }

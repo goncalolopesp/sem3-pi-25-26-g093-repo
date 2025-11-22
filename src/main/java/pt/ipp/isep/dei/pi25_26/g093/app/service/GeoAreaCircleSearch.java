@@ -95,12 +95,14 @@ public class GeoAreaCircleSearch {
             filteredDistanceMap.put(station, distanceMap.get(station));
         }
 
-        // Ordenar
+        // Ordenar com null safety
         Comparator<CompleteStation> cmp =
-                Comparator.<CompleteStation, Double>comparing(station -> filteredDistanceMap.get(station))
-                          .thenComparing(CompleteStation::getLatitude)
-                          .thenComparing(CompleteStation::getLongitude)
-                          .thenComparing(CompleteStation::getStation);
+                Comparator.<CompleteStation, Double>comparing(
+                        station -> filteredDistanceMap.get(station),
+                        Comparator.nullsLast(Comparator.naturalOrder()))
+                          .thenComparing(CompleteStation::getLatitude, Comparator.nullsLast(Comparator.naturalOrder()))
+                          .thenComparing(CompleteStation::getLongitude, Comparator.nullsLast(Comparator.naturalOrder()))
+                          .thenComparing(CompleteStation::getStation, Comparator.nullsLast(Comparator.naturalOrder()));
 
         filteredStations.sort(cmp);
 
