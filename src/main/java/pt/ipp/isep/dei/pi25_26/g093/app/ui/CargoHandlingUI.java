@@ -2,17 +2,14 @@ package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.BalancedTreeController;
 
-import java.util.Scanner;
-
 /**
  * USPL02 — Cargo Handling Operations Interface
- * Allows a Station Storage Manager to access all USEI01–USEI05 functionalities
+ * Allows a Station Storage Manager to access all USEI01–USEI09 functionalities
  * through a text-based interface.
  */
 public class CargoHandlingUI {
 
-
-    static Scanner sc = new Scanner(System.in);
+    static java.util.Scanner sc = new java.util.Scanner(System.in);
 
     /**
      * Shows the menu for Cargo Handling operations.
@@ -30,6 +27,7 @@ public class CargoHandlingUI {
             System.out.println("6. USEI06 - Time-Zone Index and Windowed Queries");
             System.out.println("7. USEI07 - Build a balanced 2D-Tree on Latitude/Longitude");
             System.out.println("8. USEI08 - Search by Geographical Area");
+            System.out.println("9. USEI09 - Search by Circular Region (radius)");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
 
@@ -45,6 +43,7 @@ public class CargoHandlingUI {
                 case 6 -> executeUSEI06();
                 case 7 -> executeUSEI07();
                 case 8 -> executeUSEI08();
+                case 9 -> executeUSEI09();
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option.");
             }
@@ -83,7 +82,7 @@ public class CargoHandlingUI {
      */
     private void executeUSEI03() {
         System.out.println("\n=== USEI03 - Picking Plans ===");
-        try{
+        try {
             PickingPlansUI pickingPlansUI = new PickingPlansUI();
             pickingPlansUI.run();
         } catch (Exception e) {
@@ -165,6 +164,25 @@ public class CargoHandlingUI {
             searchUI.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI08: " + e.getMessage());
+        }
+    }
+
+    /**
+     * USEI09 - Search by Circular Region (radius)
+     */
+    private void executeUSEI09() {
+        System.out.println("\n=== USEI09 - Search by Circular Region (radius) ===");
+        try {
+            BalancedTreeController controller = new BalancedTreeController();
+            if (!controller.treeExists()) {
+                System.out.println("No KD-tree available. Please build it first via USEI07.");
+                return;
+            }
+
+            GeoAreaCircleSearchUI ui = new GeoAreaCircleSearchUI();
+            ui.run();
+        } catch (Exception e) {
+            System.out.println("Error executing USEI09: " + e.getMessage());
         }
     }
 }
