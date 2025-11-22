@@ -6,7 +6,6 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.StationAreaFilter;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -43,27 +42,42 @@ public class GeoAreaSearch {
             throw new IllegalStateException("KD-tree is empty. Build it before querying.");
         }
 
-        ArrayList<Double> lower = new ArrayList<>(Arrays.asList(latMin, lonMin));
-        ArrayList<Double> upper = new ArrayList<>(Arrays.asList(latMax, lonMax));
+        // Create bounds lists more efficiently
+        ArrayList<Double> lower = new ArrayList<>(2);
+        lower.add(latMin);
+        lower.add(lonMin);
+        ArrayList<Double> upper = new ArrayList<>(2);
+        upper.add(latMax);
+        upper.add(lonMax);
 
         long start = System.nanoTime();
         List<Tree.TreeNode<Double>> candidateNodes = tree.RangeSearch(lower, upper);
-        List<CompleteStation> matches = new ArrayList<>();
+        
+        // Pre-allocate list with estimated size (nodes typically contain 1-2 stations)
+        int estimatedSize = Math.max(16, candidateNodes.size());
+        List<CompleteStation> matches = new ArrayList<>(estimatedSize);
 
+        // Process nodes and filter stations
         for (Tree.TreeNode<Double> node : candidateNodes) {
-            for (Object payload : node.getPayloads()) {
-                if (payload instanceof CompleteStation station &&
-                        withinBounds(station, latMin, latMax, lonMin, lonMax) &&
-                        effectiveFilter.matches(station)) {
-                    matches.add(station);
+            List<Object> payloads = node.getPayloads();
+            for (Object payload : payloads) {
+                if (payload instanceof CompleteStation station) {
+                    // Verify station is within bounds (necessary because multiple stations
+                    // can share same coordinates, and we need to check each one)
+                    if (withinBounds(station, latMin, latMax, lonMin, lonMax) &&
+                            effectiveFilter.matches(station)) {
+                        matches.add(station);
+                    }
                 }
             }
         }
 
+        // Sort results: latitude (asc), then longitude (asc), then station name (asc)
+        // Using method references for better performance
         matches.sort(Comparator
-                .comparing(CompleteStation::getLatitude)
-                .thenComparing(CompleteStation::getLongitude)
-                .thenComparing(CompleteStation::getStation));
+                .comparing(CompleteStation::getLatitude, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(CompleteStation::getLongitude, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(CompleteStation::getStation, Comparator.nullsLast(Comparator.naturalOrder())));
 
         long elapsed = System.nanoTime() - start;
 
@@ -78,13 +92,18 @@ public class GeoAreaSearch {
     private boolean withinBounds(CompleteStation station,
                                  double latMin, double latMax,
                                  double lonMin, double lonMax) {
-
+        // Cache getter calls to avoid repeated method invocations
         Double lat = station.getLatitude();
         Double lon = station.getLongitude();
-        if (lat == null || lon == null) return false;
+        
+        // Null check (stations without coordinates should not be in tree, but defensive check)
+        if (lat == null || lon == null) {
+            return false;
+        }
 
+        // Use inclusive bounds check
         return lat >= latMin && lat <= latMax &&
-                lon >= lonMin && lon <= lonMax;
+               lon >= lonMin && lon <= lonMax;
     }
 
     private void validateRanges(double latMin, double latMax,
