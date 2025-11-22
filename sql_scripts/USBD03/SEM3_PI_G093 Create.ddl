@@ -14,7 +14,8 @@ CREATE TABLE Operator (operatorID number(10) GENERATED AS IDENTITY, vatNumber va
 CREATE TABLE Owner (ownerID number(10) GENERATED AS IDENTITY, vatNumber varchar2(20) NOT NULL, name varchar2(50) NOT NULL, shortName varchar2(10) NOT NULL, PRIMARY KEY (ownerID));
 CREATE TABLE Path (pathID number(10) GENERATED AS IDENTITY, trainID number(10) NOT NULL, PRIMARY KEY (pathID));
 CREATE TABLE Railway_Line (id number(10) GENERATED AS IDENTITY, startFacilityID number(10) NOT NULL, endFacilityID number(10) NOT NULL, ownerID number(10) NOT NULL, name varchar2(100) NOT NULL, gauge number(10) NOT NULL, PRIMARY KEY (id));
-CREATE TABLE Railway_Segment (id number(10) GENERATED AS IDENTITY, railwayLineID number(10) NOT NULL, segmentOrder number(22) NOT NULL, sidingPosition number(10), sidingLength number(10), isElectrified char(1) NOT NULL, length number(22) NOT NULL, numberTracks number(10) NOT NULL, weightLimit number(22) NOT NULL, PRIMARY KEY (id), CONSTRAINT segmentOrderLine UNIQUE (segmentOrder, railwayLineID));
+CREATE TABLE Railway_Segment (id number(10) GENERATED AS IDENTITY, railwayLineID number(10) NOT NULL, segmentOrder number(22) NOT NULL, isElectrified char(1) NOT NULL, length number(22) NOT NULL, numberTracks number(10) NOT NULL, weightLimit number(22) NOT NULL, PRIMARY KEY (id), CONSTRAINT segmentOrderLine UNIQUE (segmentOrder, railwayLineID));
+CREATE TABLE Siding (railwaySegmentID number(10) NOT NULL, position number(10) NOT NULL, length number(10) NOT NULL, PRIMARY KEY (railwaySegmentID));
 CREATE TABLE Train (trainID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, startDate date NOT NULL, startTime varchar2(5) NOT NULL, PRIMARY KEY (trainID));
 CREATE TABLE Wagon (wagonID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, wagonModelID number(10) NOT NULL, identifier varchar2(20) NOT NULL, PRIMARY KEY (wagonID));
 CREATE TABLE Wagon_Freight (wagonID number(10) NOT NULL, freightID number(10) NOT NULL, PRIMARY KEY (wagonID, freightID));
@@ -46,4 +47,5 @@ ALTER TABLE Wagon_Freight ADD CONSTRAINT FKWagon_Frei975897 FOREIGN KEY (wagonID
 ALTER TABLE Wagon_Freight ADD CONSTRAINT FKWagon_Frei206959 FOREIGN KEY (freightID) REFERENCES Freight (freightID);
 ALTER TABLE Freight ADD CONSTRAINT FKFreight384143 FOREIGN KEY (trainID) REFERENCES Train (trainID);
 ALTER TABLE Locomotive ADD CONSTRAINT FKLocomotive374078 FOREIGN KEY (trainID) REFERENCES Train (trainID);
+ALTER TABLE Siding ADD CONSTRAINT FKSiding702577 FOREIGN KEY (railwaySegmentID) REFERENCES Railway_Segment (id);
 
