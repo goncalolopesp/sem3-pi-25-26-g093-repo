@@ -1,7 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.StationAreaFilter;
@@ -10,7 +10,7 @@ import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for USEI08 - Search by Geographical Area.
@@ -28,7 +28,7 @@ public class GeoAreaSearchUnitTest {
     private GeoAreaSearch service;
     private Tree<Double> tree;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         repository = new CompleteStationRepository();
         service = new GeoAreaSearch(repository);
@@ -47,14 +47,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException when latMin > latMax"
-        );
-
-        assertTrue(exception.getMessage().contains("latMin cannot be greater than latMax"),
-                  "Error message should mention latMin > latMax");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException when latMin > latMax");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention latMin > latMax",
+                      e.getMessage().contains("latMin cannot be greater than latMax"));
+        }
     }
 
     @Test
@@ -67,14 +66,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException when lonMin > lonMax"
-        );
-
-        assertTrue(exception.getMessage().contains("lonMin cannot be greater than lonMax"),
-                  "Error message should mention lonMin > lonMax");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException when lonMin > lonMax");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention lonMin > lonMax",
+                      e.getMessage().contains("lonMin cannot be greater than lonMax"));
+        }
     }
 
     @Test
@@ -87,14 +85,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException for latitude < -90"
-        );
-
-        assertTrue(exception.getMessage().contains("Latitude must be within [-90, 90]"),
-                  "Error message should mention latitude bounds");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException for latitude < -90");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention latitude bounds",
+                      e.getMessage().contains("Latitude must be within [-90, 90]"));
+        }
     }
 
     @Test
@@ -107,14 +104,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException for latitude > 90"
-        );
-
-        assertTrue(exception.getMessage().contains("Latitude must be within [-90, 90]"),
-                  "Error message should mention latitude bounds");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException for latitude > 90");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention latitude bounds",
+                      e.getMessage().contains("Latitude must be within [-90, 90]"));
+        }
     }
 
     @Test
@@ -127,14 +123,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException for longitude < -180"
-        );
-
-        assertTrue(exception.getMessage().contains("Longitude must be within [-180, 180]"),
-                  "Error message should mention longitude bounds");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException for longitude < -180");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention longitude bounds",
+                      e.getMessage().contains("Longitude must be within [-180, 180]"));
+        }
     }
 
     @Test
@@ -147,14 +142,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalArgumentException for longitude > 180"
-        );
-
-        assertTrue(exception.getMessage().contains("Longitude must be within [-180, 180]"),
-                  "Error message should mention longitude bounds");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalArgumentException for longitude > 180");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error message should mention longitude bounds",
+                      e.getMessage().contains("Longitude must be within [-180, 180]"));
+        }
     }
 
     @Test
@@ -167,14 +161,13 @@ public class GeoAreaSearchUnitTest {
         StationAreaFilter filter = new StationAreaFilter(null, null, "ALL");
 
         // Act & Assert
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class,
-            () -> service.searchByArea(latMin, latMax, lonMin, lonMax, filter),
-            "Should throw IllegalStateException when tree is empty"
-        );
-
-        assertTrue(exception.getMessage().contains("KD-tree is empty"),
-                  "Error message should mention empty tree");
+        try {
+            service.searchByArea(latMin, latMax, lonMin, lonMax, filter);
+            fail("Should throw IllegalStateException when tree is empty");
+        } catch (IllegalStateException e) {
+            assertTrue("Error message should mention empty tree",
+                      e.getMessage().contains("KD-tree is empty"));
+        }
     }
 
     // ==================== FILTER TESTS ====================
@@ -204,9 +197,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only city station");
-        assertEquals(cityStation, stations.get(0), "Should be city station");
-        assertFalse(stations.contains(nonCityStation), "Should not contain non-city station");
+        assertEquals("Should return only city station", 1, stations.size());
+        assertEquals("Should be city station", cityStation, stations.get(0));
+        assertFalse("Should not contain non-city station", stations.contains(nonCityStation));
     }
 
     @Test
@@ -234,9 +227,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only non-city station");
-        assertEquals(nonCityStation, stations.get(0), "Should be non-city station");
-        assertFalse(stations.contains(cityStation), "Should not contain city station");
+        assertEquals("Should return only non-city station", 1, stations.size());
+        assertEquals("Should be non-city station", nonCityStation, stations.get(0));
+        assertFalse("Should not contain city station", stations.contains(cityStation));
     }
 
     @Test
@@ -264,9 +257,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only main station");
-        assertEquals(mainStation, stations.get(0), "Should be main station");
-        assertFalse(stations.contains(nonMainStation), "Should not contain non-main station");
+        assertEquals("Should return only main station", 1, stations.size());
+        assertEquals("Should be main station", mainStation, stations.get(0));
+        assertFalse("Should not contain non-main station", stations.contains(nonMainStation));
     }
 
     @Test
@@ -294,9 +287,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only PT station");
-        assertEquals(ptStation, stations.get(0), "Should be PT station");
-        assertFalse(stations.contains(esStation), "Should not contain ES station");
+        assertEquals("Should return only PT station", 1, stations.size());
+        assertEquals("Should be PT station", ptStation, stations.get(0));
+        assertFalse("Should not contain ES station", stations.contains(esStation));
     }
 
     @Test
@@ -324,9 +317,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only ES station");
-        assertEquals(esStation, stations.get(0), "Should be ES station");
-        assertFalse(stations.contains(ptStation), "Should not contain PT station");
+        assertEquals("Should return only ES station", 1, stations.size());
+        assertEquals("Should be ES station", esStation, stations.get(0));
+        assertFalse("Should not contain PT station", stations.contains(ptStation));
     }
 
     @Test
@@ -354,9 +347,9 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(2, stations.size(), "Should return both stations");
-        assertTrue(stations.contains(ptStation), "Should contain PT station");
-        assertTrue(stations.contains(esStation), "Should contain ES station");
+        assertEquals("Should return both stations", 2, stations.size());
+        assertTrue("Should contain PT station", stations.contains(ptStation));
+        assertTrue("Should contain ES station", stations.contains(esStation));
     }
 
     @Test
@@ -388,8 +381,8 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return only city AND main station");
-        assertEquals(cityMain, stations.get(0), "Should be city and main station");
+        assertEquals("Should return only city AND main station", 1, stations.size());
+        assertEquals("Should be city and main station", cityMain, stations.get(0));
     }
 
     // ==================== KD-TREE RANGESEARCH TESTS ====================
@@ -415,8 +408,8 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return station inside bounds");
-        assertEquals(station, stations.get(0), "Should be the station");
+        assertEquals("Should return station inside bounds", 1, stations.size());
+        assertEquals("Should be the station", station, stations.get(0));
     }
 
     @Test
@@ -441,7 +434,7 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertTrue(stations.isEmpty(), "Should return empty for station outside bounds");
+        assertTrue("Should return empty for station outside bounds", stations.isEmpty());
     }
 
     @Test
@@ -466,8 +459,8 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return station at boundary");
-        assertEquals(station, stations.get(0), "Should be the station");
+        assertEquals("Should return station at boundary", 1, stations.size());
+        assertEquals("Should be the station", station, stations.get(0));
     }
 
     @Test
@@ -492,8 +485,8 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(1, stations.size(), "Should return station at boundary");
-        assertEquals(station, stations.get(0), "Should be the station");
+        assertEquals("Should return station at boundary", 1, stations.size());
+        assertEquals("Should be the station", station, stations.get(0));
     }
 
     @Test
@@ -526,10 +519,10 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertEquals(2, stations.size(), "Should return 2 stations inside bounds");
-        assertTrue(stations.contains(inside1), "Should contain Lisboa");
-        assertTrue(stations.contains(inside2), "Should contain Setúbal");
-        assertFalse(stations.contains(outside), "Should not contain Porto");
+        assertEquals("Should return 2 stations inside bounds", 2, stations.size());
+        assertTrue("Should contain Lisboa", stations.contains(inside1));
+        assertTrue("Should contain Setúbal", stations.contains(inside2));
+        assertFalse("Should not contain Porto", stations.contains(outside));
     }
 
     // ==================== SORTING TESTS ====================
@@ -563,12 +556,12 @@ public class GeoAreaSearchUnitTest {
 
         // Assert: Should be sorted by latitude (asc)
         List<CompleteStation> stations = result.getStations();
-        assertEquals(3, stations.size(), "Should return 3 stations");
+        assertEquals("Should return 3 stations", 3, stations.size());
 
         // Verify order: Lisboa (38.7223), Aveiro (40.6443), Braga (41.5454)
-        assertEquals(station3, stations.get(0), "First should be Lisboa (lowest latitude)");
-        assertEquals(station1, stations.get(1), "Second should be Aveiro");
-        assertEquals(station2, stations.get(2), "Third should be Braga (highest latitude)");
+        assertEquals("First should be Lisboa (lowest latitude)", station3, stations.get(0));
+        assertEquals("Second should be Aveiro", station1, stations.get(1));
+        assertEquals("Third should be Braga (highest latitude)", station2, stations.get(2));
     }
 
     @Test
@@ -600,12 +593,12 @@ public class GeoAreaSearchUnitTest {
 
         // Assert: Should be sorted by longitude (asc) when latitude is equal
         List<CompleteStation> stations = result.getStations();
-        assertEquals(3, stations.size(), "Should return 3 stations");
+        assertEquals("Should return 3 stations", 3, stations.size());
 
         // Verify order: Station A (-9.0), Station B (-8.0), Station C (-7.0)
-        assertEquals(station1, stations.get(0), "First should be Station A (lowest longitude)");
-        assertEquals(station2, stations.get(1), "Second should be Station B");
-        assertEquals(station3, stations.get(2), "Third should be Station C (highest longitude)");
+        assertEquals("First should be Station A (lowest longitude)", station1, stations.get(0));
+        assertEquals("Second should be Station B", station2, stations.get(1));
+        assertEquals("Third should be Station C (highest longitude)", station3, stations.get(2));
     }
 
     @Test
@@ -637,12 +630,12 @@ public class GeoAreaSearchUnitTest {
 
         // Assert: Should be sorted by name (asc) when coordinates are equal
         List<CompleteStation> stations = result.getStations();
-        assertEquals(3, stations.size(), "Should return 3 stations");
+        assertEquals("Should return 3 stations", 3, stations.size());
 
         // Verify order: Alpha, Beta, Gamma (alphabetical)
-        assertEquals(station1, stations.get(0), "First should be Alpha Station");
-        assertEquals(station2, stations.get(1), "Second should be Beta Station");
-        assertEquals(station3, stations.get(2), "Third should be Gamma Station");
+        assertEquals("First should be Alpha Station", station1, stations.get(0));
+        assertEquals("Second should be Beta Station", station2, stations.get(1));
+        assertEquals("Third should be Gamma Station", station3, stations.get(2));
     }
 
     // ==================== EMPTY RESULTS TESTS ====================
@@ -669,8 +662,8 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertTrue(stations.isEmpty(), "Should return empty list");
-        assertEquals(0, stations.size(), "Should have 0 stations");
+        assertTrue("Should return empty list", stations.isEmpty());
+        assertEquals("Should have 0 stations", 0, stations.size());
     }
 
     @Test
