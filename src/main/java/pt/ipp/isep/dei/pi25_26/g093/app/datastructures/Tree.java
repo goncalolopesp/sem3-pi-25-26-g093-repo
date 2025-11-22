@@ -181,8 +181,8 @@ public class Tree<T extends Comparable<T>> {
 
     private void RangeSearch(TreeNode<T> node, ArrayList<T> lower, ArrayList<T> upper, int depth, List<TreeNode<T>> matches) {
         if (node != null) {
+            // Check if the node's point is completely inside the range
             boolean inside = true;
-
             for (int i = 0; i < k; i++) {
                 int lowCompare = node.getElement(i).compareTo(lower.get(i));
                 int upCompare = node.getElement(i).compareTo(upper.get(i));
@@ -196,15 +196,29 @@ public class Tree<T extends Comparable<T>> {
             if (inside)
                 matches.add(node);
 
+            // Determine which subtrees to search based on current dimension
             int dimension = depth % k;
-            int lowCompare = node.getElement(dimension).compareTo(lower.get(dimension));
-            int upCompare = node.getElement(dimension).compareTo(upper.get(dimension));
+            T nodeValue = node.getElement(dimension);
+            T lowerBound = lower.get(dimension);
+            T upperBound = upper.get(dimension);
 
-            if (lowCompare > 0)
-                RangeSearch(node.getLeft(), lower, upper, depth + 1, matches);
+            int lowCompare = nodeValue.compareTo(lowerBound);
+            int upCompare = nodeValue.compareTo(upperBound);
 
-            if (upCompare < 0)
+            // If node's value is less than lower bound, only search right subtree
+            // If node's value is greater than upper bound, only search left subtree
+            // If node's value is between bounds, search both subtrees
+            if (lowCompare < 0) {
+                // Node value < lower bound: only search right subtree
                 RangeSearch(node.getRight(), lower, upper, depth + 1, matches);
+            } else if (upCompare > 0) {
+                // Node value > upper bound: only search left subtree
+                RangeSearch(node.getLeft(), lower, upper, depth + 1, matches);
+            } else {
+                // Node value is within bounds: search both subtrees
+                RangeSearch(node.getLeft(), lower, upper, depth + 1, matches);
+                RangeSearch(node.getRight(), lower, upper, depth + 1, matches);
+            }
         }
     }
 }
