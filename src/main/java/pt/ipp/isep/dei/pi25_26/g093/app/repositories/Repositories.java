@@ -12,9 +12,6 @@ public class Repositories {
     private ReturnItemRepository returnItemRepository;
     private TrolleyPlanRepository trolleyPlanRepository;
     private OrderRepository orderRepository;
-    private FacilityRepository facilityRepository;
-    private RailwayLineRepository railwayLineRepository;
-    private RailwayLineSegmentRepository railwayLineSegmentRepository;
     private CompleteStationRepository completeStationRepository;
 
 
@@ -28,9 +25,6 @@ public class Repositories {
         returnItemRepository = new ReturnItemRepository();
         trolleyPlanRepository = new TrolleyPlanRepository();
         orderRepository = new OrderRepository();
-        facilityRepository = new FacilityRepository();
-        railwayLineRepository = new RailwayLineRepository();
-        railwayLineSegmentRepository = new RailwayLineSegmentRepository();
         completeStationRepository = new CompleteStationRepository();
 
     }
@@ -74,30 +68,6 @@ public class Repositories {
      * @return the OrderRepository.
      */
     public OrderRepository getOrderRepository() {return orderRepository;}
-
-    /**
-     * Gets the FacilityRepository.
-     * @return the FacilityRepository.
-     */
-    public FacilityRepository getFacilityRepository() {
-        return facilityRepository;
-    }
-
-    /**
-     * Gets the RailwayLineRepository.
-     * @return the RailwayLineRepository.
-     */
-    public RailwayLineRepository getRailwayLineRepository() {
-        return railwayLineRepository;
-    }
-
-    /**
-     * Gets the RailwayLineSegmentRepository.
-     * @return the RailwayLineSegmentRepository.
-     */
-    public RailwayLineSegmentRepository getRailwayLineSegmentRepository() {
-        return railwayLineSegmentRepository;
-    }
 
     /**
      * Gets the CompleteStationRepository.
