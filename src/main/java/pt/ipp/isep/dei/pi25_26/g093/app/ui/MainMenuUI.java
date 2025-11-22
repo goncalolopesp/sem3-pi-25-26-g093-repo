@@ -27,7 +27,7 @@ public class MainMenuUI {
             switch (option) {
                 case 1 -> showTeamPresentation();
                 case 2 -> runCargoHandlingUI();
-                case 3 -> runTravelTimeUI();
+                case 4 -> runSimulation();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -43,6 +43,7 @@ public class MainMenuUI {
         System.out.println("1. Team Presentation");
         System.out.println("2. Cargo Handling Operations (USPL02)");
         System.out.println("3. Travel Time Between Stations (USPL03)");
+        System.out.println("4. Freight Dispatcher (USPL07)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Select an option: ");
@@ -83,15 +84,12 @@ public class MainMenuUI {
         }
     }
 
-    /**
-     * Option 3 – Runs the Travel Time Between Stations module (USPL03).
-     */
-    private void runTravelTimeUI() {
+    private void runSimulation() {
         try {
-            TravelTimeUI travelTimeUI = new TravelTimeUI();
-            travelTimeUI.run();
+            DispatcherUI dispatcherUI = new DispatcherUI();
+            dispatcherUI.showMenu();
         } catch (Exception e) {
-            System.out.println("Error executing TravelTimeUI: " + e.getMessage());
+            System.out.println("Error executing DispatcherUI: " + e.getMessage());
         }
     }
 }
