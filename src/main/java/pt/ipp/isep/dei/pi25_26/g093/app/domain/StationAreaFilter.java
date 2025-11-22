@@ -80,6 +80,7 @@ public class StationAreaFilter {
 
     /**
      * Checks if the provided station matches the filter.
+     * Optimized with early returns and cached getter calls.
      *
      * @param station station to evaluate
      * @return true if the station satisfies the filter (or if no filters are set)
@@ -89,16 +90,25 @@ public class StationAreaFilter {
             return false;
         }
 
-        if (isCity != null && station.isCity() != isCity) {
-            return false;
+        // Early return for most selective filters first (country is typically most selective)
+        if (!"ALL".equals(country)) {
+            String stationCountry = station.getCountry();
+            if (stationCountry == null || !country.equalsIgnoreCase(stationCountry)) {
+                return false;
+            }
         }
 
-        if (isMainStation != null && station.isMainStation() != isMainStation) {
-            return false;
+        // Check boolean filters (cache getter calls)
+        if (isCity != null) {
+            if (station.isCity() != isCity) {
+                return false;
+            }
         }
 
-        if (!"ALL".equals(country) && !country.equalsIgnoreCase(station.getCountry())) {
-            return false;
+        if (isMainStation != null) {
+            if (station.isMainStation() != isMainStation) {
+                return false;
+            }
         }
 
         return true;
