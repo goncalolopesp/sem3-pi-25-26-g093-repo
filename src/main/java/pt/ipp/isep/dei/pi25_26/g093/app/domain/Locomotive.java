@@ -1,44 +1,67 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
-import java.util.Objects;
-
-/**
- * USPL03 - Locomotive (minimal model).
- */
 public class Locomotive {
-    private final String id;
-    private final String type;           // e.g., "diesel" or "electric"
-    private final double maxSpeedKmH;    // top speed
-    private final double gaugeMm;        // track gauge (mm)
 
-    public Locomotive(String id, String type, double maxSpeedKmH, double gaugeMm) {
-        if (id == null || id.isBlank()) throw new IllegalArgumentException("Locomotive id is required");
-        if (type == null || type.isBlank()) throw new IllegalArgumentException("Locomotive type is required");
-        if (maxSpeedKmH <= 0) throw new IllegalArgumentException("Max speed must be positive");
-        if (gaugeMm <= 0) throw new IllegalArgumentException("Gauge must be positive");
-        this.id = id.trim();
-        this.type = type.trim().toLowerCase();
-        this.maxSpeedKmH = maxSpeedKmH;
-        this.gaugeMm = gaugeMm;
+    private final int id;
+    private final String identifier;
+    private final String modelName;
+    private final LocomotiveModel model;
+    private final int operatorId;
+    private int currentFacilityId;
+    private boolean busy = false;
+
+
+    public Locomotive(int id,
+                      String identifier,
+                      String modelName,
+                      LocomotiveModel model,
+                      int operatorId,
+                      int currentFacilityId) {
+        this.id = id;
+        this.identifier = identifier;
+        this.modelName = modelName;
+        this.model = model;
+        this.operatorId = operatorId;
+        this.currentFacilityId = currentFacilityId;
     }
 
-    public String getId() { return id; }
-    public String getType() { return type; }
-    public double getMaxSpeedKmH() { return maxSpeedKmH; }
-    public double getGaugeMm() { return gaugeMm; }
-    public boolean isElectric() { return "electric".equals(type); }
-    public boolean isDiesel() { return "diesel".equals(type); }
-    public boolean isGaugeCompatible(double otherGaugeMm) { return Math.abs(gaugeMm - otherGaugeMm) <= 1.0; }
+    public int getId() { return id; }
+    public String getIdentifier() { return identifier; }
+    public LocomotiveModel getModel() { return model; }
+    public int getOperator() { return operatorId; }
 
-    @Override public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Locomotive)) return false;
-        Locomotive that = (Locomotive) o;
-        return id.equalsIgnoreCase(that.id);
+    public int getCurrentFacilityId() {
+        return currentFacilityId;
     }
-    @Override public int hashCode() { return Objects.hash(id.toLowerCase()); }
 
-    @Override public String toString() {
-        return String.format("%s (%s, %.0f km/h, %.0f mm)", id, type, maxSpeedKmH, gaugeMm);
+    public void setCurrentFacilityId(int currentFacilityId) {
+        this.currentFacilityId = currentFacilityId;
     }
+
+    public double getLengthMeters() { return model.getLengthMeters(); }
+    public double getMaxSpeedKmh() { return model.getMaxSpeedKmh(); }
+    public double getPowerKw() { return model.getPowerKw(); }
+
+    public String getModelName() { return modelName; }
+
+    public boolean isBusy() {
+        return busy;
+    }
+
+    public void setBusy(boolean busy) {
+        this.busy = busy;
+    }
+
+    public boolean isAvailable() {
+        return !busy;
+    }
+
+    public void setAvailable(boolean available) {
+        this.busy = !available;
+    }
+
+
+
+
 }
+
