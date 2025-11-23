@@ -1,69 +1,103 @@
-#include <stdio.h>
+#include <string.h>
+#include "../unity.h"
 #include "move_n_to_array.h"
 
-int main() {
-    // Teste 1: Operação normal - remover 3 elementos de um buffer circular
-    printf("=== Teste 1: Operacao normal ===\n");
-    int buffer1[5] = {10, 20, 30, 40, 50};
-    int nelem1 = 5;
-    int head1 = 0;
-    int tail1 = 0;
-    int array1[5];
-    int n1 = 3;
-    
-    printf("Antes: nelem=%d, head=%d\n", nelem1, head1);
-    printf("Buffer: ");
-    for(int i = 0; i < 5; i++) printf("%d ", buffer1[i]);
-    printf("\n");
-    
-    int result1 = move_n_to_array(buffer1, 5, &nelem1, &tail1, &head1, n1, array1);
-    
-    printf("Depois: movidos=%d, nelem=%d, head=%d\n", result1, nelem1, head1);
-    printf("Array: ");
-    for(int i = 0; i < result1; i++) printf("%d ", array1[i]);
-    printf("\n\n");
-    
-    // Teste 2: Pedir mais elementos do que os disponíveis
-    printf("=== Teste 2: Pedir mais do que o disponivel ===\n");
-    int buffer2[5] = {100, 200, 300, 0, 0};
-    int nelem2 = 3;
-    int head2 = 0;
-    int tail2 = 3;
-    int array2[10];
-    int n2 = 10;  // Pedir 10 mas apenas 3 disponíveis
-    
-    printf("Antes: nelem=%d, head=%d, pedidos=%d\n", nelem2, head2, n2);
-    printf("Buffer: ");
-    for(int i = 0; i < nelem2; i++) printf("%d ", buffer2[i]);
-    printf("\n");
-    
-    int result2 = move_n_to_array(buffer2, 5, &nelem2, &tail2, &head2, n2, array2);
-    
-    printf("Depois: movidos=%d, nelem=%d, head=%d\n", result2, nelem2, head2);
-    printf("Array: ");
-    for(int i = 0; i < result2; i++) printf("%d ", array2[i]);
-    printf("\n\n");
-    
-    // Teste 3: Wraparound - O MAIS IMPORTANTE!
-    printf("=== Teste 3: Wraparound (buffer circular) ===\n");
-    int buffer3[5] = {40, 50, 10, 20, 30};
-    int nelem3 = 5;
-    int head3 = 2;  // Começa no índice 2 (mais antigo é 10)
-    int tail3 = 2;
-    int array3[5];
-    int n3 = 4;
-    
-    printf("Antes: nelem=%d, head=%d\n", nelem3, head3);
-    printf("Buffer (circular, head em %d): ", head3);
-    for(int i = 0; i < 5; i++) printf("%d ", buffer3[i]);
-    printf("\n");
-    
-    int result3 = move_n_to_array(buffer3, 5, &nelem3, &tail3, &head3, n3, array3);
-    
-    printf("Depois: movidos=%d, nelem=%d, head=%d\n", result3, nelem3, head3);
-    printf("Array (ordem de remocao): ");
-    for(int i = 0; i < result3; i++) printf("%d ", array3[i]);
-    printf("\n\n");
 
-    return 0;
+int callfunc ( int (*f)(int* array, int len, int * n_elem, int* rd, int* wr, int num, int* vec ),
+                          int* array, int len, int * n_elem, int* rd, int *wr, int num, int* vec );
+
+void setUp(void) {
+    // set stuff up here
 }
+
+void tearDown(void) {
+    // clean stuff up here
+}
+
+
+
+void run_test(int * array, int len, int n_elem, int rd, int wr, int num,
+			  int exp_res, int exp_elem, int * exp_vec, int exp_rd, int exp_wr)
+{
+    int v1[100];
+	// 0 - sentinel
+	// 1 - read
+	// 2 - sentinel
+	// 3 - write
+    // 4 - sentinel
+	// 5 - n_elem
+	// 6 - sentinel
+	// 7 - buffer
+	// 7+length - sentinel
+
+    // setup
+    memset(v1, 0x55, sizeof v1);
+	memcpy(v1+7,array,len*sizeof(int));  // buffer
+	v1[1]=rd;
+	v1[3]=wr;
+	v1[5]=n_elem;
+
+	int v2[100];
+    memset(v2, 0x55, sizeof v2);    // destination
+    int res;
+	res=callfunc(move_n_to_array, v1+7, len, v1+5, v1+1, v1+3, num, v2+1);
+    TEST_ASSERT_EQUAL_INT(exp_res,res);    // check result
+    TEST_ASSERT_EQUAL_INT(0x55555555, v1[0]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, v1[2]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, v1[4]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, v1[6]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, v1[len+7]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT_ARRAY(array, v1+7, len);    // check buffer
+    TEST_ASSERT_EQUAL_INT(exp_rd, v1[1]);    // check read
+    TEST_ASSERT_EQUAL_INT(exp_wr, v1[3]);    // check write
+    TEST_ASSERT_EQUAL_INT(exp_elem, v1[5]);    // check num_elem
+    // output vector
+    TEST_ASSERT_EQUAL_INT(0x55555555, v2[0]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, v2[num+1]);    // check sentinel
+    if (exp_res==1)
+    	TEST_ASSERT_EQUAL_INT_ARRAY(exp_vec,v2+1, num);
+		// check output
+	else
+    	TEST_ASSERT_EQUAL_INT(0x55555555, v2[1]);    // check output
+}
+// void run_test(int * array, int len,int elem, int rd, int wr, int num,
+//			  int exp_res, int exp_elem,  int * exp_vec, int exp_rd, int exp_wr)
+
+void test_One()
+{
+    run_test((int[]){0,0,0}, 3, 0, 0, 0, 1,
+							0, 0, (int[]){0,0,0}, 0, 0);
+}
+void test_Zero()
+{
+    run_test((int[]){1,0,0}, 3, 1, 0, 1, 1,
+							1, 0, (int[]){1}, 1, 1);
+}
+void test_Three()
+{
+    run_test((int[]){1,2,3,4}, 4, 3, 3, 2, 3,
+					1, 0, (int[]){4,1,2}, 2, 2);
+}
+void test_Five()
+{
+    run_test((int[]){1,2,3,4}, 4, 2, 2, 1, 3,
+					0, 2, (int[]){3,4,1}, 2, 1);
+}
+
+int main()
+  {
+
+    UNITY_BEGIN();
+    RUN_TEST(test_One);
+    RUN_TEST(test_Zero);
+    RUN_TEST(test_Three);
+    RUN_TEST(test_Five);
+    return UNITY_END();
+
+  }
+
+
+
+
+
+

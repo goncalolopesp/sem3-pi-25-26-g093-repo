@@ -1,60 +1,94 @@
-#include <stdio.h>
+#include <string.h>
+#include "../unity.h"
 #include "median.h"
 
-// Função auxiliar para imprimir array
-void print_array(int* arr, int length) {
-    for(int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
+
+int callfunc ( int (*f)(int* ptr, int num, int * me),int* ptr, int num, int* me);
+
+void setUp(void) {
+    // set stuff up here
 }
 
-int main() {
-    
-    // Teste 1: Array ímpar (5 elementos) - Mostra mediana de ímpar
-    printf("=== Teste 1: Array impar (5 elementos) ===\n");
-    int arr1[] = {5, 2, 8, 1, 9};
-    int len1 = 5;
-    int med1;
-    printf("Antes: ");
-    print_array(arr1, len1);
-    
-    int result1 = median(arr1, len1, &med1);
-    
-    printf("Depois (ordenado): ");
-    print_array(arr1, len1);
-    printf("Mediana: %d (esperado: 5)\n", med1);
-    printf("Resultado: %d (1=sucesso, 0=falha)\n\n", result1);
-    
-    // Teste 2: Array par com arredondamento - Mostra arredondamento para cima
-    printf("=== Teste 2: Array par - arredondamento para cima ===\n");
-    int arr2[] = {1, 2, 3, 4};
-    int len2 = 4;
-    int med2;
-    printf("Antes: ");
-    print_array(arr2, len2);
-    
-    int result2 = median(arr2, len2, &med2);
-    
-    printf("Depois (ordenado): ");
-    print_array(arr2, len2);
-    printf("Mediana: %d (esperado: (2+3+1)/2 = 3 arredondado para cima)\n", med2);
-    printf("Resultado: %d (1=sucesso, 0=falha)\n\n", result2);
-    
-    // Teste 3: Array ímpar com negativos - Mostra funcionamento com negativos
-    printf("=== Teste 3: Array impar com negativos ===\n");
-    int arr3[] = {-10, -5, 0, 5, 10};
-    int len3 = 5;
-    int med3;
-    printf("Antes: ");
-    print_array(arr3, len3);
-    
-    int result3 = median(arr3, len3, &med3);
-    
-    printf("Depois (ordenado): ");
-    print_array(arr3, len3);
-    printf("Mediana: %d (esperado: 0)\n", med3);
-    printf("Resultado: %d (1=sucesso, 0=falha)\n\n", result3);
-    
-    return 0;
+void tearDown(void) {
+    // clean stuff up here
 }
+
+
+
+void run_test(int * vec, int in_num, int exp_res , int  exp_med)
+{
+    int vec1[100];
+    int res;
+
+    int med[3]={-1,-1,-1};
+
+    // setup
+        memset(vec1, 0x55, sizeof vec1);
+
+	memcpy(vec1+1,vec,in_num*sizeof(int));  //
+	res=callfunc(median,vec1+1,in_num,&med[1]);
+
+    TEST_ASSERT_EQUAL_INT(0x55555555, vec1[in_num+1]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(0x55555555, vec1[0]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(exp_res, res);    // check res
+    if (exp_res==1)
+	    TEST_ASSERT_EQUAL_INT(exp_med, med[1]);    // check median
+	else
+	    TEST_ASSERT_EQUAL_INT(-1, med[1]);    // check median
+
+    TEST_ASSERT_EQUAL_INT(-1, med[0]);    // check sentinel
+    TEST_ASSERT_EQUAL_INT(-1, med[2]);    // check sentinel
+
+}
+
+//void run_test(int * vec, int in_num, int exp_res , int  exp_med)
+
+void test_NullVector()
+{
+    run_test((int[]){0},0,0,0);
+}
+void test_One()
+{
+    run_test((int[]){1000},1,1,1000);
+}
+void test_Zero()
+{
+    run_test((int[]){10,0,1},3,1,1);
+}
+void test_Three()
+{
+    run_test((int[]){-1,-3,-2},3,1,-2);
+}
+void test_Four()
+{
+    run_test((int[]){-1,-3,-4,-2},4,1,-3);
+}
+void test_Five()
+{
+    run_test((int[]){1,1,1,1,2},5,1,1);
+}
+void test_Six()
+{
+    run_test((int[]){0,3000,10,20,0,300},6,1,15);
+}
+
+int main()
+  {
+
+    UNITY_BEGIN();
+    RUN_TEST(test_NullVector);
+    RUN_TEST(test_One);
+    RUN_TEST(test_Zero);
+    RUN_TEST(test_Three);
+    RUN_TEST(test_Four);
+    RUN_TEST(test_Five);
+    RUN_TEST(test_Six);
+    return UNITY_END();
+
+  }
+
+
+
+
+
+
