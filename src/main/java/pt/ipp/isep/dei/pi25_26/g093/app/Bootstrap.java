@@ -2,7 +2,6 @@ package pt.ipp.isep.dei.pi25_26.g093.app;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WagonController;
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.WarehouseController;
-import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.AVL;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 
 import java.io.File;
@@ -90,21 +89,78 @@ public class Bootstrap {
      * Prompts the user to enter the path to the CSV files.
      */
     public void completeCSVFiles(){
+        boolean fb = false, fi = false, fo = false, fol = false, fr = false, fw = false, fes = false;
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Path to the bays csv file: ");
-        baysCsv = scanner.nextLine();
-        System.out.print("Path to the items csv file: ");
-        itemsCsv = scanner.nextLine();
-        System.out.print("Path to the order csv file: ");
-        orderCsv = scanner.nextLine();
-        System.out.print("Path to the order_lines csv file: ");
-        order_linesCsv = scanner.nextLine();
-        System.out.print("Path to the returns csv file: ");
-        returnsCsv = scanner.nextLine();
-        System.out.print("Path to the wagons csv file: ");
-        wagonsCsv = scanner.nextLine();
-        System.out.print("Path to the europe stations csv file: ");
-        europeStationsCsv = scanner.nextLine();
+        while (!fb){
+            System.out.print("Path to the bays csv file: ");
+            baysCsv = scanner.nextLine();
+            File f = new File(path + "/" + baysCsv);
+            if (f.exists()){
+                fb = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fi){
+            System.out.print("Path to the items csv file: ");
+            itemsCsv = scanner.nextLine();
+            File f = new File(path + "/" + itemsCsv);
+            if (f.exists()){
+                fi = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fo){
+            System.out.print("Path to the order csv file: ");
+            orderCsv = scanner.nextLine();
+            File f = new File(path + "/" + orderCsv);
+            if (f.exists()){
+                fo = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fol){
+            System.out.print("Path to the order_lines csv file: ");
+            order_linesCsv = scanner.nextLine();
+            File f = new File(path + "/" + order_linesCsv);
+            if (f.exists()){
+                fol = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fr){
+            System.out.print("Path to the returns csv file: ");
+            returnsCsv = scanner.nextLine();
+            File f = new File(path + "/" + returnsCsv);
+            if (f.exists()){
+                fr = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fw){
+            System.out.print("Path to the wagons csv file: ");
+            wagonsCsv = scanner.nextLine();
+            File f = new File(path + "/" + wagonsCsv);
+            if (f.exists()){
+                fw = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+        while (!fes){
+            System.out.print("Path to the europe stations csv file: ");
+            europeStationsCsv = scanner.nextLine();
+            File f = new File(path + "/" + europeStationsCsv);
+            if (f.exists()){
+                fes = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
     }
 
     /**
