@@ -5,171 +5,196 @@ skinparam monochrome true
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
-abstract class Facility {
-  +name
-  +posX
-  +posY
-  +isIntermodal
+' ===================== INFRASTRUCTURE =====================
+package "Infrastructure" {
+
+  abstract class Facility {
+    +name
+    +latitude
+    +longitude
+    +isIntermodal
+  }
+
+  class Station
+  class Terminal
+  class FreightYard
+
+  Facility <|-- Station
+  Facility <|-- Terminal
+  Facility <|-- FreightYard
+
+  class Owner {
+    +name
+  }
+
+  class Gauge {
+    +name
+    +widthMM
+  }
+
+  class RailwayLine {
+    +name
+  }
+
+  class RailwaySegment {
+    +length
+    +electrified
+    +numberTracks
+    +speedLimit
+    +weightLimit
+  }
+
+  Owner "1" -- "1..*" RailwayLine : owns >
+  RailwayLine "1" -- "1..*" RailwaySegment : composedOf >
+  RailwayLine "1" -- "1" Facility : startsAt >
+  RailwayLine "1" -- "1" Facility : endsAt >
+
+  Gauge "1" -- "0..*" RailwayLine : allowedOn >
+  Gauge "1" -- "0..*" RailwaySegment : supports >
 }
 
-class Station {}
-class Terminal {}
-class FreightYard {}
+' ===================== BUILDINGS & CARGO =====================
+package "Facilities & Cargo" {
 
-Facility <|-- Station
-Facility <|-- Terminal
-Facility <|-- FreightYard
+  class Building {
+    +name
+  }
 
-class RailwayLine {
-  +name
-  +gauge
+  class Warehouse
+  class GrainSilo
+  class RefrigeratedArea
+
+  Building <|-- Warehouse
+  Building <|-- GrainSilo
+  Building <|-- RefrigeratedArea
+
+  Facility "1" -- "0..*" Building : contains >
+
+  class Cargo {
+    +quantity
+  }
+
+  class CargoType {
+    +typeName
+  }
+
+  Cargo "1" -- "1" CargoType : ofType >
+  Cargo "1" -- "1" Building : storedAt >
 }
 
-class RailwaySegment {
-  +segmentOrder
-  +sidingPosition
-  +sidingLength
-  +isElectrified
-  +length
-  +numberTracks
-  +speedLimit
-  +weightLimit
+' ===================== OPERATORS & ROLLING STOCK =====================
+package "Rolling Stock & Operators" {
+
+  class Operator {
+    +name
+    +shortName
+  }
+
+  abstract class RollingStock {
+    +gauge
+    +tareWeight
+    +maxWeight
+    +numberOfBogies
+  }
+
+  class Locomotive {
+    +name
+    +serviceYear
+  }
+
+  class Wagon {
+    +name
+    +serviceYear
+  }
+
+  RollingStock <|-- Locomotive
+  RollingStock <|-- Wagon
+
+  abstract class LocomotiveModel {
+    +make
+    +model
+    +power
+    +acceleration
+    +maxSpeed
+    +weight
+  }
+
+  class DieselLocomotiveModel {
+    +fuelCapacity
+  }
+
+  class ElectricLocomotiveModel {
+    +voltage
+    +frequency
+  }
+
+  LocomotiveModel <|-- DieselLocomotiveModel
+  LocomotiveModel <|-- ElectricLocomotiveModel
+
+  Locomotive "1" -- "1" LocomotiveModel : ofModel >
+
+  class WagonModel {
+    +capacity
+    +volumeCapacity
+    +length
+    +height
+    +maxSpeed
+  }
+
+  class Boxcar
+  class Flatcar
+  class TankCar
+  class HopperCar
+  class RefrigeratedCar
+
+  WagonModel <|-- Boxcar
+  WagonModel <|-- Flatcar
+  WagonModel <|-- TankCar
+  WagonModel <|-- HopperCar
+  WagonModel <|-- RefrigeratedCar
+
+  Wagon "1" -- "1" WagonModel : ofModel >
+
+  Operator "1" -- "0..*" RollingStock : owns >
 }
 
-class Owner {
-  +name
+' ===================== FREIGHT, TRAINS & ROUTES =====================
+package "Freight & Train Operations" {
+
+  class Freight {
+    +departureTime
+    +arrivalTime
+    +status
+  }
+
+  Freight "1" -- "1" Facility : origin >
+  Freight "1" -- "1" Facility : destination >
+  Freight "1" -- "1..*" Wagon : includes >
+
+  class Train {
+    +name
+    +plannedStartDateTime
+  }
+
+  ' Correct: a Train is pulled by 1..* locomotives
+  Train "1" -- "1..*" Locomotive : isPulledBy >
+
+  Train "1" -- "1..*" Freight : carries >
+
+  class Route {
+    +description
+    +isComplex
+  }
+
+  Train "1" -- "1" Route : follows >
+
+  class Path {
+    +sequenceOrder
+    +plannedTime
+  }
+
+  Route "1" -- "1..*" Path : consistsOf >
+  Path "1" -- "1" Facility : refersTo >
 }
-
-Owner "1" --> "0..*" RailwayLine
-RailwayLine *-- "1..*" RailwaySegment
-RailwayLine --> "1" Facility : start >
-RailwayLine --> "1" Facility : end >
-
-abstract class RollingStock {
-  +gauge
-  +tareWeight
-  +maxWeight
-  +numberOfBogies
-}
-
-class Locomotive {
-  +name
-  +startYear
-}
-
-class Wagon {
-  +name
-}
-
-RollingStock <|-- Locomotive
-RollingStock <|-- Wagon
-
-abstract class LocomotiveModel {
-  +model
-  +power
-  +acceleration
-  +topSpeed
-  +trackType
-  +gauge
-}
-
-class DieselLocomotiveModel {
-  +fuelCapacity
-}
-
-class ElectricLocomotiveModel {
-  +voltage
-  +frequency
-}
-
-LocomotiveModel <|-- DieselLocomotiveModel
-LocomotiveModel <|-- ElectricLocomotiveModel
-Locomotive --> LocomotiveModel
-
-abstract class WagonModel {
-  +capacity
-  +volumeCapacity
-  +length
-  +height
-  +maxSpeed
-  +gauge
-}
-
-class Boxcar {}
-class Flatcar {}
-class TankCar {}
-class HopperCar {}
-class RefrigeratedCar {}
-
-WagonModel <|-- Boxcar
-WagonModel <|-- Flatcar
-WagonModel <|-- TankCar
-WagonModel <|-- HopperCar
-WagonModel <|-- RefrigeratedCar
-Wagon --> WagonModel
-
-class Cargo {
-  +quantity
-}
-
-class CargoType {
-  +typeName
-}
-
-class Building {
-  +name
-}
-
-class Warehouse {}
-class GrainSilo {}
-class RefrigeratedArea {}
-
-Building <|-- Warehouse
-Building <|-- GrainSilo
-Building <|-- RefrigeratedArea
-
-Facility "1" --> "0..*" Building
-Cargo --> CargoType
-Cargo --> Building
-
-class Freight {}
-
-Freight --> Facility : origin >
-Freight --> Facility : destination >
-Freight *-- "1..*" Wagon
-
-class Train {
-  +name
-  +startDate
-  +startTime
-}
-
-Train *-- "1..*" Locomotive
-Train *-- "1..*" Freight
-
-class Operator {
-  +name
-}
-
-Operator "1" --> "0..*" Train
-
-class Route {
-  +isComplex
-  +description
-}
-
-Operator "1" --> "0..*" Route
-Train --> "1" Route
-
-class Path {
-  +sequenceOrder
-  +plannedTime
-}
-
-Route "1" --> "1..*" Path
-Path --> "1" Facility
-
-Operator "1" --> "0..*" RollingStock
-Wagon "1" --> "0..*" Cargo
 
 @enduml
