@@ -71,6 +71,15 @@ public class Tree<T extends Comparable<T>> {
         return root;
     }
 
+    /**
+     * Returns the root node of the tree.
+     * 
+     * @return the root node, or null if the tree is empty
+     */
+    public TreeNode<T> getRoot() {
+        return root;
+    }
+
     public boolean isEmpty() {
         return root == null;
     }

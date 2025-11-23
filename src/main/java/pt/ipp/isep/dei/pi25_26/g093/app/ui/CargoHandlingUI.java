@@ -27,7 +27,7 @@ public class CargoHandlingUI {
             System.out.println("6. USEI06 - Time-Zone Index and Windowed Queries");
             System.out.println("7. USEI07 - Build a balanced 2D-Tree on Latitude/Longitude");
             System.out.println("8. USEI08 - Search by Geographical Area");
-            System.out.println("9. USEI09 - Search by Circular Region (radius)");
+            System.out.println("9. USEI09 - Proximity Search (Nearest-N with Filters)");
             System.out.println("10. USEI10 - Radius Search & Density Summary");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
@@ -170,10 +170,10 @@ public class CargoHandlingUI {
     }
 
     /**
-     * USEI09 - Search by Circular Region (radius)
+     * USEI09 - Proximity Search (Nearest-N with Filters)
      */
     private void executeUSEI09() {
-        System.out.println("\n=== USEI09 - Search by Circular Region (radius) ===");
+        System.out.println("\n=== USEI09 - Proximity Search (Nearest-N with Filters) ===");
         try {
             BalancedTreeController controller = new BalancedTreeController();
             if (!controller.treeExists()) {
@@ -181,7 +181,7 @@ public class CargoHandlingUI {
                 return;
             }
 
-            GeoAreaCircleSearchUI ui = new GeoAreaCircleSearchUI();
+            NearestNSearchUI ui = new NearestNSearchUI();
             ui.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI09: " + e.getMessage());
