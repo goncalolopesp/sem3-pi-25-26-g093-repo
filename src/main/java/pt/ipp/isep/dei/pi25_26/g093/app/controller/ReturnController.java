@@ -141,7 +141,6 @@ public class ReturnController {
             writer.write(log);
 
         } catch (IOException e) {
-            System.err.println("Failed to write audit log: " + e.getMessage());
         }
     }
 

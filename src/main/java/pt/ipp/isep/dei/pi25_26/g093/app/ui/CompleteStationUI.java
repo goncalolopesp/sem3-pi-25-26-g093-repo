@@ -62,7 +62,6 @@ public class CompleteStationUI {
             Map<Double, List<CompleteStation>> res = controller.getByLatitudeRange(min, max);
             Map.Entry<Double, List<CompleteStation>> entry = res.entrySet().iterator().next();
             printStations(res.get(entry.getKey()));
-            System.out.printf("Query executed in %.3f ms.%n", entry.getKey());
 
         } catch (IllegalStateException e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -90,7 +89,6 @@ public class CompleteStationUI {
             Map<Double, List<CompleteStation>> res = controller.getByLongitudeRange(min, max);
             Map.Entry<Double, List<CompleteStation>> entry = res.entrySet().iterator().next();
             printStations(res.get(entry.getKey()));
-            System.out.printf("Query executed in %.3f ms.%n", entry.getKey());
 
         } catch (IllegalStateException e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -111,7 +109,6 @@ public class CompleteStationUI {
             Map<Double, List<CompleteStation>> res = controller.getByTimeZoneGroup(tzg);
             Map.Entry<Double, List<CompleteStation>> entry = res.entrySet().iterator().next();
             printStations(res.get(entry.getKey()));
-            System.out.printf("Query executed in %.3f ms.%n", entry.getKey());
 
         } catch (IllegalStateException e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -137,7 +134,6 @@ public class CompleteStationUI {
             Map<Double, List<CompleteStation>> res = controller.getByTimeZoneGroupWindow(start, end);
             Map.Entry<Double, List<CompleteStation>> entry = res.entrySet().iterator().next();
             printStations(res.get(entry.getKey()));
-            System.out.printf("Query executed in %.3f ms.%n", entry.getKey());
 
         } catch (IllegalStateException e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -163,7 +159,6 @@ public class CompleteStationUI {
             Map<Double, List<CompleteStation>> res = controller.getByTimeZoneGroupAndCountry(tzg, country);
             Map.Entry<Double, List<CompleteStation>> entry = res.entrySet().iterator().next();
             printStations(res.get(entry.getKey()));
-            System.out.printf("Query executed in %.3f ms.%n", entry.getKey());
 
         } catch (IllegalStateException e) {
             System.out.println("ERROR: " + e.getMessage());
