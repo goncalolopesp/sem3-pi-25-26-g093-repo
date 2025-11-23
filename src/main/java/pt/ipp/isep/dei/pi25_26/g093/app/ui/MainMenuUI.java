@@ -27,6 +27,7 @@ public class MainMenuUI {
             switch (option) {
                 case 1 -> showTeamPresentation();
                 case 2 -> runCargoHandlingUI();
+                case 3 -> estimateTravelTime();
                 case 4 -> runSimulation();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
@@ -88,6 +89,15 @@ public class MainMenuUI {
         try {
             DispatcherUI dispatcherUI = new DispatcherUI();
             dispatcherUI.showMenu();
+        } catch (Exception e) {
+            System.out.println("Error executing DispatcherUI: " + e.getMessage());
+        }
+    }
+
+    private void estimateTravelTime() {
+        try {
+            TravelTimeUI travelUI = new TravelTimeUI();
+            travelUI.showMenu();
         } catch (Exception e) {
             System.out.println("Error executing DispatcherUI: " + e.getMessage());
         }

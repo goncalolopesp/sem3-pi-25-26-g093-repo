@@ -39,7 +39,6 @@ public class SchedulerService {
         );
 
 
-        // marcar locos como IN USE
         for (Locomotive loco : locomotives) {
             loco.setAvailable(false);
         }
@@ -57,7 +56,6 @@ public class SchedulerService {
         return schedule;
     }
 
-    // overload de conveniência (se algum dia quiseres usar só 1 loco)
     public TrainSchedule scheduleTrain(Locomotive locomotive,
                                        List<Freight> freights,
                                        List<RailwaySegment> route,
@@ -66,9 +64,6 @@ public class SchedulerService {
     }
 
 
-    // =========================
-    // EXECUTA UM SCHEDULE (usar internamente e na UI se quiseres)
-    // =========================
     public SimulationTimeline runSchedule(TrainSchedule schedule) {
         if (schedule.getStatus() == TrainSchedule.Status.CANCELLED
                 || schedule.getStatus() == TrainSchedule.Status.FINISHED) {
@@ -88,7 +83,6 @@ public class SchedulerService {
         schedule.setResultTimeline(timeline);
         schedule.setStatus(TrainSchedule.Status.FINISHED);
 
-        // libertar locomotivas (ficam novamente AVAILABLE)
         for (Locomotive loco : schedule.getTrain().getLocomotives()) {
             loco.setAvailable(true);
         }
@@ -96,10 +90,6 @@ public class SchedulerService {
         return timeline;
     }
 
-
-    // =========================
-    // SCHEDULER CLOCK
-    // =========================
     public void processScheduler(LocalDateTime now) {
 
         for (TrainSchedule schedule : schedules) {
@@ -107,7 +97,6 @@ public class SchedulerService {
             if (schedule.getStatus() != TrainSchedule.Status.SCHEDULED)
                 continue;
 
-            // Se now >= departureTime → dispara
             if (!now.isBefore(schedule.getDepartureTime())) {
                 runSchedule(schedule);
             }

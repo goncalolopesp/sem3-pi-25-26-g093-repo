@@ -76,7 +76,7 @@ public class SimulationEngine {
         return timeline;
     }
 
-    private double computeAllowedSpeedKmh(Train train, RailwaySegment segment) {
+    public double computeAllowedSpeedKmh(Train train, RailwaySegment segment) {
 
         // 1) Limite das locomotivas
         double locoLimit = train.getLocomotives().stream()

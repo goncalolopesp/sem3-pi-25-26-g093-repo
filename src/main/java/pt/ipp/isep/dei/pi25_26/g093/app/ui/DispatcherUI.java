@@ -18,32 +18,26 @@ public class DispatcherUI {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    // "Relógio" do scheduler
     private LocalDateTime currentTime = LocalDateTime.now();
 
-    // Formatação de datas/horas
     private static final DateTimeFormatter DATE_TIME_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HH:mm");
 
-    // REPOSITORIES
     private final LocomotiveRepository locomotiveRepo = new LocomotiveRepository();
     private final FreightRepository freightRepo = new FreightRepository();
     private final RailwayNetworkRepository networkRepo = new RailwayNetworkRepository();
     private final RouteService routeService = new RouteService(networkRepo);
     private final FacilityRepository facilityRepository = new FacilityRepository();
 
-    // SERVICES
     private final TrainBuilderService trainBuilderService = new TrainBuilderService();
     private final SimulationEngine simulationEngine = new SimulationEngine();
     private final SchedulerService schedulerService =
             new SchedulerService(trainBuilderService, simulationEngine);
 
-    // ================================================================
-    // PUBLIC ENTRY POINT
-    // ================================================================
+
     public void showMenu() {
 
         int option;
@@ -81,16 +75,13 @@ public class DispatcherUI {
         } while (option != 0);
     }
 
-    // ================================================================
-    // OPTION 1 – CREATE & SCHEDULE TRAIN (multi-loco, multi-freight, rota manual + REVIEW)
-    // ================================================================
+
     private void createAndScheduleTrain() {
 
         System.out.println("\n====================");
         System.out.println("   DISPATCHER UI");
         System.out.println("====================");
 
-        // 1) Escolher 1 ou 2 locomotivas
         List<Locomotive> locomotives = chooseLocomotivesForTrain();
         if (locomotives.isEmpty()) {
             System.out.println("No locomotive selected. Aborting.");
@@ -99,7 +90,6 @@ public class DispatcherUI {
 
         int locoFacilityId = locomotives.get(0).getCurrentFacilityId();
 
-        // 2) Escolher freights na mesma facility (sem mexer ainda no repositório)
         List<Freight> freights = chooseFreightsForTrain(locoFacilityId);
 
         if (freights.isEmpty()) {
@@ -107,7 +97,6 @@ public class DispatcherUI {
             return;
         }
 
-        // 2.1 Opcional: garantir que todos os freights têm a mesma origem que a loco
         boolean allSameOrigin = freights.stream()
                 .allMatch(f -> f.getOrigin().getId() == locoFacilityId);
 
@@ -116,7 +105,6 @@ public class DispatcherUI {
             System.out.println("Currently, best supported scenario is all freights sharing the loco origin.");
         }
 
-        // 3) ROUTE BUILDER MANUAL – utilizador define sequência de facilities
         List<RailwaySegment> route = null;
 
         while (true) {
@@ -133,7 +121,6 @@ public class DispatcherUI {
                 return;
             }
 
-            // 3.1 Print da rota (linha + segmento)
             System.out.println("\nRoute found for all stops:");
             for (RailwaySegment seg : route) {
                 RailwayLine line = seg.getRailwayLine();
@@ -145,17 +132,13 @@ public class DispatcherUI {
                         seg.getLengthMeters());
             }
 
-            // 3.2 ROUTE REVIEW (distância, tempo estimado, velocidade média, etc.)
             int reviewOption = reviewRoute(locomotives, freights, route);
 
             if (reviewOption == 1) {
-                // Confirmar e seguir
                 break;
             } else if (reviewOption == 2) {
-                // Redefinir rota → volta ao início do loop
                 continue;
             } else if (reviewOption == 3) {
-                // Cancelar operação por completo
                 System.out.println("Operation cancelled. Train will not be scheduled.");
                 return;
             } else {
@@ -164,14 +147,11 @@ public class DispatcherUI {
             }
         }
 
-        // 4) Perguntar data/hora de partida
         LocalDateTime departure = askPlannedDeparture();
 
-        // 5) Criar schedule
         TrainSchedule schedule =
                 schedulerService.scheduleTrain(locomotives, freights, route, departure);
 
-        // 5.1 Remover freights do "pool" global (já estão atribuídos a um train)
         for (Freight f : freights) {
             freightRepo.remove(f.getId());
         }
@@ -194,9 +174,6 @@ public class DispatcherUI {
         System.out.println("\nTrain will be simulated when scheduler time reaches departure time (option 4).");
     }
 
-    // ================================================================
-    // OPTION 2 – LIST LOCOMOTIVES
-    // ================================================================
     private void listLocomotives() {
 
         System.out.println("\n=== LOCOMOTIVES ===");
@@ -220,9 +197,7 @@ public class DispatcherUI {
         }
     }
 
-    // ================================================================
-    // OPTION 3 – LIST FREIGHTS
-    // ================================================================
+
     private void listFreights() {
 
         System.out.println("\n=== FREIGHTS ===");
@@ -238,9 +213,7 @@ public class DispatcherUI {
         }
     }
 
-    // ================================================================
-    // OPTION 4 – ADVANCE SCHEDULER TIME
-    // ================================================================
+
     private void advanceTime() {
 
         System.out.println("\nCurrent scheduler time: " + currentTime.format(DATE_TIME_FMT));
@@ -261,10 +234,8 @@ public class DispatcherUI {
         currentTime = currentTime.plusMinutes(minutes);
         System.out.println("New scheduler time: " + currentTime.format(DATE_TIME_FMT));
 
-        // Processa todos os schedules cuja hora já chegou
         schedulerService.processScheduler(currentTime);
 
-        // Mostrar simulações de todos os que já terminaram
         for (TrainSchedule s : schedulerService.listSchedules()) {
             if (s.getStatus() == TrainSchedule.Status.FINISHED &&
                     s.getResultTimeline() != null) {
@@ -273,7 +244,6 @@ public class DispatcherUI {
                 printSimulation(s);
 
 
-                // Atualizar posição das locomotivas para o último destino
                 List<Freight> freights = s.getFreights();
                 if (!freights.isEmpty()) {
                     Freight last = freights.get(freights.size() - 1);
@@ -286,9 +256,7 @@ public class DispatcherUI {
         }
     }
 
-    // ================================================================
-    // OPTION 5 – LIST SCHEDULES
-    // ================================================================
+
     private void listSchedules() {
 
         System.out.println("\n=== SCHEDULED TRAINS ===");
@@ -304,9 +272,6 @@ public class DispatcherUI {
         }
     }
 
-    // ================================================================
-    // SELECT LOCOMOTIVES (1 ou 2)
-    // ================================================================
     private List<Locomotive> chooseLocomotivesForTrain() {
 
         System.out.println("\nAvailable locomotives / trains:");
@@ -345,7 +310,6 @@ public class DispatcherUI {
         Locomotive first = available.get(choice - 1);
         int facilityId = first.getCurrentFacilityId();
 
-        // preparar segunda loco opcional
         List<Locomotive> sameFac = new ArrayList<>();
         for (Locomotive loco : available) {
             if (loco.getId() != first.getId()
@@ -384,9 +348,7 @@ public class DispatcherUI {
         return result;
     }
 
-    // ================================================================
-    // SELECT FREIGHTS (lista local, só removidos globalmente após schedule)
-    // ================================================================
+
     private List<Freight> chooseFreightsForTrain(int facilityId) {
 
         List<Freight> selected = new ArrayList<>();
@@ -438,7 +400,6 @@ public class DispatcherUI {
             }
 
             selected.add(chosen);
-            // removemos apenas da lista local (não do repositório global ainda)
             availableAtFacility.remove(chosen);
 
             System.out.println("Freight added.");
@@ -447,21 +408,11 @@ public class DispatcherUI {
         return selected;
     }
 
-    // ================================================================
-    // ROUTE BUILDER (manual, com conexões diretas, e mandatory destinations)
-    // ================================================================
-    /**
-     * Pede ao utilizador a sequência de facilities que o comboio vai percorrer.
-     * Garante que:
-     *  - começa na facility da locomotiva
-     *  - inclui todas as destinations dos freights
-     *  - a cada passo só permite conexões diretas (com base nas RailwayLines)
-     */
+
     private List<Integer> askUserForFacilityPath(int originId, List<Freight> freights) {
 
         Facility origin = networkRepo.findFacility(originId);
 
-        // mandatory stops = destinos de todos os freights
         Set<Integer> mandatory = new LinkedHashSet<>();
         for (Freight f : freights) {
             mandatory.add(f.getDestination().getId());
@@ -477,7 +428,6 @@ public class DispatcherUI {
             System.out.println(" - " + (f != null ? f.getName() + " (ID " + id + ")" : ("ID " + id)));
         }
 
-        // mapa de adjacências facility -> facilities ligadas diretamente
         Map<Integer, Set<Integer>> adjacency = buildAdjacencyMap();
 
         List<Integer> path = new ArrayList<>();
@@ -495,7 +445,6 @@ public class DispatcherUI {
             }
             System.out.println();
 
-            // mostrar obrigatórias ainda em falta
             Set<Integer> missing = new LinkedHashSet<>(mandatory);
             missing.removeAll(path);
             if (!missing.isEmpty()) {
@@ -532,7 +481,6 @@ public class DispatcherUI {
                     return null;
                 }
 
-                // validar mandatory
                 Set<Integer> visited = new HashSet<>(path);
                 List<Integer> missingList = new ArrayList<>();
                 for (Integer mid : mandatory) {
@@ -578,9 +526,6 @@ public class DispatcherUI {
         return adjacency;
     }
 
-    // ================================================================
-    // ROUTE REVIEW
-    // ================================================================
     private int reviewRoute(List<Locomotive> locomotives,
                             List<Freight> freights,
                             List<RailwaySegment> route) {
@@ -589,7 +534,6 @@ public class DispatcherUI {
         System.out.println("          ROUTE REVIEW");
         System.out.println("===============================");
 
-        // ---- Locomotives ----
         System.out.println("\nLocomotives:");
         for (Locomotive loco : locomotives) {
             System.out.printf(" - %s (%s, %.0f km/h, %.0f kW)%n",
@@ -599,7 +543,6 @@ public class DispatcherUI {
                     loco.getPowerKw());
         }
 
-        // ---- Freights ----
         System.out.println("\nFreights:");
         for (Freight f : freights) {
             System.out.printf(" - %d: %s → %s (%d wagons)%n",
@@ -609,12 +552,10 @@ public class DispatcherUI {
                     f.getWagons().size());
         }
 
-        // ---- Route summary ----
         double totalDistance = route.stream()
                 .mapToDouble(RailwaySegment::getLengthMeters)
                 .sum();
 
-        // Simulação "preview" só para obter tempo total (usa o clock atual)
         Train previewTrain = trainBuilderService.buildTrain(
                 locomotives,
                 freights,
@@ -640,7 +581,6 @@ public class DispatcherUI {
         System.out.printf(" - Estimated time: %02dm %02ds%n", totalSeconds / 60, totalSeconds % 60);
         System.out.printf(" - Average speed: %.1f km/h%n", avgSpeed);
 
-        // ---- Segments agrupados por linha ----
         System.out.println("\nSegments by line:");
         Map<RailwayLine, List<RailwaySegment>> grouped = groupSegmentsByLine(route);
 
@@ -656,7 +596,6 @@ public class DispatcherUI {
             }
         }
 
-        // ---- Menu ----
         System.out.println("\n==========================================");
         System.out.println("1) Confirm and schedule train");
         System.out.println("2) Redefine route");
@@ -711,9 +650,6 @@ public class DispatcherUI {
         return totalSeconds;
     }
 
-    // ================================================================
-    // ASK PLANNED DEPARTURE (DATE + TIME)
-    // ================================================================
     private LocalDateTime askPlannedDeparture() {
 
         System.out.println("\nPlanned departure:");
@@ -749,15 +685,7 @@ public class DispatcherUI {
         return LocalDateTime.of(date, time);
     }
 
-    // ================================================================
-    // SIMULATION PRINT (COMPACT VERSION, com linha + caminho acumulado)
-    // ================================================================
-    // ================================================================
-// SIMULATION PRINT (COMPACT VERSION, com linha + caminho acumulado + timetable por facility)
-// ================================================================
-    // ================================================================
-// SIMULATION PRINT (timetable por facility + tempos de espera)
-// ================================================================
+
     private void printSimulation(TrainSchedule schedule) {
 
         SimulationTimeline timeline = schedule.getResultTimeline();
@@ -780,7 +708,6 @@ public class DispatcherUI {
             return;
         }
 
-        // ---- 1) Determinar ordem das facilities a partir da rota ----
         List<Facility> facilityOrder = new ArrayList<>();
 
         RailwaySegment firstSeg = route.get(0);
@@ -789,11 +716,9 @@ public class DispatcherUI {
         Facility startA = networkRepo.findFacility(firstLine.getStart().getId());
         Facility startB = networkRepo.findFacility(firstLine.getEnd().getId());
 
-        // heurística simples para escolher a "realStart": qual aparece primeiro no tempo
         LocalDateTime firstEnter = findEnterTimeForSegment(events, firstSeg);
         Facility realStart = startA; // fallback
         if (startA != null && startB != null && firstEnter != null) {
-            // não precisamos complicar muito, assumimos startA como origem
             realStart = startA;
         }
 
@@ -813,7 +738,6 @@ public class DispatcherUI {
             previous = next;
         }
 
-        // map: segmento → facility de origem
         Map<Integer, Facility> segmentOriginFacility = new HashMap<>();
         for (int i = 0; i < route.size(); i++) {
             RailwaySegment seg = route.get(i);
@@ -821,7 +745,6 @@ public class DispatcherUI {
             segmentOriginFacility.put(seg.getId(), originFac);
         }
 
-        // ---- 2) Calcular arrival/departure base (sem espera) por facility ----
         List<FacilityStop> stops = new ArrayList<>();
 
         Facility firstFac = facilityOrder.get(0);
@@ -839,7 +762,6 @@ public class DispatcherUI {
             stops.add(new FacilityStop(fac, arrival, arrival, false, 0));
         }
 
-        // ---- 3) Marcar descarga (UNLOAD) com +10 min ----
         for (Freight f : schedule.getFreights()) {
             Facility dest = f.getDestination();
 
@@ -852,7 +774,6 @@ public class DispatcherUI {
             }
         }
 
-        // ---- 4) Calcular tempos de espera por facility a partir dos eventos WAITING ----
         Map<Integer, LocalDateTime> waitStartBySeg = new HashMap<>();
         Map<Integer, Long> waitSecondsByFacilityId = new HashMap<>();
 
@@ -863,7 +784,6 @@ public class DispatcherUI {
             int segId = seg.getId();
 
             if (e.getType() == SimulationEvent.Type.WAITING) {
-                // guarda o momento em que começou a espera neste segmento
                 waitStartBySeg.put(segId, e.getTime());
             } else if (e.getType() == SimulationEvent.Type.ENTER_SEGMENT) {
                 LocalDateTime start = waitStartBySeg.get(segId);
@@ -878,7 +798,6 @@ public class DispatcherUI {
             }
         }
 
-        // ---- 5) PRINT FINAL ----
         System.out.println("\nFACILITY TIMETABLE:");
         System.out.println("---------------------------------------------------------------------");
         System.out.printf("%-25s | %-16s | %-16s | %-25s%n",
@@ -933,7 +852,6 @@ public class DispatcherUI {
     }
 
 
-// ===================== HELPERS =========================
 
     private int lastIndexOfLine(List<RailwaySegment> route, RailwayLine line) {
         for (int i = route.size() - 1; i >= 0; i--) {
@@ -981,13 +899,6 @@ public class DispatcherUI {
         return list;
     }
 
-
-
-
-
-    // ================================================================
-    // INPUT UTIL
-    // ================================================================
     private int readInt(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
@@ -999,14 +910,10 @@ public class DispatcherUI {
         return value;
     }
 
-    // ================================================================
-// OPTION 6 – MOVE LOCOMOTIVES BETWEEN FACILITIES
-// ================================================================
     private void moveLocomotives() {
 
         System.out.println("\n=== LOCOMOTIVE TRANSFER MODE ===");
 
-        // 1) Escolher a primeira locomotiva
         Locomotive first = chooseAvailableLocomotiveForTransfer();
         if (first == null) {
             System.out.println("No locomotive selected. Cancelling.");
@@ -1016,7 +923,6 @@ public class DispatcherUI {
         int originId = first.getCurrentFacilityId();
         Facility origin = networkRepo.findFacility(originId);
 
-        // 2) Escolher a segunda (opcional)
         Locomotive second = chooseSecondLocomotiveForTransfer(first);
 
         List<Locomotive> locos =
@@ -1024,14 +930,12 @@ public class DispatcherUI {
                         List.of(first) :
                         List.of(first, second));
 
-        // 3) Escolher destino
         Facility destination = chooseDestinationFacility(originId);
         if (destination == null) {
             System.out.println("Transfer cancelled.");
             return;
         }
 
-        // 4) Gerar rota automática entre origem e destino
         List<RailwaySegment> route;
         try {
             route = routeService.buildRouteBetweenFacilities(originId, destination.getId());
@@ -1040,7 +944,6 @@ public class DispatcherUI {
             return;
         }
 
-        // 5) Calcular tempo estimado
         double speed = locos.stream()
                 .mapToDouble(Locomotive::getMaxSpeedKmh)
                 .min()
@@ -1061,7 +964,6 @@ public class DispatcherUI {
             return;
         }
 
-        // 6) Mover locomotivas
         for (Locomotive loco : locos) {
             loco.setCurrentFacilityId(destination.getId());
         }
@@ -1145,9 +1047,4 @@ public class DispatcherUI {
 
         return options.get(opt-1);
     }
-
-
-
-
-
 }
