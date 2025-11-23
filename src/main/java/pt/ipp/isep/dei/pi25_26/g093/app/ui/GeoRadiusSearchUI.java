@@ -7,10 +7,58 @@ import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoRadiusSearchService;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * UI for USEI10 – Radius Search & Density Summary.
+ * <p>
+ * This class provides a text-based user interface that allows a
+ * Station Storage Manager to perform a radius search around a geographical
+ * point and view:
+ * </p>
+ *
+ * <ul>
+ *     <li>All stations located inside the specified radius</li>
+ *     <li>Results sorted by distance (ascending)</li>
+ *     <li>A summary of stations per country</li>
+ *     <li>A city vs non-city station summary</li>
+ * </ul>
+ *
+ * <p>
+ * The UI collects the necessary user input, validates it at a basic level,
+ * forwards it to the {@link GeoRadiusSearchController}, and displays the
+ * results returned by the service layer.
+ * </p>
+ *
+ * <p>
+ * This UI does not contain business logic — all calculations, filtering,
+ * sorting and summaries are handled by the service.
+ * </p>
+ */
 public class GeoRadiusSearchUI implements Runnable {
 
+    /** Controller responsible for coordinating the radius search operation. */
     private final GeoRadiusSearchController controller = new GeoRadiusSearchController();
 
+    /**
+     * Executes the UI flow for USEI10.
+     * <p>
+     * Prompts the user for:
+     * </p>
+     * <ul>
+     *     <li>Center latitude</li>
+     *     <li>Center longitude</li>
+     *     <li>Radius in kilometers</li>
+     * </ul>
+     *
+     * <p>
+     * After calling the controller, the method prints:
+     * </p>
+     *
+     * <ul>
+     *     <li>The sorted list of stations inside the radius</li>
+     *     <li>A station count grouped by country</li>
+     *     <li>A summary of city vs. non-city stations</li>
+     * </ul>
+     */
     @Override
     public void run() {
         Scanner sc = new Scanner(System.in);
@@ -54,4 +102,3 @@ public class GeoRadiusSearchUI implements Runnable {
         }
     }
 }
-
