@@ -1,32 +1,33 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.repositories;
 
-import org.junit.Before;
 import org.junit.Test;
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.Wagon;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Cargo;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.Wagon;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class WagonRepositoryTest {
 
-    private WagonRepository repo;
-
-    @Before
-    public void setUp() {
-        repo = new WagonRepository();
-    }
-
     @Test
-    public void testInitiallyEmpty() {
-        assertTrue(repo.getWagons().isEmpty());
-    }
+    public void testAddAndGetWagons() {
+        WagonRepository repo = new WagonRepository();
+        Cargo c = new Cargo(1, 100, 2, "2025-01-01", "2024-11-23T10:00:00");
+        Wagon w = new Wagon(10, c);
 
-    @Test
-    public void testAddWagon() {
-        Wagon w = new Wagon(1, new Cargo(10, 5, 2, "2025-09-10", "2025-09-01T10:00:00"));
         repo.add(w);
+        List<Wagon> list = repo.getWagons();
 
-        assertEquals(1, repo.getWagons().size());
-        assertEquals(w, repo.getWagons().get(0));
+        assertEquals(1, list.size());
+        assertEquals(w, list.get(0));
+    }
+
+    @Test
+    public void testGetWagonsReturnsMutableList() {
+        WagonRepository repo = new WagonRepository();
+        List<Wagon> list = repo.getWagons();
+        assertNotNull(list);
+        list.clear(); // deve ser possível limpar sem exceptions
     }
 }

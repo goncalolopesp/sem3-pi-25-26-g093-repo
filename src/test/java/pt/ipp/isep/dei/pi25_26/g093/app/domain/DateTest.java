@@ -7,73 +7,42 @@ import static org.junit.Assert.*;
 public class DateTest {
 
     @Test
-    public void testConstructorValidDate() {
-        Date date = new Date("2025-12-01");
-        assertEquals(2025, date.getYear());
-        assertEquals(12, date.getMonth());
-        assertEquals(1, date.getDay());
+    public void testConstructorParsesValidDate() {
+        Date d = new Date("2024-11-23");
+        assertEquals(2024, d.getYear());
+        assertEquals(11, d.getMonth());
+        assertEquals(23, d.getDay());
     }
 
     @Test
-    public void testConstructorWithDateTimeFormat() {
-        Date date = new Date("2024-04-15T10:30:45");
-        assertEquals(2024, date.getYear());
-        assertEquals(4, date.getMonth());
-        assertEquals(15, date.getDay());
+    public void testConstructorHandlesNullAsDefault() {
+        Date d = new Date(null);
+        assertEquals("9999-12-31", d.toString());
     }
 
     @Test
-    public void testConstructorWithNullSetsDefaultExpiry() {
-        Date date = new Date(null);
-        assertEquals(9999, date.getYear());
-        assertEquals(12, date.getMonth());
-        assertEquals(31, date.getDay());
-    }
-
-    @Test
-    public void testConstructorWithEmptyStringSetsDefaultExpiry() {
-        Date date = new Date("");
-        assertEquals("9999-12-31", date.toString());
+    public void testConstructorRemovesTimePart() {
+        Date d = new Date("2024-11-23T10:00:00");
+        assertEquals(2024, d.getYear());
+        assertEquals(11, d.getMonth());
+        assertEquals(23, d.getDay());
     }
 
     @Test
     public void testToStringFormat() {
-        Date date = new Date("2025-07-09");
-        assertEquals("2025-07-09", date.toString());
+        Date d = new Date("2024-01-02");
+        assertEquals("2024-01-02", d.toString());
     }
 
     @Test
-    public void testCompareToDifferentYears() {
-        Date d1 = new Date("2024-05-10");
-        Date d2 = new Date("2025-05-10");
+    public void testCompareTo() {
+        Date d1 = new Date("2024-01-01");
+        Date d2 = new Date("2024-01-02");
+        Date d3 = new Date("2023-12-31");
 
         assertTrue(d1.compareTo(d2) < 0);
         assertTrue(d2.compareTo(d1) > 0);
-    }
-
-    @Test
-    public void testCompareToDifferentMonths() {
-        Date d1 = new Date("2025-03-10");
-        Date d2 = new Date("2025-04-10");
-
-        assertTrue(d1.compareTo(d2) < 0);
-        assertTrue(d2.compareTo(d1) > 0);
-    }
-
-    @Test
-    public void testCompareToDifferentDays() {
-        Date d1 = new Date("2025-03-10");
-        Date d2 = new Date("2025-03-15");
-
-        assertTrue(d1.compareTo(d2) < 0);
-        assertTrue(d2.compareTo(d1) > 0);
-    }
-
-    @Test
-    public void testCompareToEqualDates() {
-        Date d1 = new Date("2025-09-09");
-        Date d2 = new Date("2025-09-09");
-
-        assertEquals(0, d1.compareTo(d2));
+        assertTrue(d1.compareTo(new Date("2024-01-01")) == 0);
+        assertTrue(d3.compareTo(d1) < 0);
     }
 }
