@@ -3,6 +3,7 @@ package pt.ipp.isep.dei.pi25_26.g093.app.service;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.StationDistance;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class GeoRadiusSearchService {
 
     public GeoRadiusSearchService() {
         // Carrega estações reais a partir do repositório real
-        this.stations = CompleteStationRepository.getInstance().getStations();
+        this.stations = Repositories.getInstance().getCompleteStationRepository().getStations();
     }
 
     /** Usado apenas nos testes unitários para injetar estações mock */

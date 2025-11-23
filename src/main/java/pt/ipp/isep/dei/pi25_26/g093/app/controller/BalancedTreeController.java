@@ -2,10 +2,13 @@ package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.LatKey;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.LonKey;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BalancedTreeController {
     private final CompleteStationRepository repo;
@@ -29,25 +32,17 @@ public class BalancedTreeController {
         int inserted = 0;
         int skipped = 0;
 
-        for (CompleteStation s : repo.getStations()) {
-            Double lat = s.getLatitude();
-            Double lon = s.getLongitude();
+        List<LatKey> lats = repo.getLatTree().inOrder();
 
-            // Skip stations without valid coordinates
-            if (lat == null || lon == null) {
-                skipped++;
-                continue;
-            }
+        for (LatKey latKey : lats) {
+            Double lat = latKey.getLatitude();
+            CompleteStation station = latKey.getStation();
+            Double lon = station.getLongitude();
 
             ArrayList<Double> values = new ArrayList<>(2);
             values.add(lat);
             values.add(lon);
-            tree.Insert(values, s);
-            inserted++;
-        }
-
-        if (inserted == 0) {
-            return "No station with valid coordinates to build the tree.";
+            tree.Insert(values, station);
         }
 
         repo.setTree(tree);
