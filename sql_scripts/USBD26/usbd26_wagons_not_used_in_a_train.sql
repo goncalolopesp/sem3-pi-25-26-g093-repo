@@ -1,32 +1,58 @@
+SET SERVEROUTPUT ON;
+
 --------------------------------------------------------------------------------
--- Project: Projeto Integrador 2025/26
--- Fase: BDDAD
--- User Story: USBD26 - Vagões não utilizados em comboios num período temporal
--- Descrição:
---   Esta query filtra os vagões que não foram utilizados em nenhum comboio num certo período temporal, verificando a data e o id do frete.
+-- USBD26 - Vagões não utilizados num período temporal
 --------------------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION fn_usbd26 (
+    p_start_date IN DATE,
+    p_end_date   IN DATE
+) RETURN SYS_REFCURSOR
+IS
+    l_rc SYS_REFCURSOR;
+BEGIN
+OPEN l_rc FOR
 SELECT
-    WAGON.WAGONID,
-    WAGON.IDENTIFIER,
-    WAGON_MODEL.CAPACITY,
-    WAGON_MODEL.VOLUMECAPACITY,
-    WAGON_MODEL.NUMBEROFBOGIES
+    W.WAGONID,
+    W.IDENTIFIER,
+    WM.CAPACITY,
+    WM.VOLUMECAPACITY,
+    WM.NUMBEROFBOGIES
 FROM
-    WAGON
-        INNER JOIN WAGON_MODEL
-                   ON WAGON_MODEL.WAGONMODELID = WAGON.WAGONMODELID
-
-        LEFT JOIN WAGON_FREIGHT
-                  ON WAGON_FREIGHT.WAGONID = WAGON.WAGONID
-
-        LEFT JOIN FREIGHT
-                  ON FREIGHT.FREIGHTID = WAGON_FREIGHT.FREIGHTID
-                      AND FREIGHT.FREIGHTDATE BETWEEN DATE '2025-10-03' AND DATE '2025-10-06'
-
+    WAGON W
+        JOIN WAGON_MODEL WM
+             ON WM.WAGONMODELID = W.WAGONMODELID
+        LEFT JOIN WAGON_FREIGHT WF
+                  ON WF.WAGONID = W.WAGONID
+        LEFT JOIN FREIGHT F
+                  ON F.FREIGHTID = WF.FREIGHTID
+                      AND F.FREIGHTDATE BETWEEN p_start_date AND p_end_date
 WHERE
-    FREIGHT.FREIGHTID IS NULL
+    F.FREIGHTID IS NULL;
 
+RETURN l_rc;
+END fn_usbd26;
+/
 --------------------------------------------------------------------------------
--- Fim da Query
+-- Teste USBD26
 --------------------------------------------------------------------------------
+
+DECLARE
+rc      SYS_REFCURSOR;
+    v_id    NUMBER;
+    v_ident VARCHAR2(50);
+    v_cap   NUMBER;
+    v_vol   NUMBER;
+    v_bog   NUMBER;
+BEGIN
+    rc := fn_usbd26(DATE '2025-10-03', DATE '2025-10-06');
+
+    LOOP
+FETCH rc INTO v_id, v_ident, v_cap, v_vol, v_bog;
+        EXIT WHEN rc%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('WAGON: ' || v_id || ' - ' || v_ident);
+END LOOP;
+
+CLOSE rc;
+END;
+/
