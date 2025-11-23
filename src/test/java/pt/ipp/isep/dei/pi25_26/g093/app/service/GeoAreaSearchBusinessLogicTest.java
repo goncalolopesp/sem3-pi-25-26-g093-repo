@@ -150,7 +150,7 @@ public class GeoAreaSearchBusinessLogicTest {
         assertTrue("Execution time should be non-negative", result.getExecutionTimeNanos() >= 0);
 
         // Verify no exceptions were thrown
-        assertNotNull(result, "Result should not be null");
+        assertNotNull("Result should not be null", result);
     }
 
     @Test
