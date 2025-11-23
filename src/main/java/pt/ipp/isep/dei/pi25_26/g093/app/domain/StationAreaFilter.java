@@ -28,25 +28,43 @@ import java.util.stream.Collectors;
  * 
  * @author ESINF Sprint 2 Team
  * @see GeoAreaSearch
- * @see GeoAreaCircleSearch
+ * @see NearestNSearchService
  */
 public class StationAreaFilter {
 
     private final Boolean isCity;
     private final Boolean isMainStation;
     private final String country;
+    private final String timeZone;
+    private final String timeZoneGroup;
 
     /**
-     * Constructs a filter with the given options.
+     * Constructs a filter with the given options (without time zone filters).
      *
      * @param isCity          filter only city stations (true), only non-city (false), or no filter (null)
      * @param isMainStation   filter only main stations (true), only non-main (false), or no filter (null)
      * @param country         "PT", "ES", "ALL", or null (null behaves as "ALL")
      */
     public StationAreaFilter(Boolean isCity, Boolean isMainStation, String country) {
+        this(isCity, isMainStation, country, null, null);
+    }
+
+    /**
+     * Constructs a filter with the given options (including time zone filters).
+     *
+     * @param isCity          filter only city stations (true), only non-city (false), or no filter (null)
+     * @param isMainStation   filter only main stations (true), only non-main (false), or no filter (null)
+     * @param country         "PT", "ES", "ALL", or null (null behaves as "ALL")
+     * @param timeZone        filter by time zone (exact match, case-insensitive), or null for no filter
+     * @param timeZoneGroup   filter by time zone group (exact match, case-insensitive), or null for no filter
+     */
+    public StationAreaFilter(Boolean isCity, Boolean isMainStation, String country,
+                            String timeZone, String timeZoneGroup) {
         this.isCity = isCity;
         this.isMainStation = isMainStation;
         this.country = normalizeCountry(country);
+        this.timeZone = normalizeTimeZone(timeZone);
+        this.timeZoneGroup = normalizeTimeZone(timeZoneGroup);
     }
 
     private String normalizeCountry(String country) {
@@ -58,6 +76,13 @@ public class StationAreaFilter {
             case "PT", "ES", "ALL" -> normalized;
             default -> "ALL";
         };
+    }
+
+    private String normalizeTimeZone(String tz) {
+        if (tz == null || tz.isBlank()) {
+            return null;
+        }
+        return tz.trim();
     }
 
     /**
@@ -91,6 +116,24 @@ public class StationAreaFilter {
      */
     public String getCountry() {
         return country;
+    }
+
+    /**
+     * Returns the time zone filter value.
+     * 
+     * @return the time zone to filter by (case-insensitive), or null if no filter
+     */
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    /**
+     * Returns the time zone group filter value.
+     * 
+     * @return the time zone group to filter by (case-insensitive), or null if no filter
+     */
+    public String getTimeZoneGroup() {
+        return timeZoneGroup;
     }
 
     /**
@@ -142,6 +185,21 @@ public class StationAreaFilter {
             }
         }
 
+        // Check time zone filters
+        if (timeZone != null) {
+            String stationTimeZone = station.getTimeZone();
+            if (stationTimeZone == null || !timeZone.equalsIgnoreCase(stationTimeZone)) {
+                return false;
+            }
+        }
+
+        if (timeZoneGroup != null) {
+            String stationTimeZoneGroup = station.getTimeZoneGroup();
+            if (stationTimeZoneGroup == null || !timeZoneGroup.equalsIgnoreCase(stationTimeZoneGroup)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -151,6 +209,8 @@ public class StationAreaFilter {
                 "isCity=" + isCity +
                 ", isMainStation=" + isMainStation +
                 ", country='" + country + '\'' +
+                ", timeZone='" + timeZone + '\'' +
+                ", timeZoneGroup='" + timeZoneGroup + '\'' +
                 '}';
     }
 }
