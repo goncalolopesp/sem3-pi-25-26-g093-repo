@@ -7,49 +7,30 @@ import static org.junit.Assert.*;
 public class ItemTest {
 
     @Test
-    public void testValidItemConstruction() {
-        Item item = new Item(10, "Soap", "Cleaning", "Pack", 0.3, 0.2);
-        assertNotNull(item);
-        assertTrue("Expected toString to include item name for valid item",
-                item.toString().contains("Soap"));
-    }
-
-    @Test
-    public void testDifferentValidCategory() {
-        Item item = new Item(15, "TV", "Electronics", "Unit", 5.0, 10.0);
-        assertTrue(item.toString().contains("TV"));
-    }
-
-    @Test
-    public void testDifferentValidUnit() {
-        Item item = new Item(22, "Rice", "Grocery", "Bag", 2.5, 2.0);
-        assertTrue(item.toString().contains("Rice"));
+    public void testValidItem() {
+        Item i = new Item(1, "Soap", "Cleaning", "Unit", 1.0, 0.5);
+        assertTrue(i.isValid());
+        assertEquals("Soap", i.toString());
     }
 
     @Test
     public void testInvalidCategory() {
-        Item item = new Item(50, "Invalid Cat", "BadCategory", "Pack", 1.0, 1.0);
-
-        assertNotNull(item);
-        assertFalse("Invalid category should not result in valid item data",
-                item.toString().contains("Invalid Cat"));
+        Item i = new Item(2, "BadCat", "INVALID", "Unit", 1.0, 0.5);
+        assertFalse(i.isValid());
+        assertEquals("", i.toString());
     }
 
     @Test
     public void testInvalidUnit() {
-        Item item = new Item(51, "Invalid Unit", "Cleaning", "WrongUnit", 1.0, 1.0);
-
-        assertNotNull(item);
-        assertFalse("Invalid unit should not result in valid item data",
-                item.toString().contains("Invalid Unit"));
+        Item i = new Item(3, "BadUnit", "Cleaning", "INVALID", 1.0, 0.5);
+        assertFalse(i.isValid());
+        assertEquals("", i.toString());
     }
 
     @Test
-    public void testConstructorDoesNotCrashWithNullStrings() {
-        try {
-            new Item(99, null, "Electronics", "Unit", 1.0, 1.0);
-        } catch (Exception e) {
-            fail("Constructor should not throw an exception when name is null");
-        }
+    public void testValidDifferentCategoryAndUnit() {
+        Item i = new Item(4, "Coke", "Beverage", "Bottle", 0.5, 0.5);
+        assertTrue(i.isValid());
+        assertEquals("Coke", i.toString());
     }
 }

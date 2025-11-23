@@ -1,6 +1,7 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,34 +12,27 @@ public class AisleTest {
     @Test
     public void testConstructorAndGetters() {
         List<Bay> bays = new ArrayList<>();
-        bays.add(new Bay(1, 10));
-        bays.add(new Bay(2, 8));
+        Aisle aisle = new Aisle(1, bays);
 
-        Aisle aisle = new Aisle(5, bays);
-
-        assertEquals(5, aisle.getId());
+        assertEquals(1, aisle.getId());
         assertEquals(bays, aisle.getBays());
     }
 
     @Test
     public void testSetBays() {
-        List<Bay> initialBays = new ArrayList<>();
-        initialBays.add(new Bay(1, 5));
+        List<Bay> bays1 = new ArrayList<>();
+        Aisle aisle = new Aisle(1, bays1);
 
-        Aisle aisle = new Aisle(2, initialBays);
+        List<Bay> bays2 = new ArrayList<>();
+        bays2.add(new Bay(1, 10));
 
-        List<Bay> newBays = new ArrayList<>();
-        newBays.add(new Bay(3, 12));
-        newBays.add(new Bay(4, 6));
-
-        aisle.setBays(newBays);
-
-        assertEquals(newBays, aisle.getBays());
+        aisle.setBays(bays2);
+        assertEquals(bays2, aisle.getBays());
     }
 
     @Test
-    public void testGetId() {
-        Aisle aisle = new Aisle(99, new ArrayList<>());
-        assertEquals(99, aisle.getId());
+    public void testGetBaysNotNull() {
+        Aisle aisle = new Aisle(1, new ArrayList<Bay>());
+        assertNotNull(aisle.getBays());
     }
 }

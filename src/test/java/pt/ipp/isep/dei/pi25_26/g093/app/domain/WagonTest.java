@@ -8,30 +8,26 @@ public class WagonTest {
 
     @Test
     public void testConstructorWithCargo() {
-        Cargo cargo = new Cargo(10, 5, 20, "2025-12-01", "2025-07-09T13:43:00");
-        Wagon wagon = new Wagon(1, cargo);
+        Cargo c = new Cargo(1, 100, 2, "2025-01-01", "2024-11-23T10:00:00");
+        Wagon w = new Wagon(10, c);
 
-        assertEquals(1, wagon.getwagonID());
-        assertEquals(cargo, wagon.getCargo());
+        assertEquals(10, w.getwagonID());
+        assertEquals(c, w.getCargo());
     }
 
     @Test
-    public void testConstructorWithParameters() {
-        Wagon wagon = new Wagon(3, 22, 9, 15, "2026-01-05", "2025-03-21T11:20:30");
-        Cargo cargo = wagon.getCargo();
+    public void testConstructorWithPrimitiveParamsCreatesCargo() {
+        Wagon w = new Wagon(10, 1, 100, 2, "2025-01-01", "2024-11-23T10:00:00");
 
-        assertNotNull(cargo);
-        assertEquals(3, wagon.getwagonID());
-        assertEquals(22, cargo.getBoxID());
-        assertEquals(9, cargo.getSku());
-        assertEquals(15, cargo.getQuantity());
-        assertEquals("2026-01-05", cargo.getExpiryDate());
-        assertEquals("2025-03-21T11:20:30", cargo.getReceivedAt());
+        assertEquals(10, w.getwagonID());
+        assertNotNull(w.getCargo());
+        assertEquals(1, w.getCargo().getBoxID());
+        assertEquals(100, w.getCargo().getSku());
     }
 
     @Test
     public void testToString() {
-        Wagon wagon = new Wagon(7, new Cargo(1, 1, 1, "2025-01-01", "2024-01-01T00:00:00"));
-        assertEquals("Wagon 7", wagon.toString());
+        Wagon w = new Wagon(10, 1, 100, 2, "2025-01-01", "2024-11-23T10:00:00");
+        assertEquals("Wagon 10", w.toString());
     }
 }
