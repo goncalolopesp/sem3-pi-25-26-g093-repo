@@ -187,7 +187,7 @@ public class CargoHandlingUI {
             System.out.println("Error executing USEI09: " + e.getMessage());
         }
     }
-    
+
     /**
      * USEI10 - Radius Search & Density Summary
      */
