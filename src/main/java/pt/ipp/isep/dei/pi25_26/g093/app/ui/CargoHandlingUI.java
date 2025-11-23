@@ -28,6 +28,7 @@ public class CargoHandlingUI {
             System.out.println("7. USEI07 - Build a balanced 2D-Tree on Latitude/Longitude");
             System.out.println("8. USEI08 - Search by Geographical Area");
             System.out.println("9. USEI09 - Search by Circular Region (radius)");
+            System.out.println("10. USEI10 - Radius Search & Density Summary");
             System.out.println("0. Back to the main menu");
             System.out.print("Choose a option: ");
 
@@ -44,6 +45,7 @@ public class CargoHandlingUI {
                 case 7 -> executeUSEI07();
                 case 8 -> executeUSEI08();
                 case 9 -> executeUSEI09();
+                case 10 -> executeUSEI10();
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option.");
             }
@@ -183,6 +185,25 @@ public class CargoHandlingUI {
             ui.run();
         } catch (Exception e) {
             System.out.println("Error executing USEI09: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * USEI10 - Radius Search & Density Summary
+     */
+    private void executeUSEI10() {
+        System.out.println("\n=== USEI10 - Radius Search & Density Summary ===");
+        try {
+            BalancedTreeController controller = new BalancedTreeController();
+            if (!controller.treeExists()) {
+                System.out.println("No KD-tree available. Please build it first via USEI07.");
+                return;
+            }
+
+            GeoRadiusSearchUI ui = new GeoRadiusSearchUI();
+            ui.run();
+        } catch (Exception e) {
+            System.out.println("Error executing USEI10: " + e.getMessage());
         }
     }
 }
