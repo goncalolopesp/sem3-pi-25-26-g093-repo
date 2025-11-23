@@ -22,11 +22,12 @@ public class WagonUI {
      */
     private void addWagonsToWarehouses(){
         WagonController wc = new WagonController();
-        boolean addedAllWagonsToWarehouses = wc.storeAllCargoInWarehouses();
-        if (addedAllWagonsToWarehouses){
-            System.out.println("All wagons were added to the warehouses successfully.");
+        List<Bay> allBaysWithCargo = wc.storeAllCargoInWarehouses();
+        boolean addedWagonsToWarehouses = !allBaysWithCargo.isEmpty();
+        if (addedWagonsToWarehouses) {
+            System.out.println("cargo was added to the warehouses successfully.");
         } else {
-            System.out.println("Some wagons were not added to the warehouses.");
+            System.out.println("No cargo was added to the warehouses.");
         }
     }
 
@@ -118,4 +119,23 @@ public class WagonUI {
         }
     }
 
+    public void dispatchAllCargoFromWagon() {
+        WagonController wc = new WagonController();
+        List<Cargo> dispatched = wc.dispatchCargoFromWagons();
+        if (dispatched.isEmpty()) {
+            System.out.println("No cargo was dispatched from the wagons.");
+        } else {
+            System.out.println("\nSuccessfully dispatched cargo from wagons:");
+        }
+    }
+
+    public void dispatchCargoFromWagon(int quantity) {
+        WagonController wc = new WagonController();
+        List<Cargo> dispatched = wc.dispatchQuantityCargoFromWagons(quantity);
+        if (dispatched.isEmpty()) {
+            System.out.println("No cargo was dispatched from the wagons.");
+        } else {
+            System.out.println("\nSuccessfully dispatched cargo from wagons:");
+        }
+    }
 }

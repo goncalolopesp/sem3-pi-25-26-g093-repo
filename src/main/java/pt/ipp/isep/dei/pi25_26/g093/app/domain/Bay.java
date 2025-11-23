@@ -69,4 +69,8 @@ public class Bay {
     public int getId() {
         return id;
     }
+
+    public boolean removeCargo(Cargo c){
+        return this.cargo.remove(c);
+    }
 }
