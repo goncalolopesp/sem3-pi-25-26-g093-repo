@@ -81,10 +81,10 @@ even_length:
     add t3, a0, t3            # t3 = endereço de vec[length/2]
     lw t5, 0(t3)              # t5 = vec[length/2]
     
-    # Calcular média com arredondamento para cima: (t4 + t5 + 1) / 2
+    # Calcular média arredondada: (t4 + t5) / 2
+    # Se a soma é ímpar, arredondar para baixo (direção de -infinito)
     add t6, t4, t5            # t6 = vec[length/2-1] + vec[length/2]
-    addi t6, t6, 1            # t6 = soma + 1 (para arredondar para cima)
-    srli t6, t6, 1            # t6 = (soma + 1) / 2
+    srai t6, t6, 1            # t6 = soma / 2 (divisão aritmética - arredonda para -infinito)
     
     # Guardar mediana em *me
     sw t6, 0(a2)              # *me = mediana

@@ -1,18 +1,18 @@
 .globl move_n_to_array
 
-# int move_n_to_array(int* buffer, int length, int *nelem, int *tail, int *head, int n, int* array)
+# int move_n_to_array(int* buffer, int length, int *nelem, int *head, int *tail, int n, int* array)
 # a0 = buffer (ponteiro para o buffer circular)
 # a1 = length (tamanho total do buffer)
 # a2 = nelem (ponteiro para o número de elementos válidos)
-# a3 = tail (ponteiro para o índice de inserção)
-# a4 = head (ponteiro para o índice do elemento mais antigo)
+# a3 = head (ponteiro para o índice do elemento mais antigo - read)
+# a4 = tail (ponteiro para o índice de inserção - write)
 # a5 = n (número de elementos a remover)
 # a6 = array (ponteiro para o array destino)
 
 move_n_to_array:
     # Carregar valores atuais da memória
     lw t0, 0(a2)          # t0 = *nelem (número de elementos válidos)
-    lw t1, 0(a4)          # t1 = *head (índice do elemento mais antigo)
+    lw t1, 0(a3)          # t1 = *head (índice do elemento mais antigo)
     
     # Verificar se o buffer está vazio (nelem == 0)
     beqz t0, return_zero  # se *nelem == 0, retorna 0
@@ -22,17 +22,15 @@ move_n_to_array:
     
     # Determinar quantos elementos realmente mover
     # moved = min(n, *nelem)
+    # Se n > *nelem, retorna 0 (falha), senão retorna 1 (sucesso)
     mv t2, a5             # t2 = n (elementos pedidos para mover)
-    blt t0, t2, use_nelem # se *nelem < n, usa *nelem
+    blt t0, t2, return_zero_fail # se *nelem < n, retorna 0 (falha)
     j start_loop          # caso contrário usa n
-    
-use_nelem:
-    mv t2, t0             # t2 = *nelem (usa elementos disponíveis)
     
 start_loop:
     # t2 agora contém o número de elementos que vamos mover
     # Guardar para o valor de retorno
-    mv t3, t2             # t3 = número de elementos a mover (para retornar)
+    mv t3, t2             # t3 = número de elementos a mover
     
     # t4 será o nosso contador do loop (conta de t2 até 0)
     mv t4, t2             # t4 = contador
@@ -70,16 +68,20 @@ no_wrap:
     
 end_loop:
     # Atualizar *head na memória
-    sw t1, 0(a4)          # *head = valor atualizado de head
+    sw t1, 0(a3)          # *head = valor atualizado de head
     
     # Atualizar *nelem na memória
     sub t0, t0, t3        # *nelem = *nelem - movidos
     sw t0, 0(a2)          # guardar nelem atualizado
     
-    # Retornar número de elementos movidos
-    mv a0, t3             # valor de retorno = número movido
+    # Retornar 1 (sucesso)
+    li a0, 1              # valor de retorno = 1 (sucesso)
     ret
     
 return_zero:
-    li a0, 0              # retorna 0
+    li a0, 0              # retorna 0 (buffer vazio ou n=0)
+    ret
+    
+return_zero_fail:
+    li a0, 0              # retorna 0 (pediu mais elementos do que disponíveis)
     ret
