@@ -548,7 +548,6 @@ public class Bootstrap {
         return Double.parseDouble(s);
     }
 
-    // Converts "('Europe/Paris',)" -> "Europe/Paris"
     private String normalizeTimeZone(String rawTZ) {
         if (rawTZ == null) return "";
         return rawTZ
