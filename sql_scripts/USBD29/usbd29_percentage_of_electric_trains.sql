@@ -1,11 +1,16 @@
+SET SERVEROUTPUT ON;
+
 --------------------------------------------------------------------------------
--- Project: Projeto Integrador 2025/26
--- Fase: BDDAD
--- User Story: USBD29 - Percentagem de locomotivas elétricas de um operador
--- Descrição:
---   Esta query calcula a percentagem de locomotivas elétricas pertencentes a um operador específico em relação ao total de locomotivas desse operador.
+-- USBD29 - Percentagem de locomotivas elétricas de um operador
 --------------------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION fn_usbd29 (
+    p_operator_id IN NUMBER
+) RETURN SYS_REFCURSOR
+IS
+    l_rc SYS_REFCURSOR;
+BEGIN
+OPEN l_rc FOR
 SELECT
     ROUND(
             100 * COUNT(ELM.LOCOMOTIVEMODELID) / COUNT(*),
@@ -18,8 +23,24 @@ FROM
         LEFT JOIN ELECTRIC_LOCOMOTIVE_MODEL ELM
                   ON ELM.LOCOMOTIVEMODELID = LM.LOCOMOTIVEMODELID
 WHERE
-    L.OPERATORID = 5;
+    L.OPERATORID = p_operator_id;
 
+RETURN l_rc;
+END fn_usbd29;
+/
 --------------------------------------------------------------------------------
--- Fim da Query
+-- Teste USBD29
 --------------------------------------------------------------------------------
+
+DECLARE
+rc      SYS_REFCURSOR;
+    v_pct   NUMBER;
+BEGIN
+    rc := fn_usbd29(5);
+
+FETCH rc INTO v_pct;
+DBMS_OUTPUT.PUT_LINE('Percentagem = ' || v_pct || '%');
+
+CLOSE rc;
+END;
+/
