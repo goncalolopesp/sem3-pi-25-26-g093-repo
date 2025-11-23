@@ -1,6 +1,5 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.repositories;
 
-import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.AVL;
 import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.BST;
 import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
