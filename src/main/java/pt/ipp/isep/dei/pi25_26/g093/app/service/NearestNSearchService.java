@@ -137,13 +137,8 @@ public class NearestNSearchService {
                                 Comparator.nullsLast(Comparator.naturalOrder()))
         );
 
-        // Track complexity metrics
-        int[] nodesVisited = new int[1];
-        int[] nodesPruned = new int[1];
-
         // Perform nearest-N search with backtracking
-        nearestNSearch(tree.getRoot(), centerLat, centerLon, n, filter, maxHeap,
-                nodesVisited, nodesPruned, 0);
+        nearestNSearch(tree.getRoot(), centerLat, centerLon, n, filter, maxHeap, 0);
 
         // Extract results from max-heap and sort
         List<StationDistance> results = new ArrayList<>(maxHeap);
@@ -166,13 +161,11 @@ public class NearestNSearchService {
         }
 
         long elapsed = System.nanoTime() - start;
-        ComplexityStats complexity = new ComplexityStats(nodesVisited[0], nodesPruned[0]);
 
         return new NearestNSearchResult(
                 stations,
                 distances,
                 elapsed,
-                complexity,
                 DEFAULT_SAMPLE_QUERIES
         );
     }
@@ -186,8 +179,6 @@ public class NearestNSearchService {
      * @param n number of nearest neighbors to find
      * @param filter filter to apply during search
      * @param maxHeap max-heap of size N to maintain closest stations
-     * @param nodesVisited counter for nodes visited (array to allow modification)
-     * @param nodesPruned counter for nodes pruned (array to allow modification)
      * @param depth current depth in the tree (for dimension selection)
      */
     private void nearestNSearch(
@@ -197,15 +188,11 @@ public class NearestNSearchService {
             int n,
             StationAreaFilter filter,
             PriorityQueue<StationDistance> maxHeap,
-            int[] nodesVisited,
-            int[] nodesPruned,
             int depth
     ) {
         if (node == null) {
             return;
         }
-
-        nodesVisited[0]++;
 
         // Get current dimension (alternates between 0=latitude and 1=longitude)
         int dimension = depth % 2;
@@ -225,8 +212,7 @@ public class NearestNSearchService {
         }
 
         // Recursively search the near subtree first
-        nearestNSearch(nearChild, queryLat, queryLon, n, filter, maxHeap,
-                nodesVisited, nodesPruned, depth + 1);
+        nearestNSearch(nearChild, queryLat, queryLon, n, filter, maxHeap, depth + 1);
 
         // Process current node's payloads (stations at this coordinate)
         double nodeLat = node.getElement(0).doubleValue();
@@ -294,10 +280,7 @@ public class NearestNSearchService {
         // Prune far subtree if minimum possible distance exceeds N-th best
         if (minPossibleDistance < nthBestDistance) {
             // Need to search far subtree
-            nearestNSearch(farChild, queryLat, queryLon, n, filter, maxHeap,
-                    nodesVisited, nodesPruned, depth + 1);
-        } else {
-            nodesPruned[0]++;
+            nearestNSearch(farChild, queryLat, queryLon, n, filter, maxHeap, depth + 1);
         }
     }
 

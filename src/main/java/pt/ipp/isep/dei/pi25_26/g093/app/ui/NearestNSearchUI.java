@@ -2,7 +2,6 @@ package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.NearestNSearchController;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
-import pt.ipp.isep.dei.pi25_26.g093.app.service.ComplexityStats;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.NearestNSearchResult;
 
 import java.util.List;
@@ -230,13 +229,6 @@ public class NearestNSearchUI {
         System.out.println(BLUE + "Execution time (ns): " + RESET + result.getExecutionTimeNanos());
         System.out.println(BLUE + "Execution time (ms): " + RESET + 
                 String.format("%.3f", result.getExecutionTimeNanos() / 1_000_000.0));
-        
-        ComplexityStats stats = result.getComplexityStats();
-        if (stats != null) {
-            System.out.println(BLUE + "Nodes visited: " + RESET + stats.getNodesVisited());
-            System.out.println(BLUE + "Nodes pruned: " + RESET + stats.getNodesPruned());
-        }
-        System.out.println(BLUE + "Complexity: " + RESET + result.getComplexity());
 
         printDivider();
         System.out.println(GREEN + "Sample queries:" + RESET);

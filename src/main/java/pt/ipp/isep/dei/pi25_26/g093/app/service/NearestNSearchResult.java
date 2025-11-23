@@ -10,7 +10,7 @@ import java.util.List;
  * 
  * <p>This immutable class encapsulates the results of a nearest-N proximity search,
  * including the matching stations, their distances from the target point,
- * execution metrics, complexity analysis, and metadata.
+ * execution metrics, and metadata.
  * 
  * <p>All lists are immutable copies to prevent external modification.
  * The stations and distances lists are aligned: stations.get(i) corresponds
@@ -24,7 +24,6 @@ public class NearestNSearchResult {
     private final List<CompleteStation> stations;
     private final List<Double> distances;
     private final long executionTimeNanos;
-    private final ComplexityStats complexityStats;
     private final List<String> sampleQueries;
 
     /**
@@ -39,19 +38,15 @@ public class NearestNSearchResult {
      * @param distances the list of distances (in km) from target point to each station,
      *                  aligned with stations list. May be null (treated as empty).
      * @param executionTimeNanos the execution time in nanoseconds
-     * @param complexityStats the complexity statistics (nodes visited, nodes pruned).
-     *                         May be null (treated as empty stats).
      * @param sampleQueries example queries for reference. May be null (treated as empty).
      */
     public NearestNSearchResult(List<CompleteStation> stations,
                                 List<Double> distances,
                                 long executionTimeNanos,
-                                ComplexityStats complexityStats,
                                 List<String> sampleQueries) {
         this.stations = stations == null ? Collections.emptyList() : List.copyOf(stations);
         this.distances = distances == null ? Collections.emptyList() : List.copyOf(distances);
         this.executionTimeNanos = executionTimeNanos;
-        this.complexityStats = complexityStats;
         this.sampleQueries = sampleQueries == null ? Collections.emptyList() : List.copyOf(sampleQueries);
     }
 
@@ -93,29 +88,6 @@ public class NearestNSearchResult {
      */
     public long getExecutionTimeNanos() {
         return executionTimeNanos;
-    }
-
-    /**
-     * Returns the complexity statistics.
-     * 
-     * @return complexity statistics containing nodes visited and pruned.
-     *         May be null if not tracked.
-     */
-    public ComplexityStats getComplexityStats() {
-        return complexityStats;
-    }
-
-    /**
-     * Returns the temporal complexity description.
-     * 
-     * @return a string describing the time complexity (e.g.,
-     *         "Nodes visited: 150, Nodes pruned: 50, Complexity: O(log n + k) where k=150")
-     */
-    public String getComplexity() {
-        if (complexityStats == null) {
-            return "Complexity not tracked";
-        }
-        return complexityStats.getDescription();
     }
 
     /**
