@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Stores the data from the CSV files into the repositories for later use.
+ * The first class to be run in the application. It is responsible for bootstrapping the application by loading data from CSV files into the repositories.
  */
 public class Bootstrap {
 
@@ -47,6 +47,10 @@ public class Bootstrap {
         returnItemRepo = repo.getReturnItemRepository();
     }
 
+    /**
+     * Returns the singleton instance of Bootstrap.
+     * @return the singleton instance of Bootstrap
+     */
     public static Bootstrap getInstance() {
         if (instance == null) {
             synchronized (Bootstrap.class) {
@@ -86,7 +90,7 @@ public class Bootstrap {
     public String getEuropeStationsCsv() { return path + "/" + europeStationsCsv; }
 
     /**
-     * Prompts the user to enter the path to the CSV files.
+     * Prompts the user to enter the path to the CSV files and verifies if they exist.
      */
     public void completeCSVFiles(){
         boolean fb = false, fi = false, fo = false, fol = false, fr = false, fw = false, fes = false;
@@ -195,6 +199,10 @@ public class Bootstrap {
         }
     }
 
+    /**
+     * Adds the return items from the .csv file to the return item repository.
+     * @throws FileNotFoundException if there is no file with the name "returns.csv" in the directory "train_station_dataset"
+     */
     public void addReturnItemsToRepository() throws FileNotFoundException {
 
         try {
@@ -417,7 +425,6 @@ public class Bootstrap {
      * Adds Cargo to the WagonRepository box-by-box.
      * @throws FileNotFoundException if there is no file with the name "wagons.csv" in the directory "train_station_dataset"
      */
-
     public void addWagonsToRepository() throws FileNotFoundException {
         try {
             CSVParser csvParser = new CSVParser(path + "/" + wagonsCsv);
@@ -462,6 +469,10 @@ public class Bootstrap {
         }
     }
 
+    /**
+     * Adds the complete stations from the .csv file to the complete station repository.
+     * @throws FileNotFoundException if there is no file with the name passed in the "europeStationsCsv" var in the directory "train_station_dataset"
+     */
     public void addCompleteStations() throws FileNotFoundException {
 
         CompleteStationRepository repo = Repositories.getInstance().getCompleteStationRepository();
@@ -524,6 +535,10 @@ public class Bootstrap {
         System.out.println("\nLoaded stations: " + validCount + " (skipped " + invalidCount + ")");
     }
 
+    /**
+     * Adds a CompleteStation to the search trees.
+     * @param cs the CompleteStation to add
+     */
     public void addToTrees(CompleteStation cs) {
         CompleteStationRepository repo = Repositories.getInstance().getCompleteStationRepository();
         if (cs.getLatitude() != null)
@@ -535,10 +550,20 @@ public class Bootstrap {
         repo.addTzgKey(new TzgKey(cs));
     }
 
+    /**
+     * Safely trims a string, returning an empty string if the input is null.
+     * @param s the string to trim
+     * @return the trimmed string or an empty string if the input is null
+     */
     private String safeTrim(String s) {
         return s == null ? "" : s.trim();
     }
 
+    /**
+     * Parses a string into a Double, returning null for empty or "none"/"null" strings.
+     * @param s the string to parse
+     * @return the parsed Double or null
+     */
     private Double parseNullableDouble(String s) {
         if (s == null) return null;
         s = s.trim();
@@ -548,6 +573,11 @@ public class Bootstrap {
         return Double.parseDouble(s);
     }
 
+    /**
+     * Normalizes a time zone string by removing unwanted characters and extra spaces.
+     * @param rawTZ the raw time zone string
+     * @return the normalized time zone string
+     */
     private String normalizeTimeZone(String rawTZ) {
         if (rawTZ == null) return "";
         return rawTZ
