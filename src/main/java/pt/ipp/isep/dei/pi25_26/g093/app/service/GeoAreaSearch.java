@@ -9,6 +9,31 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Service class for USEI08 - Search by Geographical Area (Rectangular Query).
+ * 
+ * <p>This service performs efficient rectangular region searches over railway stations
+ * using a 2D KD-tree (Tree&lt;Double&gt;). The search uses RangeSearch to prune
+ * candidates before applying filters, ensuring optimal performance even with large
+ * datasets (~62k stations).
+ * 
+ * <p>The search accepts:
+ * <ul>
+ *   <li>A rectangular region defined by latitude and longitude bounds</li>
+ *   <li>Optional filters: isCity, isMainStation, country</li>
+ * </ul>
+ * 
+ * <p>Results are sorted by latitude (ascending), then longitude (ascending),
+ * then station name (ascending).
+ * 
+ * <p>Time complexity: Approximately O(sqrt(n) + m) where n is the total number
+ * of stations and m is the number of stations in the result set.
+ * 
+ * @author ESINF Sprint 2 Team
+ * @see GeoAreaSearchResult
+ * @see StationAreaFilter
+ * @see Tree
+ */
 public class GeoAreaSearch {
 
     private static final List<String> DEFAULT_SAMPLE_QUERIES = List.of(
@@ -20,6 +45,13 @@ public class GeoAreaSearch {
 
     private final CompleteStationRepository repository;
 
+    /**
+     * Constructs a new GeoAreaSearch service with the specified repository.
+     * 
+     * @param repository the CompleteStationRepository containing the KD-tree
+     *                   and station data. Must not be null.
+     * @throws IllegalArgumentException if repository is null
+     */
     public GeoAreaSearch(CompleteStationRepository repository) {
         if (repository == null) {
             throw new IllegalArgumentException("CompleteStationRepository is required");
@@ -27,6 +59,39 @@ public class GeoAreaSearch {
         this.repository = repository;
     }
 
+    /**
+     * Searches for stations within a rectangular geographical area using the KD-tree.
+     * 
+     * <p>The search process:
+     * <ol>
+     *   <li>Validates input ranges (latitude [-90, 90], longitude [-180, 180])</li>
+     *   <li>Uses KD-tree RangeSearch to find candidate stations within bounding box</li>
+     *   <li>Filters candidates by exact bounds (handles stations sharing coordinates)</li>
+     *   <li>Applies optional StationAreaFilter (isCity, isMainStation, country)</li>
+     *   <li>Sorts results by latitude, longitude, then station name</li>
+     * </ol>
+     * 
+     * <p>The KD-tree must be built before calling this method (typically done
+     * during application startup via USEI07).
+     * 
+     * @param latMin minimum latitude of the search rectangle (inclusive, range [-90, 90])
+     * @param latMax maximum latitude of the search rectangle (inclusive, range [-90, 90])
+     * @param lonMin minimum longitude of the search rectangle (inclusive, range [-180, 180])
+     * @param lonMax maximum longitude of the search rectangle (inclusive, range [-180, 180])
+     * @param filter optional filter for isCity, isMainStation, and country.
+     *               If null, no filtering is applied (all countries).
+     * @return GeoAreaSearchResult containing matching stations, execution time,
+     *         complexity description, and sample queries. Never null.
+     * @throws IllegalArgumentException if:
+     *         <ul>
+     *           <li>latMin &gt; latMax</li>
+     *           <li>lonMin &gt; lonMax</li>
+     *           <li>latitude values are outside [-90, 90]</li>
+     *           <li>longitude values are outside [-180, 180]</li>
+     *         </ul>
+     * @throws IllegalStateException if the KD-tree is null or empty
+     *         (must be built before querying)
+     */
     public GeoAreaSearchResult searchByArea(double latMin, double latMax,
                                             double lonMin, double lonMax,
                                             StationAreaFilter filter) {

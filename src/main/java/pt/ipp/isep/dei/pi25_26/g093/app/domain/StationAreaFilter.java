@@ -7,17 +7,28 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Represents the optional filtering criteria used in USEI08
+ * Represents the optional filtering criteria used in USEI08 and USEI09
  * (Search by Geographical Area).
  *
- * Each field may be:
- *  - a Boolean value (true/false) to apply the filter, or
- *  - null, meaning "no filter" for that field.
+ * <p>Each field may be:
+ * <ul>
+ *   <li>a Boolean value (true/false) to apply the filter, or</li>
+ *   <li>null, meaning "no filter" for that field.</li>
+ * </ul>
  *
- * The "country" filter may be:
- *  - "PT"
- *  - "ES"
- *  - "ALL" (or null → treated as no filter)
+ * <p>The "country" filter may be:
+ * <ul>
+ *   <li>"PT" - filter for Portuguese stations only</li>
+ *   <li>"ES" - filter for Spanish stations only</li>
+ *   <li>"ALL" (or null) - no country filter (all countries)</li>
+ * </ul>
+ *
+ * <p>Filters are applied with AND logic: a station must match all
+ * specified filter criteria to be included in results.
+ * 
+ * @author ESINF Sprint 2 Team
+ * @see GeoAreaSearch
+ * @see GeoAreaCircleSearch
  */
 public class StationAreaFilter {
 
@@ -49,15 +60,35 @@ public class StationAreaFilter {
         };
     }
 
-    // Getters
+    /**
+     * Returns the city filter value.
+     * 
+     * @return true if filtering for city stations only,
+     *         false if filtering for non-city stations only,
+     *         null if no city filter is applied
+     */
     public Boolean getIsCity() {
         return isCity;
     }
 
+    /**
+     * Returns the main station filter value.
+     * 
+     * @return true if filtering for main stations only,
+     *         false if filtering for non-main stations only,
+     *         null if no main station filter is applied
+     */
     public Boolean getIsMainStation() {
         return isMainStation;
     }
 
+    /**
+     * Returns the country filter value.
+     * 
+     * @return "PT" for Portuguese stations only,
+     *         "ES" for Spanish stations only,
+     *         "ALL" if no country filter is applied
+     */
     public String getCountry() {
         return country;
     }

@@ -12,14 +12,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service class for USEI09 - Search by Circular Region (Radius Query).
+ * 
+ * <p>This service performs efficient circular region searches over railway stations
+ * using a 2D KD-tree (Tree&lt;Double&gt;) for initial candidate pruning, followed
+ * by exact Haversine distance calculations.
+ * 
+ * <p>The search process:
+ * <ol>
+ *   <li>Creates a bounding box from the center point and radius</li>
+ *   <li>Uses KD-tree RangeSearch to find candidate stations within the bounding box</li>
+ *   <li>Calculates exact Haversine distance for each candidate</li>
+ *   <li>Filters stations within the specified radius (distance &lt;= radiusKm)</li>
+ *   <li>Applies optional StationAreaFilter (isCity, isMainStation, country)</li>
+ *   <li>Sorts results by distance, then latitude, longitude, and station name</li>
+ * </ol>
+ * 
+ * <p>The Haversine formula uses Earth radius = 6371.0 km for accurate distance
+ * calculations between geographical coordinates.
+ * 
+ * <p>Time complexity: Approximately O(sqrt(n) + m) where n is the total number
+ * of stations and m is the number of stations in the result set.
+ * 
+ * @author ESINF Sprint 2 Team
+ * @see GeoAreaCircleSearchResult
+ * @see StationAreaFilter
+ * @see Tree
+ */
 public class GeoAreaCircleSearch {
 
     private final CompleteStationRepository repository;
 
+    /**
+     * Constructs a new GeoAreaCircleSearch service with the specified repository.
+     * 
+     * @param repository the CompleteStationRepository containing the KD-tree
+     *                   and station data. Must not be null.
+     */
     public GeoAreaCircleSearch(CompleteStationRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Constructs a new GeoAreaCircleSearch service using the default repository instance.
+     */
     public GeoAreaCircleSearch() {
         this(Repositories.getInstance().getCompleteStationRepository());
     }
@@ -31,7 +68,41 @@ public class GeoAreaCircleSearch {
             "center(38.7, -9.1) radius=25km isCity=false isMainStation=false"
     );
 
-    // Método principal
+    /**
+     * Searches for stations within a circular geographical region using KD-tree
+     * pruning and Haversine distance calculation.
+     * 
+     * <p>The search process:
+     * <ol>
+     *   <li>Validates input parameters (latitude [-90, 90], longitude [-180, 180], radius &gt; 0)</li>
+     *   <li>Creates a bounding box from center point and radius</li>
+     *   <li>Uses KD-tree RangeSearch to find candidate stations within bounding box</li>
+     *   <li>Calculates exact Haversine distance for each candidate</li>
+     *   <li>Filters stations where distance &lt;= radiusKm (inclusive)</li>
+     *   <li>Applies optional StationAreaFilter (isCity, isMainStation, country)</li>
+     *   <li>Sorts results by distance (ascending), then latitude, longitude, station name</li>
+     * </ol>
+     * 
+     * <p>The KD-tree must be built before calling this method (typically done
+     * during application startup via USEI07).
+     * 
+     * @param centerLat center point latitude (range [-90, 90])
+     * @param centerLon center point longitude (range [-180, 180])
+     * @param radiusKm search radius in kilometers (must be &gt; 0)
+     * @param isCityFilter filter for city stations (true = only cities, false = only non-cities, null = no filter)
+     * @param isMainStationFilter filter for main stations (true = only main, false = only non-main, null = no filter)
+     * @param countryFilter filter for country ("PT", "ES", "ALL", or null = all countries)
+     * @return GeoAreaCircleSearchResult containing matching stations with distances,
+     *         execution time, complexity description, and sample queries. Never null.
+     * @throws IllegalArgumentException if:
+     *         <ul>
+     *           <li>centerLat is outside [-90, 90]</li>
+     *           <li>centerLon is outside [-180, 180]</li>
+     *           <li>radiusKm &lt;= 0</li>
+     *         </ul>
+     * @throws IllegalStateException if the KD-tree is null or empty
+     *         (must be built before querying)
+     */
     public GeoAreaCircleSearchResult searchCircle(
             double centerLat,
             double centerLon,

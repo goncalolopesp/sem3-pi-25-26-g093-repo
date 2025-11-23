@@ -7,6 +7,23 @@ import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoAreaCircleSearchResult;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * User interface for USEI09 - Search by Circular Region (Radius Query).
+ * 
+ * <p>This UI class handles user interaction for circular geographical searches,
+ * including input validation, filter selection, and result display.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Validates latitude, longitude, and radius during input</li>
+ *   <li>Supports optional filters (isCity, isMainStation, country)</li>
+ *   <li>Displays results in a formatted table with distances</li>
+ *   <li>Shows execution metrics and sample queries</li>
+ * </ul>
+ * 
+ * @author ESINF Sprint 2 Team
+ * @see GeoAreaCircleSearchController
+ */
 public class GeoAreaCircleSearchUI {
 
     private final GeoAreaCircleSearchController controller;
@@ -21,11 +38,28 @@ public class GeoAreaCircleSearchUI {
     private static final String BLUE = "\u001B[34m";
     private static final String BOLD = "\u001B[1m";
 
+    /**
+     * Constructs a new GeoAreaCircleSearchUI with default controller.
+     */
     public GeoAreaCircleSearchUI() {
         this.controller = new GeoAreaCircleSearchController();
         this.sc = new Scanner(System.in);
     }
 
+    /**
+     * Runs the USEI09 user interface.
+     * 
+     * <p>This method:
+     * <ol>
+     *   <li>Prompts for center point (centerLat, centerLon) and radius</li>
+     *   <li>Validates input ranges (latitude [-90, 90], longitude [-180, 180], radius &gt; 0)</li>
+     *   <li>Prompts for optional filters</li>
+     *   <li>Executes the search and displays results in a formatted table</li>
+     * </ol>
+     * 
+     * <p>The method handles exceptions gracefully and provides user-friendly
+     * error messages.
+     */
     public void run() {
 
         printHeader("USEI09 - Circular Geographical Search");

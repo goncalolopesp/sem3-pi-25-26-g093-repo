@@ -7,6 +7,23 @@ import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoAreaSearchResult;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * User interface for USEI08 - Search by Geographical Area (Rectangular Query).
+ * 
+ * <p>This UI class handles user interaction for rectangular geographical searches,
+ * including input validation, filter selection, and result display.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Validates latitude and longitude ranges during input</li>
+ *   <li>Supports optional filters (isCity, isMainStation, country)</li>
+ *   <li>Displays results with execution metrics</li>
+ *   <li>Shows sample queries for reference</li>
+ * </ul>
+ * 
+ * @author ESINF Sprint 2 Team
+ * @see GeoAreaSearchController
+ */
 public class GeoAreaSearchUI {
 
     private final GeoAreaSearchController controller;
@@ -21,11 +38,28 @@ public class GeoAreaSearchUI {
     private static final String RESET = "\u001B[0m";
     private static final String BOLD = "\u001B[1m";
 
+    /**
+     * Constructs a new GeoAreaSearchUI with default controller.
+     */
     public GeoAreaSearchUI() {
         this.controller = new GeoAreaSearchController();
         this.sc = new Scanner(System.in);
     }
 
+    /**
+     * Runs the USEI08 user interface.
+     * 
+     * <p>This method:
+     * <ol>
+     *   <li>Prompts for rectangular region bounds (latMin, latMax, lonMin, lonMax)</li>
+     *   <li>Validates input ranges</li>
+     *   <li>Prompts for optional filters</li>
+     *   <li>Executes the search and displays results</li>
+     * </ol>
+     * 
+     * <p>The method handles exceptions gracefully and provides user-friendly
+     * error messages.
+     */
     public void run() {
 
         printHeader("USEI08 — Search Stations by Geographical Area");
