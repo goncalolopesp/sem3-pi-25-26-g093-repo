@@ -28,6 +28,11 @@ public class GeoRadiusSearchController {
         this.service = new GeoRadiusSearchService();
     }
 
+    // NOVO CONSTRUTOR para testes (injeção de mocks)
+    public GeoRadiusSearchController(GeoRadiusSearchService service) {
+        this.service = service;
+    }
+
     /**
      * Executes a radius search around a geographical point.
      *
