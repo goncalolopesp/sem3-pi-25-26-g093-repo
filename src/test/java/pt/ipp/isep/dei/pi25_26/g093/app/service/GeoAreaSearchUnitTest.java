@@ -688,7 +688,7 @@ public class GeoAreaSearchUnitTest {
 
         // Assert
         List<CompleteStation> stations = result.getStations();
-        assertTrue(stations.isEmpty(), "Should return empty list when filter excludes all");
+        assertTrue("Should return empty list when filter excludes all", stations.isEmpty());
     }
 
     // ==================== HELPER METHODS ====================

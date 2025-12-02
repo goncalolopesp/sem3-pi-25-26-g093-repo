@@ -1,238 +1,156 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
+import org.junit.Before;
+import org.junit.Test;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
-import pt.ipp.isep.dei.pi25_26.g093.app.repositories.CompleteStationRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.NearestNSearchResult;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.NearestNSearchService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for NearestNSearchController.
- * 
- * Tests:
- * - Controller correctly delegates to service
- * - All parameters are forwarded correctly
- * - Invalid inputs are handled properly
- * - Service exceptions are propagated
+ * Unit tests for NearestNSearchController (JUnit 4, sem Mockito).
  */
-@ExtendWith(MockitoExtension.class)
 public class NearestNSearchControllerTest {
 
-    @Mock
-    private NearestNSearchService mockService;
-
     private NearestNSearchController controller;
+    private StubNearestNSearchService stubService;
 
-    @BeforeEach
+    @Before
     public void setUp() {
-        controller = new NearestNSearchController(mockService);
+        stubService = new StubNearestNSearchService();
+        controller = new NearestNSearchController(stubService);
     }
 
     // ==================== DELEGATION TESTS ====================
 
     @Test
     public void testSearchNearestN_DelegatesToService() {
-        // Arrange
-        double centerLat = 40.0;
-        double centerLon = -8.0;
-        int n = 5;
-        Boolean isCity = true;
-        Boolean isMainStation = false;
-        String country = "PT";
-        String timeZone = "Europe/Lisbon";
-        String timeZoneGroup = "WET";
+        double lat = 40.0, lon = -8.0;
+        NearestNSearchResult result = controller.searchNearestN(lat, lon, 5,
+                true, false, "PT", "Europe/Lisbon", "WET");
 
-        NearestNSearchResult expectedResult = createMockResult();
-        when(mockService.searchNearestN(centerLat, centerLon, n, isCity, isMainStation, 
-                country, timeZone, timeZoneGroup))
-                .thenReturn(expectedResult);
-
-        // Act
-        NearestNSearchResult result = controller.searchNearestN(
-                centerLat, centerLon, n, isCity, isMainStation, country, timeZone, timeZoneGroup);
-
-        // Assert
         assertNotNull(result);
-        assertEquals(expectedResult, result);
-        verify(mockService, times(1)).searchNearestN(
-                centerLat, centerLon, n, isCity, isMainStation, country, timeZone, timeZoneGroup);
+        assertEquals("PT", result.getStations().get(0).getCountry());
+        assertTrue(stubService.wasCalled);
     }
 
     @Test
     public void testSearchNearestN_AllNullFilters_DelegatesCorrectly() {
-        // Arrange
-        double centerLat = 40.0;
-        double centerLon = -8.0;
-        int n = 10;
+        NearestNSearchResult result = controller.searchNearestN(40.0, -8.0, 10,
+                null, null, null, null, null);
 
-        NearestNSearchResult expectedResult = createMockResult();
-        when(mockService.searchNearestN(centerLat, centerLon, n, null, null, null, null, null))
-                .thenReturn(expectedResult);
-
-        // Act
-        NearestNSearchResult result = controller.searchNearestN(
-                centerLat, centerLon, n, null, null, null, null, null);
-
-        // Assert
         assertNotNull(result);
-        verify(mockService, times(1)).searchNearestN(
-                centerLat, centerLon, n, null, null, null, null, null);
+        assertTrue(stubService.wasCalled);
     }
 
     // ==================== EXCEPTION PROPAGATION TESTS ====================
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSearchNearestN_InvalidLatitude_PropagatesException() {
-        // Arrange
-        double centerLat = 91.0; // Invalid
-        double centerLon = -8.0;
-        int n = 5;
-
-        when(mockService.searchNearestN(centerLat, centerLon, n, null, null, null, null, null))
-                .thenThrow(new IllegalArgumentException("Latitude must be within [-90, 90]."));
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.searchNearestN(centerLat, centerLon, n, null, null, null, null, null);
-        });
-        assertTrue(exception.getMessage().contains("Latitude"));
+        controller.searchNearestN(91.0, -8.0, 5, null, null, null, null, null);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSearchNearestN_InvalidLongitude_PropagatesException() {
-        // Arrange
-        double centerLat = 40.0;
-        double centerLon = 181.0; // Invalid
-        int n = 5;
-
-        when(mockService.searchNearestN(centerLat, centerLon, n, null, null, null, null, null))
-                .thenThrow(new IllegalArgumentException("Longitude must be within [-180, 180]."));
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.searchNearestN(centerLat, centerLon, n, null, null, null, null, null);
-        });
-        assertTrue(exception.getMessage().contains("Longitude"));
+        controller.searchNearestN(40.0, 181.0, 5, null, null, null, null, null);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSearchNearestN_InvalidN_PropagatesException() {
-        // Arrange
-        double centerLat = 40.0;
-        double centerLon = -8.0;
-        int n = 0; // Invalid
-
-        when(mockService.searchNearestN(centerLat, centerLon, n, null, null, null, null, null))
-                .thenThrow(new IllegalArgumentException("N must be greater than 0."));
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.searchNearestN(centerLat, centerLon, n, null, null, null, null, null);
-        });
-        assertTrue(exception.getMessage().contains("N must be greater than 0"));
+        controller.searchNearestN(40.0, -8.0, 0, null, null, null, null, null);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testSearchNearestN_EmptyTree_PropagatesException() {
-        // Arrange
-        double centerLat = 40.0;
-        double centerLon = -8.0;
-        int n = 5;
-
-        when(mockService.searchNearestN(centerLat, centerLon, n, null, null, null, null, null))
-                .thenThrow(new IllegalStateException("KD-tree is empty. Build it before querying."));
-
-        // Act & Assert
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            controller.searchNearestN(centerLat, centerLon, n, null, null, null, null, null);
-        });
-        assertTrue(exception.getMessage().contains("KD-tree is empty"));
+        stubService.throwEmptyTree = true;
+        controller.searchNearestN(40.0, -8.0, 5, null, null, null, null, null);
     }
 
     // ==================== CONSTRUCTOR TESTS ====================
 
     @Test
     public void testConstructor_DefaultConstructor_CreatesService() {
-        // Arrange & Act
         NearestNSearchController defaultController = new NearestNSearchController();
-
-        // Assert
         assertNotNull(defaultController);
-        // Should not throw when using default constructor
-        // (Note: This will use real repository, so tree must be set up)
     }
 
     @Test
     public void testConstructor_CustomService_UsesProvidedService() {
-        // Arrange
-        NearestNSearchService customService = mock(NearestNSearchService.class);
-
-        // Act
-        NearestNSearchController customController = new NearestNSearchController(customService);
-
-        // Assert
-        assertNotNull(customController);
-        // Verify it uses the provided service
-        NearestNSearchResult mockResult = createMockResult();
-        when(customService.searchNearestN(anyDouble(), anyDouble(), anyInt(), 
-                any(), any(), any(), any(), any())).thenReturn(mockResult);
-
-        NearestNSearchResult result = customController.searchNearestN(
-                40.0, -8.0, 5, null, null, null, null, null);
-
+        NearestNSearchController customController = new NearestNSearchController(stubService);
+        NearestNSearchResult result = customController.searchNearestN(40.0, -8.0, 5,
+                null, null, null, null, null);
         assertNotNull(result);
-        verify(customService, times(1)).searchNearestN(anyDouble(), anyDouble(), anyInt(),
-                any(), any(), any(), any(), any());
     }
 
     // ==================== PARAMETER FORWARDING TESTS ====================
 
     @Test
     public void testSearchNearestN_AllParametersForwarded() {
-        // Arrange
-        double centerLat = 38.7223;
-        double centerLon = -9.1393;
-        int n = 10;
-        Boolean isCity = true;
-        Boolean isMainStation = true;
-        String country = "PT";
-        String timeZone = "Europe/Lisbon";
-        String timeZoneGroup = "WET";
+        controller.searchNearestN(38.7223, -9.1393, 10,
+                true, true, "PT", "Europe/Lisbon", "WET");
 
-        NearestNSearchResult expectedResult = createMockResult();
-        when(mockService.searchNearestN(eq(centerLat), eq(centerLon), eq(n),
-                eq(isCity), eq(isMainStation), eq(country), eq(timeZone), eq(timeZoneGroup)))
-                .thenReturn(expectedResult);
-
-        // Act
-        controller.searchNearestN(centerLat, centerLon, n, isCity, isMainStation, 
-                country, timeZone, timeZoneGroup);
-
-        // Assert
-        verify(mockService, times(1)).searchNearestN(
-                eq(centerLat), eq(centerLon), eq(n),
-                eq(isCity), eq(isMainStation), eq(country), eq(timeZone), eq(timeZoneGroup));
+        assertEquals(38.7223, stubService.lastLat, 0.0001);
+        assertEquals(-9.1393, stubService.lastLon, 0.0001);
+        assertEquals(10, stubService.lastN);
+        assertEquals(Boolean.TRUE, stubService.lastIsCity);
+        assertEquals(Boolean.TRUE, stubService.lastIsMainStation);
+        assertEquals("PT", stubService.lastCountry);
+        assertEquals("Europe/Lisbon", stubService.lastTimeZone);
+        assertEquals("WET", stubService.lastTimeZoneGroup);
     }
 
-    // ==================== HELPER METHODS ====================
+    // ==================== HELPER STUB ====================
 
-    private NearestNSearchResult createMockResult() {
-        List<CompleteStation> stations = new ArrayList<>();
-        List<Double> distances = new ArrayList<>();
-        stations.add(new CompleteStation("PT", "Europe/Lisbon", "WET", "Test", 40.0, -8.0, false, false, false));
-        distances.add(0.0);
-        return new NearestNSearchResult(stations, distances, 1000L, new ArrayList<>());
+    private static class StubNearestNSearchService extends NearestNSearchService {
+        boolean wasCalled = false;
+        boolean throwEmptyTree = false;
+
+        double lastLat;
+        double lastLon;
+        int lastN;
+        Boolean lastIsCity;
+        Boolean lastIsMainStation;
+        String lastCountry;
+        String lastTimeZone;
+        String lastTimeZoneGroup;
+
+        @Override
+        public NearestNSearchResult searchNearestN(double centerLat, double centerLon, int n,
+                                                   Boolean isCity, Boolean isMainStation,
+                                                   String country, String timeZone, String timeZoneGroup) {
+            wasCalled = true;
+            lastLat = centerLat;
+            lastLon = centerLon;
+            lastN = n;
+            lastIsCity = isCity;
+            lastIsMainStation = isMainStation;
+            lastCountry = country;
+            lastTimeZone = timeZone;
+            lastTimeZoneGroup = timeZoneGroup;
+
+            if (centerLat < -90 || centerLat > 90) {
+                throw new IllegalArgumentException("Latitude must be within [-90, 90].");
+            }
+            if (centerLon < -180 || centerLon > 180) {
+                throw new IllegalArgumentException("Longitude must be within [-180, 180].");
+            }
+            if (n <= 0) {
+                throw new IllegalArgumentException("N must be greater than 0.");
+            }
+            if (throwEmptyTree) {
+                throw new IllegalStateException("KD-tree is empty. Build it before querying.");
+            }
+
+            List<CompleteStation> stations = new ArrayList<>();
+            stations.add(new CompleteStation("PT", "Europe/Lisbon", "WET", "Test",
+                    40.0, -8.0, false, false, false));
+            List<Double> distances = new ArrayList<>();
+            distances.add(0.0);
+            return new NearestNSearchResult(stations, distances, 1000L, new ArrayList<>());
+        }
     }
 }
-
