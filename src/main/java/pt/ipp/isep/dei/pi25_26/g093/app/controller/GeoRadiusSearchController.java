@@ -1,55 +1,44 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.controller;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoRadiusSearchService;
 
 /**
- * Controller for USEI10 – Radius Search & Density Summary.
- * <p>
- * This controller acts as an intermediate layer between the UI and the
- * {@link GeoRadiusSearchService}. It receives the user inputs (latitude,
- * longitude and search radius), forwards them to the service, and returns the
- * processed result to the UI.
- * </p>
- *
- * <p>
- * The controller performs no business logic of its own; all computation is
- * delegated to the service layer to maintain clean separation of concerns.
- * </p>
+ * Controller que liga a UI ao Service.
  */
 public class GeoRadiusSearchController {
 
-    /** Service responsible for performing radius-based geographical searches. */
     private final GeoRadiusSearchService service;
 
     /**
-     * Creates a new controller and initializes the underlying service.
+     * CONSTRUTOR 1: Usado pela UI (Modo Real).
+     * Vai buscar a árvore carregada no sistema para iniciar o serviço.
      */
     public GeoRadiusSearchController() {
-        this.service = new GeoRadiusSearchService();
+
+        var stationRepository = Repositories.getInstance().getCompleteStationRepository();
+        Tree<Double> globalKDTree = stationRepository.getTree();
+        this.service = new GeoRadiusSearchService(globalKDTree);
     }
 
-    // NOVO CONSTRUTOR para testes (injeção de mocks)
+    /**
+     * CONSTRUTOR 2: Usado pelos Testes (Modo Mock).
+     * Permite injetar um serviço com dados falsos para testar sem a base de dados.
+     */
     public GeoRadiusSearchController(GeoRadiusSearchService service) {
         this.service = service;
     }
 
     /**
-     * Executes a radius search around a geographical point.
+     * Método chamado pela UI para executar a pesquisa.
      *
-     * @param lat      center latitude in decimal degrees
-     * @param lon      center longitude in decimal degrees
-     * @param radiusKm radius of the search area in kilometers
-     *
-     * @return a {@link GeoRadiusSearchService.Result} object containing:
-     *         <ul>
-     *             <li>Sorted list of stations inside the radius</li>
-     *             <li>Summary by country</li>
-     *             <li>City vs non-city station summary</li>
-     *         </ul>
+     * @param lat      Latitude do centro
+     * @param lon      Longitude do centro
+     * @param radiusKm Raio em quilómetros
+     * @return O resultado contendo a árvore ordenada e estatísticas
      */
     public GeoRadiusSearchService.Result execute(double lat, double lon, double radiusKm) {
         return service.search(lat, lon, radiusKm);
     }
 }
-
-

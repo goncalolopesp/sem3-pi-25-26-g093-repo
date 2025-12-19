@@ -2,60 +2,101 @@ package pt.ipp.isep.dei.pi25_26.g093.app.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.AVL;
+import pt.ipp.isep.dei.pi25_26.g093.app.datastructures.Tree;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.CompleteStation;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.StationDistance;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class GeoRadiusSearchServiceTest {
 
     private GeoRadiusSearchService service;
+    private Tree<Double> mockKdTree;
 
     @Before
     public void setUp() {
-        service = new GeoRadiusSearchService();
+        // 1. Criar uma KD-Tree real (vazia) com k=2 dimensões
+        mockKdTree = new Tree<>(2);
 
-        // Criar mocks de estações
-        List<CompleteStation> mockStations = new ArrayList<>();
-        mockStations.add(new CompleteStation("Portugal", "GMT+0", "Europe/Lisbon", "Porto",
-                41.15, -8.61, true, true, false));
-        mockStations.add(new CompleteStation("Portugal", "GMT+0", "Europe/Lisbon", "Matosinhos",
-                41.20, -8.60, false, false, false));
-        mockStations.add(new CompleteStation("Spain", "GMT+1", "Europe/Madrid", "Madrid",
-                40.00, -3.70, true, true, false));
+        // 2. Criar Estações de Teste
+        addStationToTree("Station Close", 40.004, -8.0, "PT", true);
+        addStationToTree("Station Border", 40.08, -8.0, "ES", false);
+        addStationToTree("Station Far", 41.0, -8.0, "FR", true);
 
-        service.injectMockStations(mockStations);
+        // 3. Inicializar o Serviço com a árvore populada
+        service = new GeoRadiusSearchService(mockKdTree);
+    }
+
+    // Método auxiliar corrigido
+    private void addStationToTree(String name, double lat, double lon, String country, boolean isCity) {
+
+        // 1. Criar a Estação
+        // CORREÇÃO: A ordem dos argumentos agora está correta:
+        // (Country, TimeZone, TimeZoneGroup, StationName, Lat, Lon, ...)
+        CompleteStation s = new CompleteStation(
+                country,    // 1. Country (Antes estava 'name')
+                "",         // 2. TimeZone (Antes estava 'country')
+                "",         // 3. TimeZoneGroup
+                name,       // 4. Station Name (Antes estava "")
+                lat,        // 5. Latitude
+                lon,        // 6. Longitude
+                isCity,     // 7. isCity
+                false,      // 8. isMainStation
+                false       // 9. isAirport
+        );
+
+        // 2. Criar as coordenadas como ArrayList
+        ArrayList<Double> coords = new ArrayList<>();
+        coords.add(lat);
+        coords.add(lon);
+
+        // 3. Inserir na árvore
+        mockKdTree.Insert(coords, s);
     }
 
     @Test
-    public void testSearchInsideRadius() {
-        double lat = 41.15;
-        double lon = -8.61;
-        double radiusKm = 10;
+    public void testSearch_FindsStationsInsideRadius() {
+        // Act
+        GeoRadiusSearchService.Result result = service.search(40.0, -8.0, 10.0);
+        AVL<StationDistance> tree = result.getStationsTree();
 
-        GeoRadiusSearchService.Result result = service.search(lat, lon, radiusKm);
+        // Assert
+        assertFalse("A árvore de resultados não devia estar vazia", tree.isEmpty());
 
-        assertEquals(2, result.getStations().size());
-        assertEquals(Integer.valueOf(2), result.getCountryCounts().get("Portugal"));
-        assertEquals(1, result.getCityCount());
-        assertEquals(1, result.getNonCityCount());
+        int count = 0;
+        for (StationDistance sd : tree.inOrder()) {
+            count++;
+        }
+
+        assertEquals("Deve encontrar exatamente 2 estações dentro de 10km", 2, count);
     }
 
     @Test
-    public void testSearchNothingFound() {
-        GeoRadiusSearchService.Result result = service.search(0, 0, 1);
+    public void testSearch_CalculatesStatsCorrectly() {
+        // Act
+        GeoRadiusSearchService.Result result = service.search(40.0, -8.0, 10.0);
 
-        assertTrue(result.getStations().isEmpty());
-        assertEquals(0, result.getCityCount());
-        assertEquals(0, result.getNonCityCount());
+        // Assert
+        Integer countPT = result.getCountryCounts().get("PT");
+        Integer countES = result.getCountryCounts().get("ES");
+
+        assertNotNull("Deve haver contagem para PT", countPT);
+        assertNotNull("Deve haver contagem para ES", countES);
+
+        assertEquals("Deve haver 1 estação PT", 1, countPT.intValue());
+        assertEquals("Deve haver 1 estação ES", 1, countES.intValue());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testErrorWhenNoStationsLoaded() {
-        GeoRadiusSearchService emptyService = new GeoRadiusSearchService();
-        emptyService.injectMockStations(new ArrayList<>());
-        emptyService.search(0, 0, 10);
+    @Test
+    public void testSearch_NoStationsFound() {
+        // Act
+        GeoRadiusSearchService.Result result = service.search(0.0, 0.0, 5.0);
+
+        // Assert
+        assertTrue("A árvore deve vir vazia", result.getStationsTree().isEmpty());
+        assertEquals("Contagem de cidades deve ser 0", 0, result.getCityCount());
     }
 }
