@@ -18,6 +18,7 @@ public class CompleteStationRepository {
     private BST<LonKey> lonTree = new BST<>();
     private BST<TzgKey> tzgTree = new BST<>();
 
+    // This is your 2D-Tree (KD-Tree)
     private Tree<Double> tree = new Tree<>(2);
 
     /**
@@ -59,6 +60,13 @@ public class CompleteStationRepository {
      * @return the main Tree structure
      */
     public Tree<Double> getTree() { return tree; }
+
+    /**
+     * Gets the KD-Tree (Alias for getTree).
+     * Added to satisfy GeoRadiusSearchController requirements.
+     * @return the KD-Tree structure
+     */
+    public Tree<Double> getKDTree() { return tree; }
 
     /**
      * Sets the latitude BST.

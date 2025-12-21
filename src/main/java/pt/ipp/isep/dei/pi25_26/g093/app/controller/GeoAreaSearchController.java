@@ -4,6 +4,7 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.StationAreaFilter;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoAreaSearch;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoAreaSearchResult;
+import pt.ipp.isep.dei.pi25_26.g093.app.ui.GeoAreaSearchUI;
 
 /**
  * Controller for USEI08 - Search by Geographical Area (Rectangular Query).

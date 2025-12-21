@@ -2,16 +2,6 @@ package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import java.util.Locale;
 
-/**
- * Represents a station paired with its computed distance (in kilometers)
- * relative to a reference point.
- *
- * <p>This class implements {@link Comparable} so results can be sorted:</p>
- * <ul>
- *     <li>1) By distance ascending</li>
- *     <li>2) If distance is equal, by station name alphabetically (ASC)</li>
- * </ul>
- */
 public class StationDistance implements Comparable<StationDistance> {
 
     private final CompleteStation station;
@@ -32,14 +22,25 @@ public class StationDistance implements Comparable<StationDistance> {
 
     @Override
     public int compareTo(StationDistance other) {
-        int cmp = Double.compare(this.distanceKm, other.distanceKm);
-        if (cmp != 0) return cmp;
+        // 1. Comparar Distância (Crescente / Menor para Maior)
+        int distComparison = Double.compare(this.distanceKm, other.distanceKm);
 
-        return this.station.getStation().compareTo(other.station.getStation());
+        if (distComparison != 0) {
+            return distComparison;
+        }
+
+        // 2. Comparar Nome (Decrescente / Z -> A) [
+        // Para ordenar Z->A, comparamos o 'other' com o 'this'
+        String myName = (this.station != null && this.station.getStation() != null) ? this.station.getStation() : "";
+        String otherName = (other.station != null && other.station.getStation() != null) ? other.station.getStation() : "";
+
+        return otherName.compareTo(myName);
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "%.2f km - %s", distanceKm, station.toString());
+        // Formata a string para passar no teste
+        String name = (station != null && station.getStation() != null) ? station.getStation() : "Unknown";
+        return String.format(Locale.US, "%.2f km - %s", distanceKm, name);
     }
 }
