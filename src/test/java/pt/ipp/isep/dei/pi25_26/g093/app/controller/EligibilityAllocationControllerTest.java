@@ -20,11 +20,6 @@ public class EligibilityAllocationControllerTest {
     }
 
     @Test
-    public void ensureConstructorWorks() {
-        assertNotNull(controller);
-    }
-
-    @Test
     public void ensureGetAllocationsReturnsEmptyListInitially() {
         assertNotNull(controller.getAllocations());
         assertTrue(controller.getAllocations().isEmpty());
