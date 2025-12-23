@@ -1,5 +1,8 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.service.GeoAreaSearch;
+import pt.ipp.isep.dei.pi25_26.g093.app.service.NearestNSearchService;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
