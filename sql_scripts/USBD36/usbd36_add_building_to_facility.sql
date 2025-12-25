@@ -28,6 +28,8 @@ END fn_usbd36;
 
 DECLARE
     rc BOOLEAN;
+    v_facility_id INT;
+
 BEGIN
     -- Test invalid IDs
     rc := fn_usbd36(-1, -1, 'Nome');
