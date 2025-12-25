@@ -27,14 +27,13 @@ END fn_usbd36;
 /
 
 DECLARE
-    rc BOOLEAN;
+    b BOOLEAN;
     v_facility_id INT;
-
 BEGIN
     -- Test invalid IDs
-    rc := fn_usbd36(-1, -1, 'Nome');
+    b := fn_usbd36(-1, -1, 'Nome');
 
-    IF rc = FALSE THEN
+    IF b = FALSE THEN
         DBMS_OUTPUT.PUT_LINE('Test #1 Successful!');
     ELSE
         DBMS_OUTPUT.PUT_LINE('Test #1 Failed!');
