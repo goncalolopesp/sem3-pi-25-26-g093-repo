@@ -42,8 +42,9 @@ public class Locomotive {
     public double getMaxSpeedKmh() { return model.getMaxSpeedKmh(); }
     public double getPowerKw() { return model.getPowerKw(); }
 
-    public String getModelName() { return modelName; }
-
+    public String getModelName() {
+        return model != null ? model.getName() : "UNKNOWN";
+    }
     public boolean isBusy() {
         return busy;
     }
