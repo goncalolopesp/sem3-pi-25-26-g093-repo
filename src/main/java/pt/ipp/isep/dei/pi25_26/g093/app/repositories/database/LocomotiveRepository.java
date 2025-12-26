@@ -11,9 +11,20 @@ public class LocomotiveRepository {
     private final Map<Integer, Locomotive> locomotives = new HashMap<>();
     private final LocomotiveModelRepository modelRepository;
 
-    private static final String SQL =
-            "SELECT LOCOMOTIVEID, LOCOMOTIVEMODELID, IDENTIFIER, OPERATORID, MODEL " +
-                    "FROM LOCOMOTIVE";
+    private static final String CALL =
+            "{ ? = call pkg_locomotive.get_all }";
+
+    private static final String SQL_LEIXOES_ID =
+            "SELECT id FROM Facility WHERE name = 'Leixões'";
+
+    private int getLeixoesId(Connection conn) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(SQL_LEIXOES_ID);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        }
+        throw new IllegalStateException("Facility 'Leixões' not found.");
+    }
+
 
     public LocomotiveRepository() {
         this.modelRepository = new LocomotiveModelRepository();
@@ -30,34 +41,37 @@ public class LocomotiveRepository {
     private void loadAll() {
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement stmt = conn.prepareCall(CALL)) {
 
-            while (rs.next()) {
+            int leixoesId = getLeixoesId(conn);
 
-                int modelId = rs.getInt("LOCOMOTIVEMODELID");
-                LocomotiveModel model = modelRepository.findById(modelId);
+            stmt.registerOutParameter(1, Types.REF_CURSOR);
+            stmt.execute();
 
-                // Todas começam em Leixões (ID 50)
-                int leixoesId = 50;
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
+                while (rs.next()) {
 
-                Locomotive loco = new Locomotive(
-                        rs.getInt("LOCOMOTIVEID"),
-                        rs.getString("IDENTIFIER"),
-                        rs.getString("MODEL"),            // CP1900, E4000, Eurosprinter...
-                        model,
-                        rs.getInt("OPERATORID"),
-                        leixoesId                         // NOVO
-                );
+                    int modelId = rs.getInt("LOCOMOTIVEMODELID");
+                    LocomotiveModel model = modelRepository.findById(modelId);
 
-                locomotives.put(loco.getId(), loco);
+                    Locomotive loco = new Locomotive(
+                            rs.getInt("LOCOMOTIVEID"),
+                            rs.getString("IDENTIFIER"),
+                            (model != null ? model.getName() : "UNKNOWN"), // modelo derivado
+                            model,
+                            rs.getInt("OPERATORID"),
+                            leixoesId // <-- todas em Leixões
+                    );
+
+                    locomotives.put(loco.getId(), loco);
+                }
             }
 
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading locomotives", e);
+            throw new RuntimeException("Error loading locomotives (PL/SQL)", e);
         }
     }
+
 
     public Locomotive findById(int id) {
         return locomotives.get(id);
