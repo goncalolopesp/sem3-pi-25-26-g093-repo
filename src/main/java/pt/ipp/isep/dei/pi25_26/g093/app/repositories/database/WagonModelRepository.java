@@ -10,10 +10,9 @@ public class WagonModelRepository {
 
     private final Map<Integer, WagonModel> models = new HashMap<>();
 
-    private static final String SQL =
-            "SELECT WAGONMODELID, WAGONMODELTYPEID, CAPACITY, VOLUMECAPACITY, " +
-                    "LENGTH, HEIGHT, MAXSPEED, GAUGE, MAKER, TAREWEIGHT, NUMBEROFBOGIES " +
-                    "FROM WAGON_MODEL";
+    private static final String CALL =
+            "{ ? = call pkg_wagon_model.get_all }";
+
 
     public WagonModelRepository() {
         loadAll();
@@ -22,32 +21,38 @@ public class WagonModelRepository {
     private void loadAll() {
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement cs = conn.prepareCall(CALL)) {
 
-            while (rs.next()) {
+            cs.registerOutParameter(1, Types.REF_CURSOR);
+            cs.execute();
 
-                WagonModel wm = new WagonModel(
-                        rs.getInt("WAGONMODELID"),
-                        rs.getInt("WAGONMODELTYPEID"),
-                        rs.getDouble("CAPACITY"),
-                        rs.getDouble("VOLUMECAPACITY"),
-                        rs.getDouble("LENGTH"),
-                        rs.getDouble("HEIGHT"),
-                        rs.getDouble("MAXSPEED"),
-                        rs.getDouble("GAUGE"),
-                        rs.getString("MAKER"),
-                        rs.getDouble("TAREWEIGHT"),
-                        rs.getInt("NUMBEROFBOGIES")
-                );
+            try (ResultSet rs = (ResultSet) cs.getObject(1)) {
 
-                models.put(wm.getId(), wm);
+                while (rs.next()) {
+
+                    WagonModel wm = new WagonModel(
+                            rs.getInt("WAGONMODELID"),
+                            rs.getInt("WAGONMODELTYPEID"),
+                            rs.getDouble("CAPACITY"),
+                            rs.getDouble("VOLUMECAPACITY"),
+                            rs.getDouble("LENGTH"),
+                            rs.getDouble("HEIGHT"),
+                            rs.getDouble("MAXSPEED"),
+                            0.0,
+                            rs.getString("MAKER"),
+                            rs.getDouble("TAREWEIGHT"),
+                            rs.getInt("NUMBEROFBOGIES")
+                    );
+
+                    models.put(wm.getId(), wm);
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading wagon models", e);
+            throw new RuntimeException("Error loading wagon models (PL/SQL)", e);
         }
     }
+
 
     public WagonModel findById(int id) {
         return models.get(id);
