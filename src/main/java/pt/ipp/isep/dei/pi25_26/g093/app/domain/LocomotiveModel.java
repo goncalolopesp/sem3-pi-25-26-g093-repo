@@ -7,10 +7,12 @@ public class LocomotiveModel {
     private final double powerKw;
     private final double maxSpeedKmh;
     private final int trackType;
-    private final double gauge;
+    private final double gauge; // podes manter, mas não usamos
     private final double tareWeightTon;
     private final double maxWeightTon;
     private final int numberOfBogies;
+
+    private final String tractionType; // <-- NOVO
 
     public LocomotiveModel(int id,
                            String maker,
@@ -20,7 +22,8 @@ public class LocomotiveModel {
                            double gauge,
                            double tareWeightTon,
                            double maxWeightTon,
-                           int numberOfBogies) {
+                           int numberOfBogies,
+                           String tractionType) {
 
         this.id = id;
         this.maker = maker;
@@ -31,6 +34,8 @@ public class LocomotiveModel {
         this.tareWeightTon = tareWeightTon;
         this.maxWeightTon = maxWeightTon;
         this.numberOfBogies = numberOfBogies;
+        this.tractionType = tractionType;
+
     }
 
     public int getId() { return id; }
@@ -45,5 +50,13 @@ public class LocomotiveModel {
 
     public double getLengthMeters() {
         return 19.0;
+    }
+
+    public String getTractionType() { return tractionType; }
+
+    public String getName() {
+        String type = (tractionType != null ? tractionType : "UNKNOWN");
+        return maker + " " + type
+                ;
     }
 }
