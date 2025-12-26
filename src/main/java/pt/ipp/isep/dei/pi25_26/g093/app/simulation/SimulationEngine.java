@@ -77,36 +77,23 @@ public class SimulationEngine {
     }
 
     public double computeAllowedSpeedKmh(Train train, RailwaySegment segment) {
-
-        // 1) Limite das locomotivas
+        // Cálculos da velocidade considerando o limite da locomotiva, o limite do segmento e o peso
         double locoLimit = train.getLocomotives().stream()
                 .mapToDouble(Locomotive::getMaxSpeedKmh)
                 .min()
-                .orElse(40);
+                .orElse(40); // velocidade mínima
 
-        // 2) Limite da via (se não existir, assume 120)
-        double trackLimit = 120;
-        try {
-            trackLimit = segment.getSpeedLimitKmh();
-        } catch (Exception ignored) {}
-
-        // 3) Peso total (usa freight max weight)
+        double trackLimit = segment.getSpeedLimitKmh();
         double totalWeightTon = train.getFreights().stream()
                 .mapToDouble(Freight::getTotalMaxWeightTon)
                 .sum();
-
-        // 4) Potência total
         double totalPowerKw = train.getLocomotives().stream()
                 .mapToDouble(Locomotive::getPowerKw)
                 .sum();
 
-        // Evitar divisões por zero
-        if (totalWeightTon < 1) totalWeightTon = 1;
-
-        // 5) Velocidade limitada pela potência (modelo semi-realista)
+        // Fórmula simplificada para calcular a velocidade máxima
         double powerLimit = (totalPowerKw / totalWeightTon) * 10.0;
-
-        // 6) Resultado final
         return Math.max(5, Math.min(locoLimit, Math.min(trackLimit, powerLimit)));
     }
+
 }

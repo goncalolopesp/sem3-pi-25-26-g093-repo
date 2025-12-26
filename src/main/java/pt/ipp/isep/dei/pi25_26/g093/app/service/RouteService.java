@@ -45,22 +45,23 @@ public class RouteService {
     /**
      * Rota entre duas facilities (origem/destino), via BFS sobre RailwayLine.
      */
-    public List<RailwaySegment> buildRouteBetweenFacilities(int originFacilityId,
-                                                            int destinationFacilityId) {
-
+    public List<RailwaySegment> buildRouteBetweenFacilities(int originFacilityId, int destinationFacilityId) {
         if (originFacilityId == destinationFacilityId) {
-            return List.of(); // já lá está
+            return List.of(); // Já estamos na origem
         }
 
+        // Encontra o caminho das linhas
         List<RailwayLine> usedLines = findLinePath(originFacilityId, destinationFacilityId);
 
         List<RailwaySegment> route = new ArrayList<>();
+        // Para cada linha encontrada no caminho, adicionamos seus segmentos na ordem
         for (RailwayLine line : usedLines) {
-            route.addAll(line.getSegments()); // os segmentos da linha já vêm ordenados
+            route.addAll(line.getSegments());
         }
 
         return route;
     }
+
 
     /**
      * Constrói uma rota completa com base numa lista de facilities (path manual do utilizador).
@@ -69,74 +70,84 @@ public class RouteService {
      * -> concatena rota(Leixões→Contumil) + rota(Contumil→Nine) + ...
      */
     public List<RailwaySegment> buildManualRoute(List<Integer> facilityPath) {
-
         if (facilityPath == null || facilityPath.size() < 2) {
             throw new IllegalArgumentException("Route must contain at least origin and destination facility.");
         }
 
         List<RailwaySegment> fullRoute = new ArrayList<>();
+        Set<Integer> visitedFacilities = new LinkedHashSet<>();  // Usamos LinkedHashSet para garantir ordem
 
+        // Construção da rota com repetição permitida
         for (int i = 0; i < facilityPath.size() - 1; i++) {
             int origin = facilityPath.get(i);
             int dest = facilityPath.get(i + 1);
 
-            List<RailwaySegment> partial = buildRouteBetweenFacilities(origin, dest);
-            fullRoute.addAll(partial);
+            // Adiciona as facilities visitadas ao conjunto de paradas
+            visitedFacilities.add(origin);
+
+            // Não adicionamos a última facility para evitar duplicação
+            if (i == facilityPath.size() - 2) {
+                visitedFacilities.add(dest);
+            }
+
+            List<RailwaySegment> partialRoute = buildRouteBetweenFacilities(origin, dest);
+            fullRoute.addAll(partialRoute);
+        }
+
+        // Mostrar as facilities em ordem para o usuário
+        System.out.println("\nCurrent route:");
+        for (Integer facilityId : visitedFacilities) {
+            Facility f = network.findFacility(facilityId);
+            System.out.println(f != null ? f.getName() : "Unknown Facility");
         }
 
         return fullRoute;
     }
 
+
     // ================================================================
     // BFS interno: facilities -> lista de RailwayLine que ligam origem a destino
     // ================================================================
     private List<RailwayLine> findLinePath(int origin, int destination) {
-
         Map<Integer, RailwayLine> parent = new HashMap<>();
         Queue<Integer> queue = new ArrayDeque<>();
         Set<Integer> visited = new HashSet<>();
-
-        queue.add(origin);
         visited.add(origin);
+        queue.add(origin);
 
         while (!queue.isEmpty()) {
-
             int current = queue.poll();
 
             if (current == destination) {
-                break;
+                break; // Já encontramos o destino
             }
 
+            // Percorre as linhas e encontra os próximos pontos conectados
             for (RailwayLine line : network.getAllLines()) {
-
                 int a = line.getStart().getId();
                 int b = line.getEnd().getId();
-
                 int next = -1;
 
                 if (a == current) next = b;
                 else if (b == current) next = a;
 
+                // Se a estação ainda não foi visitada, adicionamos ao caminho
                 if (next != -1 && !visited.contains(next)) {
-                    visited.add(next);
+                    visited.add(next); // Marca a estação como visitada
                     parent.put(next, line);
                     queue.add(next);
                 }
             }
         }
 
+        // Se não encontramos o destino, lançamos uma exceção
         if (!visited.contains(destination)) {
-            Facility o = network.findFacility(origin);
-            Facility d = network.findFacility(destination);
-
-            String oName = (o != null ? o.getName() : String.valueOf(origin));
-            String dName = (d != null ? d.getName() : String.valueOf(destination));
-
-            throw new IllegalStateException(
-                    "No route found between " + oName + " and " + dName + "."
-            );
+            throw new IllegalStateException("No route found between " +
+                    network.findFacility(origin).getName() + " and " +
+                    network.findFacility(destination).getName() + ".");
         }
 
+        // Reconstruímos a sequência de linhas percorridas até o destino
         List<RailwayLine> usedLines = new ArrayList<>();
         int node = destination;
 
@@ -144,13 +155,15 @@ public class RouteService {
             RailwayLine line = parent.get(node);
             usedLines.add(line);
 
+            // Passa para o próximo nó até chegar à origem
             int a = line.getStart().getId();
             int b = line.getEnd().getId();
-
             node = (node == a ? b : a);
         }
 
+        // Inverte as linhas para obter a sequência correta
         Collections.reverse(usedLines);
         return usedLines;
     }
+
 }
