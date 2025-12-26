@@ -11,9 +11,9 @@ public class WagonRealRepository {
     private final Map<Integer, WagonReal> wagons = new HashMap<>();
     private final WagonModelRepository modelRepo;
 
-    private static final String SQL =
-            "SELECT WAGONID, WAGONMODELID, IDENTIFIER " +
-                    "FROM WAGON";
+    private static final String CALL =
+            "{ ? = call pkg_wagon_real.get_all }";
+
 
     public WagonRealRepository() {
         this.modelRepo = new WagonModelRepository();
@@ -23,28 +23,34 @@ public class WagonRealRepository {
     private void loadAll() {
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement cs = conn.prepareCall(CALL)) {
 
-            while (rs.next()) {
+            cs.registerOutParameter(1, Types.REF_CURSOR);
+            cs.execute();
 
-                WagonModel model = modelRepo.findById(
-                        rs.getInt("WAGONMODELID")
-                );
+            try (ResultSet rs = (ResultSet) cs.getObject(1)) {
 
-                WagonReal wr = new WagonReal(
-                        rs.getInt("WAGONID"),
-                        model,
-                        rs.getString("IDENTIFIER")
-                );
+                while (rs.next()) {
 
-                wagons.put(wr.getId(), wr);
+                    WagonModel model = modelRepo.findById(
+                            rs.getInt("WAGONMODELID")
+                    );
+
+                    WagonReal wr = new WagonReal(
+                            rs.getInt("WAGONID"),
+                            model,
+                            rs.getString("IDENTIFIER")
+                    );
+
+                    wagons.put(wr.getId(), wr);
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading wagons", e);
+            throw new RuntimeException("Error loading wagons (PL/SQL)", e);
         }
     }
+
 
     public WagonReal findById(int id) {
         return wagons.get(id);
