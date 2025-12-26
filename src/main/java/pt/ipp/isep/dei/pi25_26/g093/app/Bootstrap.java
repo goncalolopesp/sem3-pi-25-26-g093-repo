@@ -145,22 +145,24 @@ public class Bootstrap {
                 System.out.println("File not found. Please try again.");
             }
         }
-        while (!fw){
-            System.out.print("Path to the wagons csv file: ");
-            wagonsCsv = scanner.nextLine();
-            File f = new File(path + "/" + wagonsCsv);
-            if (f.exists()){
-                fw = true;
-            }else{
-                System.out.println("File not found. Please try again.");
-            }
-        }
+
         while (!fes){
             System.out.print("Path to the europe stations csv file: ");
             europeStationsCsv = scanner.nextLine();
             File f = new File(path + "/" + europeStationsCsv);
             if (f.exists()){
                 fes = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+
+        while (!fw){
+            System.out.print("Path to the wagons csv file: ");
+            wagonsCsv = scanner.nextLine();
+            File f = new File(path + "/" + wagonsCsv);
+            if (f.exists()){
+                fw = true;
             }else{
                 System.out.println("File not found. Please try again.");
             }

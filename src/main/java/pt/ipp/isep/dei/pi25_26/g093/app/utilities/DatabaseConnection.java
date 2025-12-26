@@ -1,6 +1,5 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.utilities;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,11 +7,11 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static final String URL =
-            "jdbc:oracle:thin:@//localhost:1521/XEPDB1";
+            "jdbc:oracle:thin:@vsgate-s1.dei.isep.ipp.pt:10938:XE";
 
-    private static final String USER = "G093";
+    private static final String USER = "system";
 
-    private static final String PASSWORD = "G093";
+    private static final String PASSWORD = "egdcps123nadmtt";
 
     static {
         try {
