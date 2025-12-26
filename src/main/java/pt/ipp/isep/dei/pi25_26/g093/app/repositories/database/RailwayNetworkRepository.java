@@ -12,6 +12,13 @@ public class RailwayNetworkRepository {
     private final Map<Integer, RailwayLine> lines = new HashMap<>();
     private final Map<Integer, List<RailwaySegment>> segmentsByLine = new HashMap<>();
 
+    private static final String CALL_GET_LINES =
+            "{ ? = call pkg_railway_network.get_lines }";
+
+    private static final String CALL_GET_SEGMENTS =
+            "{ ? = call pkg_railway_network.get_segments }";
+
+
     public RailwayNetworkRepository() {
         loadFacilities();
         loadLines();
@@ -44,28 +51,33 @@ public class RailwayNetworkRepository {
     // ========================= LINES ==============================
     private void loadLines() {
 
-        final String SQL =
-                "SELECT ID, STARTFACILITYID, ENDFACILITYID, NAME, GAUGE " +
-                        "FROM RAILWAY_LINE";
-
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement stmt =
+                     conn.prepareCall(CALL_GET_LINES)) {
 
-            while (rs.next()) {
+            stmt.registerOutParameter(1, Types.REF_CURSOR);
+            stmt.execute();
 
-                Facility start = facilities.get(rs.getInt("STARTFACILITYID"));
-                Facility end   = facilities.get(rs.getInt("ENDFACILITYID"));
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
 
-                RailwayLine line = new RailwayLine(
-                        rs.getInt("ID"),
-                        rs.getString("NAME"),
-                        start,
-                        end,
-                        rs.getDouble("GAUGE")
-                );
+                while (rs.next()) {
 
-                lines.put(line.getId(), line);
+                    Facility start =
+                            facilities.get(rs.getInt("STARTFACILITYID"));
+
+                    Facility end =
+                            facilities.get(rs.getInt("ENDFACILITYID"));
+
+                    RailwayLine line = new RailwayLine(
+                            rs.getInt("ID"),
+                            rs.getString("NAME"),
+                            start,
+                            end,
+                            0   // gauge ignorado
+                    );
+
+                    lines.put(line.getId(), line);
+                }
             }
 
         } catch (SQLException e) {
@@ -73,52 +85,47 @@ public class RailwayNetworkRepository {
         }
     }
 
+
     // ======================= SEGMENTS =============================
     private void loadSegments() {
 
-        final String SQL =
-                "SELECT ID, RAILWAYLINEID, SEGMENTORDER, SIDINGPOSITION, " +
-                        "SIDINGLENGTH, LENGTH, NUMBERTRACKS, WEIGHTLIMIT " +
-                        "FROM RAILWAY_SEGMENT";
-
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement stmt =
+                     conn.prepareCall(CALL_GET_SEGMENTS)) {
 
-            while (rs.next()) {
+            stmt.registerOutParameter(1, Types.REF_CURSOR);
+            stmt.execute();
 
-                int lineId = rs.getInt("RAILWAYLINEID");
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
 
-                Double sidingPos = (rs.getObject("SIDINGPOSITION") != null)
-                        ? rs.getDouble("SIDINGPOSITION")
-                        : null;
+                while (rs.next()) {
 
-                Double sidingLen = (rs.getObject("SIDINGLENGTH") != null)
-                        ? rs.getDouble("SIDINGLENGTH")
-                        : null;
+                    int lineId = rs.getInt("RAILWAYLINEID");
 
-                double speedLimit = computeDefaultSpeedLimit(lineId);
+                    double speedLimit = computeDefaultSpeedLimit(lineId);
 
-                RailwaySegment seg = new RailwaySegment(
-                        rs.getInt("ID"),
-                        rs.getInt("SEGMENTORDER"),
-                        rs.getDouble("LENGTH"),
-                        rs.getInt("NUMBERTRACKS"),
-                        sidingPos,
-                        sidingLen,
-                        rs.getDouble("WEIGHTLIMIT"),
-                        speedLimit
-                );
+                    RailwaySegment seg = new RailwaySegment(
+                            rs.getInt("ID"),
+                            rs.getInt("SEGMENTORDER"),
+                            rs.getDouble("LENGTH"),
+                            rs.getInt("NUMBERTRACKS"),
+                            null,           // sidingPosition
+                            null,           // sidingLength
+                            rs.getDouble("WEIGHTLIMIT"),
+                            speedLimit
+                    );
 
-                segmentsByLine
-                        .computeIfAbsent(lineId, k -> new ArrayList<>())
-                        .add(seg);
+                    segmentsByLine
+                            .computeIfAbsent(lineId, k -> new ArrayList<>())
+                            .add(seg);
+                }
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error loading railway segments", e);
         }
     }
+
 
 
     // =================== CONNECT SEGMENTS TO LINES ================
