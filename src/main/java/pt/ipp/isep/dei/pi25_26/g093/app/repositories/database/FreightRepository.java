@@ -14,12 +14,11 @@ public class FreightRepository {
     private final FacilityRepository facilityRepository;
     private final WagonRealRepository wagonRepository;
 
-    private static final String SQL_FREIGHT =
-            "SELECT FREIGHTID, STARTFACILITYID, ENDFACILITYID, FREIGHTDATE " +
-                    "FROM FREIGHT";
+    private static final String CALL_GET_ALL =
+            "{ ? = call pkg_freight.get_all }";
 
-    private static final String SQL_WAGONS =
-            "SELECT WAGONID FROM WAGON_FREIGHT WHERE FREIGHTID = ?";
+    private static final String CALL_GET_WAGONS =
+            "{ ? = call pkg_freight.get_wagons_for_freight(?) }";
 
     public FreightRepository() {
         this.facilityRepository = new FacilityRepository();
@@ -31,34 +30,44 @@ public class FreightRepository {
     private void loadAll() {
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_FREIGHT);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement stmt =
+                     conn.prepareCall(CALL_GET_ALL)) {
 
-            while (rs.next()) {
+            stmt.registerOutParameter(1, Types.REF_CURSOR);
+            stmt.execute();
 
-                int id = rs.getInt("FREIGHTID");
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
 
-                Facility origin = facilityRepository.findById(
-                        rs.getInt("STARTFACILITYID")
-                );
+                while (rs.next()) {
 
-                Facility destination = facilityRepository.findById(
-                        rs.getInt("ENDFACILITYID")
-                );
+                    int id = rs.getInt("FREIGHTID");
 
-                LocalDate date = rs.getDate("FREIGHTDATE").toLocalDate();
+                    Facility origin =
+                            facilityRepository.findById(
+                                    rs.getInt("STARTFACILITYID"));
 
-                List<WagonReal> wagons = loadWagonsForFreight(conn, id);
+                    Facility destination =
+                            facilityRepository.findById(
+                                    rs.getInt("ENDFACILITYID"));
 
-                Freight f = new Freight(id, origin, destination, date, wagons);
+                    LocalDate date =
+                            rs.getDate("FREIGHTDATE").toLocalDate();
 
-                freights.put(id, f);
+                    List<WagonReal> wagons =
+                            loadWagonsForFreight(conn, id);
+
+                    Freight freight =
+                            new Freight(id, origin, destination, date, wagons);
+
+                    freights.put(id, freight);
+                }
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error loading freights", e);
         }
     }
+
 
     public List<Freight> getAvailableAtFacility(int facilityId) {
         return freights.values().stream()
@@ -81,19 +90,27 @@ public class FreightRepository {
 
         List<WagonReal> list = new ArrayList<>();
 
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_WAGONS)) {
-            stmt.setInt(1, freightId);
+        try (CallableStatement stmt =
+                     conn.prepareCall(CALL_GET_WAGONS)) {
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            stmt.registerOutParameter(1, Types.REF_CURSOR);
+            stmt.setInt(2, freightId);
+            stmt.execute();
+
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
                 while (rs.next()) {
-                    WagonReal wr = wagonRepository.findById(rs.getInt("WAGONID"));
-                    list.add(wr);
+                    int wagonId = rs.getInt("WAGONID");
+                    WagonReal wr = wagonRepository.findById(wagonId);
+                    if (wr != null) {
+                        list.add(wr);
+                    }
                 }
             }
         }
 
         return list;
     }
+
 
     public Optional<Freight> findById(int id) {
         return Optional.ofNullable(freights.get(id));
