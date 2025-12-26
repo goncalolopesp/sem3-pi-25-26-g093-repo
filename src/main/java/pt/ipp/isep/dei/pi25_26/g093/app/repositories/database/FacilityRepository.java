@@ -10,8 +10,9 @@ public class FacilityRepository {
 
     private final Map<Integer, Facility> facilities = new HashMap<>();
 
-    private static final String SQL =
-            "SELECT ID, NAME, POSX, POSY FROM FACILITY";
+    private static final String CALL =
+            "{ ? = call pkg_facility.get_all }";
+
 
     public FacilityRepository() {
         loadAll();
@@ -20,21 +21,29 @@ public class FacilityRepository {
     private void loadAll() {
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
+             CallableStatement cs = conn.prepareCall(CALL)) {
 
-            while (rs.next()) {
-                Facility f = new Facility(
-                        rs.getInt("ID"),
-                        rs.getString("NAME")
-                );
-                facilities.put(f.getId(), f);
+            cs.registerOutParameter(1, Types.REF_CURSOR);
+            cs.execute();
+
+            try (ResultSet rs = (ResultSet) cs.getObject(1)) {
+
+                while (rs.next()) {
+
+                    Facility f = new Facility(
+                            rs.getInt("ID"),
+                            rs.getString("NAME")
+                    );
+
+                    facilities.put(f.getId(), f);
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading facilities", e);
+            throw new RuntimeException("Error loading facilities (PL/SQL)", e);
         }
     }
+
 
     public Facility findById(int id) {
         return facilities.get(id);
