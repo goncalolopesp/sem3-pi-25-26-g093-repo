@@ -13,7 +13,9 @@ public class WagonReal {
     }
 
     public int getId() { return id; }
+
     public WagonModel getModel() { return model; }
+
     public String getIdentifier() { return identifier; }
 
     public double getLengthMeters() { return model.getLengthMeters(); }
