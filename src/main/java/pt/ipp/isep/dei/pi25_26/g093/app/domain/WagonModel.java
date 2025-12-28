@@ -1,9 +1,9 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
-public class WagonModel {
+public class  WagonModel {
 
     private final int id;
-    private final int typeId;
+    private final WagonModelType type;
     private final double capacityTon;
     private final double volumeCapacityM3;
     private final double lengthMeters;
@@ -21,7 +21,7 @@ public class WagonModel {
                       String maker, double tareWeightTon, int numberOfBogies) {
 
         this.id = id;
-        this.typeId = typeId;
+        this.type = new WagonModelType(typeId);
         this.capacityTon = capacityTon;
         this.volumeCapacityM3 = volumeCapacityM3;
         this.lengthMeters = lengthMeters;
@@ -35,6 +35,8 @@ public class WagonModel {
 
     public int getId() { return id; }
 
+    public String getMaker() { return maker; }
+
     public double getLengthMeters() { return lengthMeters; }
 
     public double getTareWeightTon() { return tareWeightTon; }
@@ -42,4 +44,6 @@ public class WagonModel {
     public double getMaxLoadTon() { return capacityTon; }
 
     public double getMaxSpeedKmh() { return maxSpeedKmh; }
+
+    public WagonModelType getType() { return type; }
 }
