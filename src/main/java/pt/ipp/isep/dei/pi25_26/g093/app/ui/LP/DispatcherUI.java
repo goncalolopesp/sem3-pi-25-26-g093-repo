@@ -1,4 +1,4 @@
-package pt.ipp.isep.dei.pi25_26.g093.app.ui;
+package pt.ipp.isep.dei.pi25_26.g093.app.ui.LP;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.*;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.database.*;
@@ -409,7 +409,7 @@ public class DispatcherUI {
     }
 
 
-    private List<Integer> askUserForFacilityPath(int originId, List<Freight> freights) {
+    public List<Integer> askUserForFacilityPath(int originId, List<Freight> freights) {
 
         Facility origin = networkRepo.findFacility(originId);
 
