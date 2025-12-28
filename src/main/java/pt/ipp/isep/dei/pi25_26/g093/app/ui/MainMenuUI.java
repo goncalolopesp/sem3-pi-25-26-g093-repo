@@ -1,5 +1,8 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.ui.LP.DispatcherUI;
+import pt.ipp.isep.dei.pi25_26.g093.app.ui.LP.PendingFreightUI;
+
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
@@ -31,7 +34,7 @@ public class MainMenuUI {
                 case 2 -> runCargoHandlingUI();
                 case 3 -> estimateTravelTime();
                 case 4 -> runSimulation();
-                case 5 -> runUpgradePlan();
+                case 5 -> freightPlanner();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -48,7 +51,7 @@ public class MainMenuUI {
         System.out.println("2. Cargo Handling Operations (USPL02)");
         System.out.println("3. Travel Time Between Stations (USPL03)");
         System.out.println("4. Freight Dispatcher (USPL07)");
-        System.out.println("5. Directed Line Upgrade Plan (USEI11)");
+        System.out.println("5. Freight Planner (USPL08)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Select an option: ");
@@ -95,6 +98,16 @@ public class MainMenuUI {
             dispatcherUI.showMenu();
         } catch (Exception e) {
             System.out.println("Error executing DispatcherUI: " + e.getMessage());
+        }
+    }
+
+    private void freightPlanner(){
+
+        try{
+            PendingFreightUI pendingFreightUI = new PendingFreightUI();
+            pendingFreightUI.showMenu();
+        } catch (Exception e) {
+            System.out.println("Error executing PendingFreightUI: " + e.getMessage());
         }
     }
 
