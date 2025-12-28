@@ -76,10 +76,8 @@ public class FreightRepository {
     }
 
     public void markDelivered(Freight freight) {
-        // Atualiza a localização para a facility destino
         freight.setCurrentFacilityId(freight.getDestination().getId());
 
-        // Tira este freight do mapa de pendentes
         freights.remove(freight.getId());
     }
 
@@ -123,5 +121,7 @@ public class FreightRepository {
     public void remove(int id) {
         freights.remove(id);
     }
+
+    public Collection<Freight> getPendingFreights(){ return freights.values(); }
 
 }
