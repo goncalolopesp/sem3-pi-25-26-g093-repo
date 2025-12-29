@@ -2,16 +2,19 @@ package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Train {
 
     private final int id;
-    private final String number;                 // identificador do train, se precisares
-    private final List<Locomotive> locomotives;  // 1 ou 2
-    private final List<Freight> freights;        // 0..N (depois do dispatcher)
+    private final String number;
+    private final List<Locomotive> locomotives;
+    private final List<Freight> freights;
     private final LocalDate startDate;
     private final LocalTime startTime;
+
+    private List<RailwaySegment> route;
 
     public Train(int id,
                  String number,
@@ -86,18 +89,24 @@ public class Train {
     public double getTotalWeightTon() {
         double w = 0;
 
-        // locomotivas
         for (Locomotive loco : locomotives)
             w += loco.getModel().getTareWeightTon();
 
-        // wagons + cargas
         for (Freight f : freights) {
             for (WagonReal wgn : f.getWagons()) {
                 w += wgn.getTareWeightTon();
-                // Se quisesse somar carga, adicionava aqui
             }
         }
 
         return w;
     }
+
+    public List<RailwaySegment> getRoute() {
+        return route;
+    }
+
+    public void setRoute(List<RailwaySegment> route) {
+        this.route = route;
+    }
+
 }
