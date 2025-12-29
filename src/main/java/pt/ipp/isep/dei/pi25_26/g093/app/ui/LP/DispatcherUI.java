@@ -46,7 +46,7 @@ public class DispatcherUI {
             System.out.println("==============================");
             System.out.println("         DISPATCHER MENU      ");
             System.out.println("==============================");
-            System.out.println("1) Create & Schedule a Train (USPL07)");
+            System.out.println("1) Create & Schedule a Train");
             System.out.println("2) List all locomotives");
             System.out.println("3) List all freights");
             System.out.println("4) Advance scheduler time");
@@ -73,7 +73,6 @@ public class DispatcherUI {
 
 
     private void createAndScheduleTrain() {
-
         System.out.println("\n====================");
         System.out.println("   DISPATCHER UI");
         System.out.println("====================");
@@ -103,43 +102,59 @@ public class DispatcherUI {
 
         List<RailwaySegment> route = null;
 
-        while (true) {
-            List<Integer> facilityPath = askUserForFacilityPath(locoFacilityId, freights);
-            if (facilityPath == null) {
-                System.out.println("Route definition aborted. Train will not be scheduled.");
-                return;
-            }
+        // Pergunta se o usuário quer modo automático ou manual
+        int routeMode = 0;
+        while (routeMode != 1 && routeMode != 2) {
+            System.out.println("\nWould you like to create the route automatically or manually?");
+            System.out.println("1) Automatic Route");
+            System.out.println("2) Manual Route");
+            routeMode = readInt("Choose an option: ");
+        }
 
-            try {
-                route = routeService.buildManualRoute(facilityPath);
-            } catch (IllegalStateException e) {
-                System.out.println("Error building route: " + e.getMessage());
-                return;
-            }
+        if (routeMode == 1) {
+            // Modo automático
+            route = buildAutomaticRoute(freights);  // Chama a função que gera a rota automática
+            System.out.println("Automatic route generated successfully.");
+        } else if (routeMode == 2) {
+            // Modo manual
+            while (true) {
+                List<Integer> facilityPath = askUserForFacilityPath(locoFacilityId, freights);
+                if (facilityPath == null) {
+                    System.out.println("Route definition aborted. Train will not be scheduled.");
+                    return;
+                }
 
-            System.out.println("\nRoute found for all stops:");
-            for (RailwaySegment seg : route) {
-                RailwayLine line = seg.getRailwayLine();
-                String lineName = (line != null ? line.getName() : "Unknown line");
-                System.out.printf("%s | SEG %d (order %d) | %.0f m%n",
-                        lineName,
-                        seg.getId(),
-                        seg.getOrderInLine(),
-                        seg.getLengthMeters());
-            }
+                try {
+                    route = routeService.buildManualRoute(facilityPath);
+                } catch (IllegalStateException e) {
+                    System.out.println("Error building route: " + e.getMessage());
+                    return;
+                }
 
-            int reviewOption = reviewRoute(locomotives, freights, route);
+                System.out.println("\nRoute found for all stops:");
+                for (RailwaySegment seg : route) {
+                    RailwayLine line = seg.getRailwayLine();
+                    String lineName = (line != null ? line.getName() : "Unknown line");
+                    System.out.printf("%s | SEG %d (order %d) | %.0f m%n",
+                            lineName,
+                            seg.getId(),
+                            seg.getOrderInLine(),
+                            seg.getLengthMeters());
+                }
 
-            if (reviewOption == 1) {
-                break;
-            } else if (reviewOption == 2) {
-                continue;
-            } else if (reviewOption == 3) {
-                System.out.println("Operation cancelled. Train will not be scheduled.");
-                return;
-            } else {
-                System.out.println("Invalid option on route review. Cancelling.");
-                return;
+                int reviewOption = reviewRoute(locomotives, freights, route);
+
+                if (reviewOption == 1) {
+                    break;
+                } else if (reviewOption == 2) {
+                    continue;
+                } else if (reviewOption == 3) {
+                    System.out.println("Operation cancelled. Train will not be scheduled.");
+                    return;
+                } else {
+                    System.out.println("Invalid option on route review. Cancelling.");
+                    return;
+                }
             }
         }
 
@@ -169,6 +184,7 @@ public class DispatcherUI {
         System.out.println(" - Planned departure: " + departure.format(DATE_TIME_FMT));
         System.out.println("\nTrain will be simulated when scheduler time reaches departure time (option 4).");
     }
+
 
     private void listLocomotives() {
 
@@ -254,19 +270,53 @@ public class DispatcherUI {
 
 
     private void listSchedules() {
-
         System.out.println("\n=== SCHEDULED TRAINS ===");
 
         for (TrainSchedule s : schedulerService.listSchedules()) {
             LocalDateTime dep = s.getDepartureTime();
+            Train train = s.getTrain();
+
             System.out.printf(
                     "Train %s | Departure: %s | Status: %s%n",
-                    s.getTrain().getNumber(),
+                    train.getNumber(),
                     dep.format(DATE_TIME_FMT),
                     s.getStatus()
             );
+
+            System.out.println("  Locomotives:");
+            for (Locomotive loco : train.getLocomotives()) {
+                System.out.printf("   - %s (%s, %.0f km/h)%n", loco.getIdentifier(), loco.getModelName(), loco.getMaxSpeedKmh());
+            }
+
+            System.out.println("  Freights:");
+            for (Freight f : train.getFreights()) {
+                System.out.printf("   - Freight ID: %d (%s → %s)%n", f.getId(), f.getOrigin().getName(), f.getDestination().getName());
+            }
+
+            System.out.println("  Route:");
+            List<RailwaySegment> route = s.getRoute();
+            List<Facility> facilitiesOnRoute = new ArrayList<>();
+
+            for (RailwaySegment segment : route) {
+                Facility startFacility = networkRepo.findFacility(segment.getRailwayLine().getStart().getId());
+                Facility endFacility = networkRepo.findFacility(segment.getRailwayLine().getEnd().getId());
+
+                if (startFacility != null && !facilitiesOnRoute.contains(startFacility)) {
+                    facilitiesOnRoute.add(startFacility);
+                }
+                if (endFacility != null && !facilitiesOnRoute.contains(endFacility)) {
+                    facilitiesOnRoute.add(endFacility);
+                }
+            }
+
+            for (Facility facility : facilitiesOnRoute) {
+                System.out.println("   - " + facility.getName());
+            }
+
+            System.out.println();
         }
     }
+
 
     public List<Locomotive> chooseLocomotivesForTrain() {
 
@@ -848,15 +898,6 @@ public class DispatcherUI {
     }
 
 
-
-    private int lastIndexOfLine(List<RailwaySegment> route, RailwayLine line) {
-        for (int i = route.size() - 1; i >= 0; i--) {
-            if (route.get(i).getRailwayLine().getId() == line.getId())
-                return i;
-        }
-        return 0;
-    }
-
     private LocalDateTime findEnterTimeForSegment(List<SimulationEvent> events, RailwaySegment seg) {
         for (SimulationEvent e : events) {
             if (e.getSegment().getId() == seg.getId() &&
@@ -875,25 +916,6 @@ public class DispatcherUI {
         return null;
     }
 
-    private List<LocalDateTime> allEnterTimes(List<SimulationEvent> events,
-                                              RailwayLine line,
-                                              Facility fac) {
-        List<LocalDateTime> list = new ArrayList<>();
-
-        for (SimulationEvent e : events) {
-            if (e.getType() == SimulationEvent.Type.ENTER_SEGMENT &&
-                    e.getSegment().getRailwayLine().getId() == line.getId()) {
-
-                RailwaySegment seg = e.getSegment();
-                Facility A = facilityRepository.findById(seg.getRailwayLine().getStart().getId());
-
-                if (A != null && A.getId() == fac.getId())
-                    list.add(e.getTime());
-            }
-        }
-
-        return list;
-    }
 
     private int readInt(String prompt) {
         System.out.print(prompt);
@@ -1043,4 +1065,31 @@ public class DispatcherUI {
 
         return options.get(opt-1);
     }
+
+    public List<RailwaySegment> buildAutomaticRoute(List<Freight> freights) {
+        List<RailwaySegment> fullRoute = new ArrayList<>();
+
+        for (Freight freight : freights) {
+            int originId = freight.getOrigin().getId();
+            int destinationId = freight.getDestination().getId();
+
+            List<RailwaySegment> route = routeService.buildRouteBetweenFacilities(originId, destinationId);
+            fullRoute.addAll(route);
+        }
+
+        System.out.println("\nAutomatic route has been generated:");
+        for (RailwaySegment seg : fullRoute) {
+            RailwayLine line = seg.getRailwayLine();
+            String lineName = (line != null ? line.getName() : "Unknown line");
+            System.out.printf("%s | SEG %d (order %d) | Length: %.0f meters%n",
+                    lineName,
+                    seg.getId(),
+                    seg.getOrderInLine(),
+                    seg.getLengthMeters());
+        }
+
+        return fullRoute;
+    }
+
+
 }
