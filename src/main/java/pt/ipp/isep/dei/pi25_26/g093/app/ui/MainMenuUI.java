@@ -1,5 +1,6 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.ui.LP.AssembleTrainUI;
 import pt.ipp.isep.dei.pi25_26.g093.app.ui.LP.DispatcherUI;
 import pt.ipp.isep.dei.pi25_26.g093.app.ui.LP.PendingFreightUI;
 
@@ -33,8 +34,9 @@ public class MainMenuUI {
                 case 1 -> showTeamPresentation();
                 case 2 -> runCargoHandlingUI();
                 case 3 -> estimateTravelTime();
-                case 4 -> runSimulation();
-                case 5 -> freightPlanner();
+                case 4 -> freightPlanner();
+                case 5 -> assembleTrain();
+                case 6 -> runSimulation();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -50,8 +52,9 @@ public class MainMenuUI {
         System.out.println("1. Team Presentation");
         System.out.println("2. Cargo Handling Operations (USPL02)");
         System.out.println("3. Travel Time Between Stations (USPL03)");
-        System.out.println("4. Freight Dispatcher (USPL07)");
-        System.out.println("5. Freight Planner (USPL08)");
+        System.out.println("4. Freight Planner (USPL08)");
+        System.out.println("5. Assemble Train (USPL09)");
+        System.out.println("6. Freight Dispatcher (USPL10)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Select an option: ");
@@ -129,6 +132,16 @@ public class MainMenuUI {
             upgradeUI.showMenu();
         } catch (Exception e) {
             System.out.println("Error executing UpgradePlanUI: " + e.getMessage());
+        }
+    }
+
+    private void assembleTrain() {
+        try{
+            AssembleTrainUI assembleTrainUI = new AssembleTrainUI();
+            assembleTrainUI.showMenu();
+        }catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error executing AssembleTrainUI: " + e.getMessage());
         }
     }
 }
