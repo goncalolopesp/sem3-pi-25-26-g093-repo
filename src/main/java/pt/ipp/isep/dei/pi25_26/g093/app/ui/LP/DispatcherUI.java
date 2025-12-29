@@ -43,10 +43,6 @@ public class DispatcherUI {
         int option;
 
         do {
-            System.out.println();
-            System.out.println("=== USPL07 - Train Dispatch & Simulation ===");
-            System.out.println("Current scheduler time: " + currentTime.format(DATE_TIME_FMT));
-            System.out.println();
             System.out.println("==============================");
             System.out.println("         DISPATCHER MENU      ");
             System.out.println("==============================");
@@ -272,7 +268,7 @@ public class DispatcherUI {
         }
     }
 
-    private List<Locomotive> chooseLocomotivesForTrain() {
+    public List<Locomotive> chooseLocomotivesForTrain() {
 
         System.out.println("\nAvailable locomotives / trains:");
 
@@ -349,7 +345,7 @@ public class DispatcherUI {
     }
 
 
-    private List<Freight> chooseFreightsForTrain(int facilityId) {
+    public List<Freight> chooseFreightsForTrain(int facilityId) {
 
         List<Freight> selected = new ArrayList<>();
 
