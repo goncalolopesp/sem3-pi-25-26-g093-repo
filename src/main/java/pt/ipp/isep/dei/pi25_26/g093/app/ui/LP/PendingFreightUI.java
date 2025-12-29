@@ -1,56 +1,58 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.ui.LP;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.Freight;
-import pt.ipp.isep.dei.pi25_26.g093.app.domain.RailwaySegment;
+import pt.ipp.isep.dei.pi25_26.g093.app.domain.PlannedRoute;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.WagonReal;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.database.FacilityRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.database.FreightRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.database.RailwayNetworkRepository;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.RouteService;
 
-import java.util.Scanner;
-
 import java.util.*;
 
 public class PendingFreightUI {
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     private final FreightRepository freightRepository = new FreightRepository();
     private final FacilityRepository facilityRepository = new FacilityRepository();
     private final RailwayNetworkRepository railwayNetworkRepository = new RailwayNetworkRepository();
     private final RouteService routeService = new RouteService(railwayNetworkRepository);
-    private final DispatcherUI dispatch = new DispatcherUI();
+    private final DispatcherUI dispatcherUI = new DispatcherUI();
 
-    private final Map<Integer, List<RailwaySegment>> plannedRoutes = new HashMap<>();
-    private final Map<Integer, List<Integer>> plannedFacilityPaths = new HashMap<>();
+    // Planned routes (in memory – used later by USLP10)
+    private final Map<Integer, PlannedRoute> plannedRoutes = new HashMap<>();
+    private int nextRouteId = 1;
 
-
+    // =========================================================
+    // MENU
+    // =========================================================
     public void showMenu() {
 
-        int option = 0;
+        int option;
 
         do {
-
             System.out.println("\n=== USLP08 - Pending Freights Planning ===");
-            System.out.println("1) List all pending freights.");
-            System.out.println("2) Plan route for pending freight.");
-            System.out.println("3) Exit program.");
-            System.out.println("Choose an option: ");
+            System.out.println("1) List all pending freights");
+            System.out.println("2) Plan route for pending freights");
+            System.out.println("3) Exit");
+            System.out.print("Choose an option: ");
 
             option = scanner.nextInt();
 
             switch (option) {
-
                 case 1 -> listPendingFreights();
                 case 2 -> planPendingFreights();
-                case 3 -> System.out.println("Exiting program.");
+                case 3 -> System.out.println("Exiting...");
                 default -> System.out.println("Invalid option.");
             }
+
         } while (option != 3);
     }
 
-
+    // =========================================================
+    // LIST PENDING FREIGHTS
+    // =========================================================
     private void listPendingFreights() {
 
         Collection<Freight> freights = freightRepository.getAll();
@@ -64,7 +66,11 @@ public class PendingFreightUI {
 
         for (Freight f : freights) {
 
-            boolean hasPlan = plannedRoutes.containsKey(f.getId());
+            Optional<PlannedRoute> routeOpt = plannedRoutes.values().stream()
+                    .filter(r -> r.getFreightIDs().contains(f.getId()))
+                    .findFirst();
+
+            boolean hasRoute = routeOpt.isPresent();
 
             System.out.printf(
                     "Freight %d | %s → %s | %d wagons | %s%n",
@@ -72,9 +78,10 @@ public class PendingFreightUI {
                     f.getOrigin().getName(),
                     f.getDestination().getName(),
                     f.getWagons().size(),
-                    hasPlan ? "ROUTE PLANNED" : "NO ROUTE ASSIGNED"
+                    hasRoute ? "ROUTE PLANNED" : "NO ROUTE ASSIGNED"
             );
 
+            // Wagons + cargo type
             for (WagonReal w : f.getWagons()) {
                 System.out.printf(
                         " - %s | Model: %s | Max load: %.1f t | Cargo Type: %s | Max speed: %.0f km/h%n",
@@ -86,41 +93,46 @@ public class PendingFreightUI {
                 );
             }
 
-            List<Integer> path = plannedFacilityPaths.get(f.getId());
+            // Route info
+            if (hasRoute) {
+                PlannedRoute pr = routeOpt.get();
 
-            if (path != null) {
-                System.out.print("   Planned route: ");
+                System.out.println("Route type: " + (pr.isComplex() ? "COMPLEX" : "SIMPLE"));
 
-                for (int i = 0; i < path.size(); i++) {
+                System.out.print("Route: ");
+                for (int i = 0; i < pr.getFacilityPath().size(); i++) {
                     if (i > 0) System.out.print(" → ");
                     System.out.print(
-                            facilityRepository.findById(path.get(i)).getName()
+                            facilityRepository
+                                    .findById(pr.getFacilityPath().get(i))
+                                    .getName()
                     );
                 }
                 System.out.println();
+
+                System.out.println("Associated freights in this route: " + pr.getFreightIDs());
             }
 
             System.out.println();
         }
     }
 
-
+    // =========================================================
+    // PLAN ROUTE (MULTI-FREIGHT)
+    // =========================================================
     private void planPendingFreights() {
 
-        Collection<Freight> freights = freightRepository.getAll();
+        List<Freight> freights = new ArrayList<>(freightRepository.getAll());
 
         if (freights.isEmpty()) {
             System.out.println("\nNo pending freights available.");
             return;
         }
 
-        System.out.println("\n=== PLAN PENDING FREIGHT ===");
-        System.out.println("\nAvailable pending freights:");
+        System.out.println("\n=== PLAN ROUTE FOR PENDING FREIGHTS ===");
 
-        List<Freight> list = new ArrayList<>(freights);
-
-        for (int i = 0; i < list.size(); i++) {
-            Freight f = list.get(i);
+        for (int i = 0; i < freights.size(); i++) {
+            Freight f = freights.get(i);
             System.out.printf(
                     "%d) Freight %d | %s → %s | %d wagons%n",
                     i + 1,
@@ -131,23 +143,55 @@ public class PendingFreightUI {
             );
         }
 
-        System.out.println("0) Cancel");
+        System.out.println("0) Finish selection");
 
+        // -------------------------------
+        // Select multiple freights
+        // -------------------------------
+        List<Freight> selectedFreights = new ArrayList<>();
+        System.out.println("\nSelect freights for this route (0 to finish):");
 
-        System.out.println("Choose a freight to plan: ");
-        int opt = scanner.nextInt();
-        if (opt == 0) return;
-        if (opt < 1 || opt > list.size()) {
-            System.out.println("Invalid option.");
+        while (true) {
+            int opt = scanner.nextInt();
+            if (opt == 0) break;
+
+            if (opt < 1 || opt > freights.size()) {
+                System.out.println("Invalid option.");
+                continue;
+            }
+
+            Freight f = freights.get(opt - 1);
+
+            if (!selectedFreights.contains(f)) {
+                selectedFreights.add(f);
+                System.out.println("Added freight " + f.getId());
+            }
+        }
+
+        if (selectedFreights.isEmpty()) {
+            System.out.println("No freights selected.");
             return;
         }
 
-        Freight freight = list.get(opt - 1);
+        // -------------------------------
+        // Validation: same origin
+        // -------------------------------
+        int originId = selectedFreights.get(0).getOrigin().getId();
 
+        boolean sameOrigin = selectedFreights.stream()
+                .allMatch(f -> f.getOrigin().getId() == originId);
 
-        List<Integer> facilityPath = dispatch.askUserForFacilityPath(
-                freight.getOrigin().getId(),
-                List.of(freight)
+        if (!sameOrigin) {
+            System.out.println("All selected freights must start at the same facility.");
+            return;
+        }
+
+        // -------------------------------
+        // Route builder (reuse USLP07 logic)
+        // -------------------------------
+        List<Integer> facilityPath = dispatcherUI.askUserForFacilityPath(
+                originId,
+                selectedFreights
         );
 
         if (facilityPath == null) {
@@ -155,97 +199,16 @@ public class PendingFreightUI {
             return;
         }
 
-        List<RailwaySegment> route;
-        try {
-            route = routeService.buildManualRoute(facilityPath);
-
-            plannedRoutes.put(freight.getId(), route);
-            plannedFacilityPaths.put(freight.getId(), facilityPath);
-
-        } catch (Exception e) {
-            System.out.println("Error building route: " + e.getMessage());
-            return;
-        }
-
-
-        System.out.println("\n=== ROUTE PLAN REVIEW ===");
-
-        System.out.printf(
-                "Freight %d | %s → %s%n",
-                freight.getId(),
-                freight.getOrigin().getName(),
-                freight.getDestination().getName()
+        PlannedRoute route = new PlannedRoute(
+                nextRouteId++,
+                selectedFreights.stream().map(Freight::getId).toList(),
+                facilityPath
         );
 
-        System.out.println("\nWagons:");
-        for (WagonReal w : freight.getWagons()) {
-            System.out.printf(
-                    " - %s | Model: %s | Max load: %.1f t | Cargo Type: %s | Max speed: %.0f km/h%n",
-                    w.getIdentifier(),
-                    w.getModel().getMaker(),
-                    w.getMaxLoadTon(),
-                    w.getModel().getType().getTypeName(),
-                    w.getMaxSpeedKmh()
-            );
-        }
+        plannedRoutes.put(route.getId(), route);
 
-        double totalDistance = route.stream()
-                .mapToDouble(RailwaySegment::getLengthMeters)
-                .sum();
-
-        System.out.println("\nPlanned route:");
-        for (RailwaySegment seg : route) {
-            System.out.printf(
-                    " - %s | SEG %d | %.0f m%n",
-                    seg.getRailwayLine().getName(),
-                    seg.getId(),
-                    seg.getLengthMeters()
-            );
-        }
-
-        System.out.printf(
-                "%nTotal planned distance: %.1f km%n",
-                totalDistance / 1000.0
-        );
-
-        System.out.println("\nRoute planned successfully (not dispatched).");
+        System.out.println("\nRoute planned successfully!");
+        System.out.println("Route type: " + (route.isComplex() ? "COMPLEX" : "SIMPLE"));
+        System.out.println("Associated freights: " + route.getFreightIDs());
     }
-
-    private List<String> buildFacilityOrder(
-            Freight freight,
-            List<RailwaySegment> route
-    ) {
-        List<String> facilities = new ArrayList<>();
-
-        int currentFacilityId = freight.getOrigin().getId();
-        facilities.add(freight.getOrigin().getName());
-
-        for (RailwaySegment seg : route) {
-
-            int a = seg.getRailwayLine().getStart().getId();
-            int b = seg.getRailwayLine().getEnd().getId();
-
-            int nextFacilityId;
-
-            if (currentFacilityId == a) {
-                nextFacilityId = b;
-            } else if (currentFacilityId == b) {
-                nextFacilityId = a;
-            } else {
-                continue;
-            }
-
-            facilities.add(
-                    facilityRepository.findById(nextFacilityId).getName()
-            );
-
-            currentFacilityId = nextFacilityId;
-        }
-
-        return facilities;
-    }
-
-
-
 }
-
