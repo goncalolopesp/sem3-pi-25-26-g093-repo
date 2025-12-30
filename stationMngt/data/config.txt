@@ -1,0 +1,11 @@
+# --- SENSORS ---
+SENSOR_TEMP,10,5
+SENSOR_HUM,20,5
+
+# --- TRACKS ---
+TRACK,1,FREE,-1
+TRACK,2,BUSY,105
+
+# --- USERS ---
+USER,Administrador do Sistema,admin,PASS,3
+USER,Operador de Turno,op1,SECRET,5
