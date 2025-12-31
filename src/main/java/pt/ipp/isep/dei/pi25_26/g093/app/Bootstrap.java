@@ -22,6 +22,16 @@ import java.util.*;
  */
 public class Bootstrap {
 
+    final String BAYS_CSV = "bays.csv";
+    final String ITEMS_CSV = "items.csv";
+    final String ORDER_LINES_CSV = "order_lines.csv";
+    final String ORDER_CSV = "orders.csv";
+    final String RETURNS_CSV = "returns.csv";
+    final String WAGONS_CSV = "wagons.csv";
+    final String EUROPE_STATIONS_CSV = "train_stations_europe.csv";
+    final String LINES_CSV = "lines.csv";
+    final String STATIONS_CSV = "stations.csv";
+
     Repositories repo;
     WagonRepository wagonRepo;
     WarehouseRepository warehouseRepo;
@@ -33,6 +43,8 @@ public class Bootstrap {
     String returnsCsv;
     String wagonsCsv;
     String europeStationsCsv;
+    String linesCsv;
+    String stationsCsv;
 
     String path = "train_station_dataset";
 
@@ -89,11 +101,19 @@ public class Bootstrap {
      */
     public String getEuropeStationsCsv() { return path + "/" + europeStationsCsv; }
 
+    public String getStationsCsv() {
+        return path + "/" + stationsCsv;
+    }
+
+    public String getLinesCsv() {
+        return path + "/" + linesCsv;
+    }
+
     /**
      * Prompts the user to enter the path to the CSV files and verifies if they exist.
      */
     public void completeCSVFiles(){
-        boolean fb = false, fi = false, fo = false, fol = false, fr = false, fw = false, fes = false;
+        boolean fb = false, fi = false, fo = false, fol = false, fr = false, fw = false, fes = false, fls = false, fss = false;
         Scanner scanner = new Scanner(System.in);
         while (!fb){
             System.out.print("Path to the bays csv file: ");
@@ -167,20 +187,69 @@ public class Bootstrap {
                 System.out.println("File not found. Please try again.");
             }
         }
+
+        while (!fss){
+            System.out.print("Path to the stations csv file: ");
+            stationsCsv = scanner.nextLine();
+            File f = new File(path + "/" + stationsCsv);
+            if (f.exists()){
+                fss = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+
+        while (!fls){
+            System.out.print("Path to the lines csv file: ");
+            linesCsv = scanner.nextLine();
+            File f = new File(path + "/" + linesCsv);
+            if (f.exists()){
+                fls = true;
+            }else{
+                System.out.println("File not found. Please try again.");
+            }
+        }
+    }
+
+    private boolean getCsvInputMethod(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Choose the CSV input method: Automatic - a | Manual - m : ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        return response.equals("a") || response.equals("auto") || response.equals("automatic");
+    }
+
+    public void completeCSVFiles1(){
+        baysCsv = BAYS_CSV;
+        itemsCsv = ITEMS_CSV;
+        order_linesCsv = ORDER_LINES_CSV;
+        orderCsv = ORDER_CSV;
+        returnsCsv = RETURNS_CSV;
+        wagonsCsv = WAGONS_CSV;
+        europeStationsCsv = EUROPE_STATIONS_CSV;
+        linesCsv = LINES_CSV;
+        stationsCsv = STATIONS_CSV;
     }
 
     /**
      * Runs the bootstrap process.
      * @throws FileNotFoundException if there are no files in the directory "train_station_dataset"
      */
-    public void run() throws FileNotFoundException {
-        printAllCSVFilesOfDirectory(path);
-        completeCSVFiles();
+    public void run() throws Exception {
+        boolean flag1 = getCsvInputMethod();
+        if (!flag1) {
+            printAllCSVFilesOfDirectory(path);
+            completeCSVFiles();
+        }else{
+            System.out.println("Automatic CSV input method selected.");
+            completeCSVFiles1();
+        }
         addWarehousesToRepository();
         addWagonsToRepository();
         addReturnItemsToRepository();
         addOrdersToRepository();
         addCompleteStations();
+        loadStations();
+        loadLines();
     }
 
     /**
@@ -587,6 +656,50 @@ public class Bootstrap {
                 .replace(",", " ")
                 .replaceAll("\\s+", " ")
                 .trim();
+    }
+
+    private void loadStations() throws Exception {
+        CSVParser parser = new CSVParser(path + "/" + stationsCsv);
+        GraphRepository repo = Repositories.getInstance().getGraphRepository();
+
+        for (Map<String, String> row : parser.getCSVData()) {
+            int id = Integer.parseInt(row.get("Station id"));
+
+            CompleteStation s = new CompleteStation(
+                    "BE",
+                    "Europe/Brussels",
+                    "CET",
+                    row.get("Station"),
+                    Double.parseDouble(row.get("Lat")),
+                    Double.parseDouble(row.get("Lon")),
+                    false,
+                    false,
+                    false
+            );
+
+            double x = Double.parseDouble(row.get("CoordX"));
+            double y = Double.parseDouble(row.get("CoordY"));
+
+            repo.addStation(id, s, x, y);
+        }
+    }
+
+    private void loadLines() throws Exception {
+        CSVParser parser = new CSVParser(path + "/" + linesCsv);
+        GraphRepository repo = Repositories.getInstance().getGraphRepository();
+
+        for (Map<String, String> row : parser.getCSVData()) {
+            int idOrig = Integer.parseInt(row.get("departure_stid"));
+            int idDest = Integer.parseInt(row.get("arrival_stid"));
+            double dist = Double.parseDouble(row.get("dist"));
+
+            CompleteStation s1 = repo.getStationById(idOrig);
+            CompleteStation s2 = repo.getStationById(idDest);
+
+            if (s1 != null && s2 != null) {
+                repo.addTrack(s1, s2, dist);
+            }
+        }
     }
 
 }

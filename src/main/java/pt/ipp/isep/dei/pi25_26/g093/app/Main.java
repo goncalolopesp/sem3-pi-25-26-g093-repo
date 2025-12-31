@@ -22,7 +22,7 @@ public class Main {
      * @param args Arguments/Variables sent through the console when executing the .jar program.
      * @throws FileNotFoundException if there are no files in the train_station_dataset folder.
      */
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws Exception {
         Bootstrap bootstrap = Bootstrap.getInstance();
         bootstrap.run();
         MainMenuUI mainMenuUI = new MainMenuUI();
