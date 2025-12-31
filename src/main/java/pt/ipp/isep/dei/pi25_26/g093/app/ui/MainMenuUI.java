@@ -37,6 +37,7 @@ public class MainMenuUI {
                 case 4 -> freightPlanner();
                 case 5 -> assembleTrain();
                 case 6 -> runSimulation();
+                case 7 -> runMinimalBackbone();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -142,6 +143,15 @@ public class MainMenuUI {
         }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error executing AssembleTrainUI: " + e.getMessage());
+        }
+    }
+
+    private void runMinimalBackbone(){
+        try{
+            MinimalBackboneUI minimalBackboneUI = new MinimalBackboneUI();
+            minimalBackboneUI.run();
+        } catch (Exception e) {
+            System.out.println("Error executing MinimalBackboneUI: " + e.getMessage());
         }
     }
 }
