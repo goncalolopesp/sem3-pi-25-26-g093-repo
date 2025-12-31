@@ -13,6 +13,7 @@ public class Repositories {
     private TrolleyPlanRepository trolleyPlanRepository;
     private OrderRepository orderRepository;
     private CompleteStationRepository completeStationRepository;
+    private GraphRepository graphRepository;
 
 
     /**
@@ -26,6 +27,7 @@ public class Repositories {
         trolleyPlanRepository = new TrolleyPlanRepository();
         orderRepository = new OrderRepository();
         completeStationRepository = new CompleteStationRepository();
+        graphRepository = new GraphRepository();
 
     }
 
@@ -75,6 +77,10 @@ public class Repositories {
      */
     public CompleteStationRepository getCompleteStationRepository() {
         return completeStationRepository;
+    }
+
+    public GraphRepository getGraphRepository() {
+        return graphRepository;
     }
 
     /**
