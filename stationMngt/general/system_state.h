@@ -3,13 +3,11 @@
 
 #include "domain.h"
 
-extern User *users;
+extern User users[MAX_USERS];
 extern int num_users;
 
-extern Track *tracks;
+extern Track tracks[MAX_TRACKS];
 extern int num_tracks;
 
-extern SensorConfig temp_sensor;
-extern SensorConfig hum_sensor;
-
 #endif
+

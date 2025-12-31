@@ -1,5 +1,5 @@
-#ifndef LOGS_C
-#define LOGS_C
+#ifndef LOGS_H
+#define LOGS_H
 
 void write_log(const char *username, const char *action);
 

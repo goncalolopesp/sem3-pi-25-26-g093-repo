@@ -6,13 +6,8 @@
 #include "domain.h"
 #include "system_state.h"
 
-extern void encrypt_data(char *str, int key);
-
-static TrackState parse_track_state(const char *s) {
-    if (strcmp(s, "FREE") == 0) return FREE;
-    if (strcmp(s, "BUSY") == 0) return BUSY;
-    return INOPERATIVE;
-}
+// encrypt_data(in, key, out)
+extern int encrypt_data(const char *in, int key, char *out);
 
 int load_setup(const char *filename) {
 
@@ -24,58 +19,85 @@ int load_setup(const char *filename) {
 
     char line[256];
 
+    num_users = 0;
+    num_tracks = 0;
+
     while (fgets(line, sizeof(line), f)) {
 
         if (line[0] == '#' || line[0] == '\n')
             continue;
 
-        /* -------- SENSOR TEMP -------- */
+        /* ---------- SENSOR TEMP ---------- */
         if (strncmp(line, "SENSOR_TEMP", 11) == 0) {
-            sscanf(line, "SENSOR_TEMP,%d,%d",
-                   &temp_sensor.buffer_length,
-                   &temp_sensor.window_length);
+            int buf, win;
+            sscanf(line, "SENSOR_TEMP,%d,%d", &buf, &win);
+            // se quiseres guardar depois, fazes isso noutro módulo
         }
 
-        /* -------- SENSOR HUM -------- */
+        /* ---------- SENSOR HUM ---------- */
         else if (strncmp(line, "SENSOR_HUM", 10) == 0) {
-            sscanf(line, "SENSOR_HUM,%d,%d",
-                   &hum_sensor.buffer_length,
-                   &hum_sensor.window_length);
+            int buf, win;
+            sscanf(line, "SENSOR_HUM,%d,%d", &buf, &win);
         }
 
-        /* -------- TRACK -------- */
-        else if (strncmp(line, "TRACK", 5) == 0) {
+       /* ---------- TRACK ---------- */
+else if (strncmp(line, "TRACK", 5) == 0) {
+    int id, train;
+    char state_str[20];
 
-            tracks = realloc(tracks, sizeof(Track) * (num_tracks + 1));
-            Track *t = &tracks[num_tracks];
+    if (sscanf(line, "TRACK,%d,%[^,],%d", &id, state_str, &train) == 3) {
 
-            char state_str[20];
-            sscanf(line, "TRACK,%d,%[^,],%d",
-                   &t->id, state_str, &t->train_id);
+        tracks[num_tracks].id = id;
+        tracks[num_tracks].train_id = train;
 
-            t->state = parse_track_state(state_str);
-            num_tracks++;
+        if (strcmp(state_str, "FREE") == 0) {
+            tracks[num_tracks].state = FREE;
+        } else if (strcmp(state_str, "BUSY") == 0) {
+            tracks[num_tracks].state = BUSY;
+        } else {
+            // estado desconhecido → ignora este track
+            continue;
         }
 
-        /* -------- USER -------- */
+        num_tracks++;
+    }
+}
+
+
+        /* ---------- USER ---------- */
         else if (strncmp(line, "USER", 4) == 0) {
 
-            users = realloc(users, sizeof(User) * (num_users + 1));
-            User *u = &users[num_users];
+            char name[50];
+            char username[20];
+            char password_plain[50];
+            int key;
 
-            sscanf(line, "USER,%[^,],%[^,],%[^,],%d",
-                   u->name,
-                   u->username,
-                   u->password,
-                   &u->cipher_key);
+            if (sscanf(line, "USER,%[^,],%[^,],%[^,],%d",
+                       name, username, password_plain, &key) == 4) {
 
-            encrypt_data(u->password, u->cipher_key);
-            num_users++;
+                char password_enc[50];
+
+                if (!encrypt_data(password_plain, key, password_enc)) {
+                    continue;
+                }
+
+                strcpy(users[num_users].name, name);
+                strcpy(users[num_users].username, username);
+                strcpy(users[num_users].password, password_enc);
+                users[num_users].cipher_key = key;
+
+                num_users++;
+            }
         }
     }
 
     fclose(f);
 
-    printf("SETUP OK: %d users | %d tracks\n", num_users, num_tracks);
+printf("\n--- DEBUG USERS ---\n");
+for (int i = 0; i < num_users; i++) {
+    printf("USER[%d] username=%s key=%d pass(encrypted)=%s\n",
+           i, users[i].username, users[i].cipher_key, users[i].password);
+}
+printf("-------------------\n\n");
     return 1;
 }

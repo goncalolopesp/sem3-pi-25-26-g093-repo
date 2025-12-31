@@ -3,6 +3,11 @@
 
 #include <time.h>
 
+/* ---------- LIMITS ---------- */
+#define MAX_USERS   10
+#define MAX_TRACKS  10
+#define MAX_LOGS    100
+
 /* ---------- USERS ---------- */
 typedef struct {
     char name[50];
@@ -35,7 +40,7 @@ typedef struct {
                                                         typedef struct {
                                                             int id;
                                                                 TrackState state;
-                                                                    int train_id;   // -1 if none
+                                                                    int train_id;
                                                                     } Track;
 
                                                                     /* ---------- TRAINS ---------- */
@@ -43,13 +48,5 @@ typedef struct {
                                                                         int id;
                                                                         } Train;
 
-                                                                        /* ---------- LOGS ---------- */
-                                                                        typedef struct {
-                                                                            int id;
-                                                                                char username[20];
-                                                                                    char action[100];
-                                                                                        time_t timestamp;
-                                                                                        } Log;
-
-                                                                                        #endif
-                                                                                        
+                                                                        #endif
+                                                                        
