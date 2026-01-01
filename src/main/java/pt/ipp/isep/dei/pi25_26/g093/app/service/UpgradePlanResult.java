@@ -4,102 +4,125 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.NetworkNode;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.NetworkEdge;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Result of the upgrade plan calculation.
- * 
- * <p>Contains either:
+ * Result of the upgrade plan calculation for USEI11.
+ *
+ * <p>This class represents the outcome of analyzing a directed railway
+ * dependency graph. It supports two mutually exclusive scenarios:
  * <ul>
- *   <li>A valid topological ordering of nodes (if no cycles exist)</li>
- *   <li>Information about detected cycles (if cycles exist)</li>
+ *   <li>Acyclic graph: a valid topological ordering of all nodes</li>
+ *   <li>Cyclic graph: identification of nodes and edges involved in cycles</li>
  * </ul>
- * 
+ *
+ * <p>The time complexity analysis of the executed algorithm is also included.
+ *
  * @author Logistics on Rails Team
  */
 public class UpgradePlanResult {
-    
+
     private final boolean hasCycle;
     private final List<NetworkNode> topologicalOrder;
-    private final List<NetworkNode> cycleNodes;
-    private final List<NetworkEdge> cycleEdges;
+    private final Set<NetworkNode> cycleNodes;
+    private final Set<NetworkEdge> cycleEdges;
     private final String complexityAnalysis;
-    
+
     /**
-     * Creates a result for a valid topological ordering (no cycles).
-     * 
-     * @param topologicalOrder ordered list of nodes for upgrade
-     * @param complexityAnalysis time complexity analysis
+     * Creates a result for an acyclic graph.
+     *
+     * @param topologicalOrder ordered list of nodes representing
+     *                         a valid upgrade sequence
+     * @param complexityAnalysis textual time complexity analysis
+     * @throws IllegalArgumentException if topologicalOrder is null
      */
-    public UpgradePlanResult(List<NetworkNode> topologicalOrder, String complexityAnalysis) {
+    public UpgradePlanResult(List<NetworkNode> topologicalOrder,
+                             String complexityAnalysis) {
+
+        if (topologicalOrder == null) {
+            throw new IllegalArgumentException("Topological order cannot be null");
+        }
+
         this.hasCycle = false;
         this.topologicalOrder = new ArrayList<>(topologicalOrder);
-        this.cycleNodes = new ArrayList<>();
-        this.cycleEdges = new ArrayList<>();
+        this.cycleNodes = new HashSet<>();
+        this.cycleEdges = new HashSet<>();
         this.complexityAnalysis = complexityAnalysis;
     }
-    
+
     /**
-     * Creates a result for a graph with cycles.
-     * 
-     * @param cycleNodes nodes involved in the cycle
-     * @param cycleEdges edges involved in the cycle
-     * @param complexityAnalysis time complexity analysis
+     * Creates a result for a graph containing cycles.
+     *
+     * @param cycleNodes nodes involved in cycles
+     * @param cycleEdges edges involved in cycles
+     * @param complexityAnalysis textual time complexity analysis
+     * @throws IllegalArgumentException if cycleNodes or cycleEdges are null
      */
-    public UpgradePlanResult(List<NetworkNode> cycleNodes, 
-                            List<NetworkEdge> cycleEdges,
-                            String complexityAnalysis) {
+    public UpgradePlanResult(Set<NetworkNode> cycleNodes,
+                             Set<NetworkEdge> cycleEdges,
+                             String complexityAnalysis) {
+
+        if (cycleNodes == null || cycleEdges == null) {
+            throw new IllegalArgumentException("Cycle nodes and edges cannot be null");
+        }
+
         this.hasCycle = true;
         this.topologicalOrder = new ArrayList<>();
-        this.cycleNodes = new ArrayList<>(cycleNodes);
-        this.cycleEdges = new ArrayList<>(cycleEdges);
+        this.cycleNodes = new HashSet<>(cycleNodes);
+        this.cycleEdges = new HashSet<>(cycleEdges);
         this.complexityAnalysis = complexityAnalysis;
     }
-    
+
     /**
-     * Returns whether the graph contains cycles.
-     * 
-     * @return true if cycles were detected, false otherwise
+     * Indicates whether the dependency graph contains cycles.
+     *
+     * @return {@code true} if cycles were detected; {@code false} otherwise
      */
     public boolean hasCycle() {
         return hasCycle;
     }
-    
+
     /**
-     * Returns the topological ordering of nodes (valid only if no cycles).
-     * 
-     * @return ordered list of nodes, or empty list if cycles exist
+     * Returns the topological ordering of nodes.
+     *
+     * <p>This list is meaningful only if {@link #hasCycle()} returns {@code false}.
+     *
+     * @return ordered list of nodes, or an empty list if cycles exist
      */
     public List<NetworkNode> getTopologicalOrder() {
         return new ArrayList<>(topologicalOrder);
     }
-    
+
     /**
-     * Returns the nodes involved in a cycle (valid only if cycles exist).
-     * 
-     * @return list of nodes in the cycle, or empty list if no cycles
+     * Returns the nodes involved in cycles.
+     *
+     * <p>This set is meaningful only if {@link #hasCycle()} returns {@code true}.
+     *
+     * @return set of nodes involved in cycles, or an empty set if no cycles exist
      */
-    public List<NetworkNode> getCycleNodes() {
-        return new ArrayList<>(cycleNodes);
+    public Set<NetworkNode> getCycleNodes() {
+        return new HashSet<>(cycleNodes);
     }
-    
+
     /**
-     * Returns the edges involved in a cycle (valid only if cycles exist).
-     * 
-     * @return list of edges in the cycle, or empty list if no cycles
+     * Returns the edges involved in cycles.
+     *
+     * <p>This set is meaningful only if {@link #hasCycle()} returns {@code true}.
+     *
+     * @return set of edges involved in cycles, or an empty set if no cycles exist
      */
-    public List<NetworkEdge> getCycleEdges() {
-        return new ArrayList<>(cycleEdges);
+    public Set<NetworkEdge> getCycleEdges() {
+        return new HashSet<>(cycleEdges);
     }
-    
+
     /**
-     * Returns the time complexity analysis.
-     * 
+     * Returns the time complexity analysis of the executed algorithm.
+     *
      * @return complexity analysis string
      */
     public String getComplexityAnalysis() {
         return complexityAnalysis;
     }
 }
-
-
