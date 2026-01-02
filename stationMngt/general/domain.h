@@ -33,6 +33,7 @@ typedef struct {
                                             /* ---------- TRACKS ---------- */
                                             typedef enum {
                                                 FREE,
+						ASSIGNED,	
                                                     BUSY,
                                                         INOPERATIVE
                                                         } TrackState;

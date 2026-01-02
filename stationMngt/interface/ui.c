@@ -39,10 +39,6 @@ void ui_menu_admin(void) {
         printf("\n--- ADMIN MENU ---\n");
         printf("1. USAC11 – Load Configuration\n");
         printf("2. USAC12 – View Logs\n");
-        printf("3. USAC13 – Get Sensor Data\n");
-        printf("4. USAC14 – Control Signals\n");
-        printf("5. USAC15 – Send Message\n");
-        printf("6. USAC16 – Manage Tracks\n");
         printf("0. Logout\n");
         printf("Option: ");
 
@@ -71,7 +67,7 @@ void ui_menu_operator(void) {
         printf("1. USAC13 – Get Sensor Data\n");
         printf("2. USAC14 – Control Signals\n");
         printf("3. USAC15 – Send Message\n");
-        printf("4. USAC16 – Manage Tracks\n");
+        printf("4. USAC16 – Track Manager\n");
         printf("0. Logout\n");
         printf("Option: ");
 
@@ -81,12 +77,19 @@ void ui_menu_operator(void) {
         }
 
         switch (opt) {
-            case 1: printf("[OP] Sensor read pending.\n"); break;
-            case 2: printf("[OP] Signal control pending.\n"); break;
-            case 3: printf("[OP] Messaging pending.\n"); break;
-            case 4: printf("[OP] Track management pending.\n"); break;
+case 1:
+    manager_get_sensor_data();
+    break;
+            case 2: manager_control_signal(); break;
+case 3:
+    manager_show_board();
+    break;
+case 4:
+    manager_manage_tracks();
+    break;
             case 0: printf("Logout...\n"); break;
             default: printf("Invalid option.\n");
         }
     } while (opt != 0);
 }
+
