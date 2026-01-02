@@ -9,13 +9,9 @@ import java.util.Scanner;
 
 /**
  * Main Menu of the application.
- * Provides access to:
- *  1. Team Presentation
- *  2. Cargo Handling Operations (USPL02)
- *  3. Travel Time Between Stations (USPL03)
- *  4. Freight Dispatcher (USPL07)
- *  5. Directed Line Upgrade Plan (USEI11)
- *  0. Exit
+ *
+ * <p>Provides access to the different use cases of the system, including
+ * planning, simulation and infrastructure analysis modules.
  */
 public class MainMenuUI {
 
@@ -38,6 +34,7 @@ public class MainMenuUI {
                 case 5 -> assembleTrain();
                 case 6 -> runSimulation();
                 case 7 -> runMinimalBackbone();
+                case 8 -> runUpgradePlan();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -56,6 +53,8 @@ public class MainMenuUI {
         System.out.println("4. Freight Planner (USPL08)");
         System.out.println("5. Assemble Train (USPL09)");
         System.out.println("6. Freight Dispatcher (USPL10)");
+        System.out.println("7. Minimal Backbone (USEI10)");
+        System.out.println("8. Directed Line Upgrade Plan (USEI11)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Select an option: ");
@@ -87,7 +86,6 @@ public class MainMenuUI {
      * Option 2 – Runs the Cargo Handling Operations module (USPL02).
      */
     private void runCargoHandlingUI() {
-        System.out.println("\n=== USPL02 - Cargo Handling Operations ===");
         try {
             CargoHandlingUI cargoUI = new CargoHandlingUI();
             cargoUI.showMenu();
@@ -96,6 +94,45 @@ public class MainMenuUI {
         }
     }
 
+    /**
+     * Option 3 – Estimates travel time between stations (USPL03).
+     */
+    private void estimateTravelTime() {
+        try {
+            TravelTimeUI travelUI = new TravelTimeUI();
+            travelUI.showMenu();
+        } catch (Exception e) {
+            System.out.println("Error executing TravelTimeUI: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Option 4 – Runs the freight planner module (USPL08).
+     */
+    private void freightPlanner() {
+        try {
+            PendingFreightUI pendingFreightUI = new PendingFreightUI();
+            pendingFreightUI.showMenu();
+        } catch (Exception e) {
+            System.out.println("Error executing PendingFreightUI: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Option 5 – Runs the assemble train module (USPL09).
+     */
+    private void assembleTrain() {
+        try {
+            AssembleTrainUI assembleTrainUI = new AssembleTrainUI();
+            assembleTrainUI.showMenu();
+        } catch (Exception e) {
+            System.out.println("Error executing AssembleTrainUI: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Option 6 – Runs the freight dispatcher module (USPL10).
+     */
     private void runSimulation() {
         try {
             DispatcherUI dispatcherUI = new DispatcherUI();
@@ -105,27 +142,20 @@ public class MainMenuUI {
         }
     }
 
-    private void freightPlanner(){
-
-        try{
-            PendingFreightUI pendingFreightUI = new PendingFreightUI();
-            pendingFreightUI.showMenu();
-        } catch (Exception e) {
-            System.out.println("Error executing PendingFreightUI: " + e.getMessage());
-        }
-    }
-
-    private void estimateTravelTime() {
+    /**
+     * Option 7 – Runs the minimal backbone module (USEI10).
+     */
+    private void runMinimalBackbone() {
         try {
-            TravelTimeUI travelUI = new TravelTimeUI();
-            travelUI.showMenu();
+            MinimalBackboneUI minimalBackboneUI = new MinimalBackboneUI();
+            minimalBackboneUI.run();
         } catch (Exception e) {
-            System.out.println("Error executing DispatcherUI: " + e.getMessage());
+            System.out.println("Error executing MinimalBackboneUI: " + e.getMessage());
         }
     }
 
     /**
-     * Option 5 – Runs the Directed Line Upgrade Plan module (USEI11).
+     * Option 8 – Runs the Directed Line Upgrade Plan module (USEI11).
      */
     private void runUpgradePlan() {
         try {
@@ -133,25 +163,6 @@ public class MainMenuUI {
             upgradeUI.showMenu();
         } catch (Exception e) {
             System.out.println("Error executing UpgradePlanUI: " + e.getMessage());
-        }
-    }
-
-    private void assembleTrain() {
-        try{
-            AssembleTrainUI assembleTrainUI = new AssembleTrainUI();
-            assembleTrainUI.showMenu();
-        }catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error executing AssembleTrainUI: " + e.getMessage());
-        }
-    }
-
-    private void runMinimalBackbone(){
-        try{
-            MinimalBackboneUI minimalBackboneUI = new MinimalBackboneUI();
-            minimalBackboneUI.run();
-        } catch (Exception e) {
-            System.out.println("Error executing MinimalBackboneUI: " + e.getMessage());
         }
     }
 }
