@@ -2,6 +2,7 @@ package pt.ipp.isep.dei.pi25_26.g093.app.ui;
 
 import pt.ipp.isep.dei.pi25_26.g093.app.controller.HubCentralityController;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.HubScore;
+import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
 import java.util.List;
 
@@ -14,9 +15,7 @@ public class HubCentralityUI {
         System.out.println("Hub Scores are being calculated, this may take a while depending on the graph's size!");
 
         HubCentralityController controller = new HubCentralityController();
-        controller.HubCentrality();
-
-        List<HubScore> scores = HubScore.getScoreList();
+        List<HubScore> scores = controller.HubCentrality(Repositories.getInstance().getGraphRepository().getGraph());
 
         System.out.printf("%-5s | %-10s | %-10s | %-10s | %-12s | %-12s | %-8s\n",
                 "ID",
