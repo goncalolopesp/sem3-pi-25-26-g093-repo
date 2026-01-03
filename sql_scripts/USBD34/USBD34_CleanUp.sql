@@ -1,0 +1,11 @@
+BEGIN
+DELETE FROM Wagon_Freight WHERE wagonID IN (SELECT wagonID FROM Wagon WHERE identifier LIKE 'W-%-34');
+DELETE FROM Freight WHERE trainID IN (SELECT trainID FROM Train WHERE operatorID IN (SELECT operatorID FROM Operator WHERE vatNumber IN ('999000111', '999000222')));
+DELETE FROM Wagon WHERE identifier LIKE 'W-%-34';
+DELETE FROM Train WHERE operatorID IN (SELECT operatorID FROM Operator WHERE vatNumber IN ('999000111', '999000222'));
+DELETE FROM Operator WHERE vatNumber IN ('999000111', '999000222');
+DELETE FROM Path WHERE pathID NOT IN (SELECT pathID FROM Train);
+COMMIT;
+DBMS_OUTPUT.PUT_LINE('USBD34 CleanUp: Executed.');
+END;
+/
