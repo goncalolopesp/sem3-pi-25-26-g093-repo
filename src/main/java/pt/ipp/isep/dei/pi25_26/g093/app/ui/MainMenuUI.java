@@ -34,8 +34,8 @@ public class MainMenuUI {
                 case 4 -> freightPlanner();
                 case 5 -> assembleTrain();
                 case 6 -> runSimulation();
-                case 7 -> runMinimalBackbone();
-                case 8 -> runUpgradePlan();
+                case 7 -> runUpgradePlan();
+                case 8 -> runMinimalBackbone();
                 case 9 -> runHubScore();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
@@ -55,8 +55,8 @@ public class MainMenuUI {
         System.out.println("4. Freight Planner (USPL08)");
         System.out.println("5. Assemble Train (USPL09)");
         System.out.println("6. Freight Dispatcher (USPL10)");
-        System.out.println("7. Minimal Backbone (USEI10)");
-        System.out.println("8. Directed Line Upgrade Plan (USEI11)");
+        System.out.println("7. Directed Line Upgrade Plan (USEI11)");
+        System.out.println("8. Minimal Backbone (USEI12)");
         System.out.println("9. Rail Hub Score (USEI13)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
