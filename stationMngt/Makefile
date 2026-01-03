@@ -1,23 +1,58 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+# ===============================
+# Toolchain
+# ===============================
+CC      = riscv32-linux-gcc
+QEMU    = qemu-riscv32
 
-TARGET = log_export
+# ===============================
+# Flags
+# ===============================
+CFLAGS  = -Wall -Wextra -fanalyzer -g \
+          -march=rv32imd -mabi=ilp32d \
+          -Igeneral -Imanager -Iinterface -Idata
 
-OBJS = main.o log_export.o
+QEMU_SYSROOT = /home/guest/bin/bootlin/riscv32-buildroot-linux-gnu/sysroot
+
+# ===============================
+# Files
+# ===============================
+C_SRC = \
+	manager/manager.c \
+	manager/setup.c \
+	general/system_state.c \
+	data/logs.c \
+	interface/ui.c
+
+ASM_SRC = \
+	assembly/encrypt_data.s \
+	assembly/extract_data.s \
+	assembly/update_track.s
+
+OBJ = $(C_SRC:.c=.o) $(ASM_SRC:.s=.o)
+
+TARGET = stationMngt.elf
+
+# ===============================
+# Rules
+# ===============================
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
 
-main.o: main.c log_export.h
-	$(CC) $(CFLAGS) -c main.c
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-log_export.o: log_export.c log_export.h
-	$(CC) $(CFLAGS) -c log_export.c
+%.o: %.s
+	$(CC) -c $< -o $@
+
+run: $(TARGET)
+	$(QEMU) -L $(QEMU_SYSROOT) ./$(TARGET)
 
 clean:
-	rm -f $(OBJS) $(TARGET) *_actions.txt
+	rm -f $(OBJ) $(TARGET)
 
-run: all
-	./$(TARGET)
+.PHONY: all clean run
+
+		

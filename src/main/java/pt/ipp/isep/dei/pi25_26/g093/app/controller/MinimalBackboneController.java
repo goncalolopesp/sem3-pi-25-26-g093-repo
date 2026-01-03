@@ -94,4 +94,10 @@ public class MinimalBackboneController {
             return false;
         }
     }
+
+    public Graph<CompleteStation, Double> getMinimalBackboneGraph() {
+        Graph<CompleteStation, Double> g = repo.getGraph();
+        if (g.numVertices() == 0) return null;
+        return computePrim(g);
+    }
 }
