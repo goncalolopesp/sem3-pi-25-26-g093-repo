@@ -3,124 +3,113 @@ package pt.ipp.isep.dei.pi25_26.g093.app.service;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.NetworkNode;
 import pt.ipp.isep.dei.pi25_26.g093.app.domain.NetworkEdge;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Result of the upgrade plan calculation for USEI11.
+ * Encapsulates the result of the Directed Line Upgrade Plan computation (USEI11).
  *
- * <p>This class represents the outcome of analyzing a directed railway
- * dependency graph. It supports two mutually exclusive scenarios:
+ * <p>This class represents one of two mutually exclusive outcomes:
  * <ul>
- *   <li>Acyclic graph: a valid topological ordering of all nodes</li>
- *   <li>Cyclic graph: identification of nodes and edges involved in cycles</li>
+ *   <li><b>Acyclic graph</b>: a valid topological ordering of all stations</li>
+ *   <li><b>Cyclic graph</b>: the set of stations and links involved in cycles</li>
  * </ul>
  *
- * <p>The time complexity analysis of the executed algorithm is also included.
+ * <p>This structure directly reflects the expected returns defined in the
+ * USEI11 user story.
  *
- * @author Logistics on Rails Team
+ * <p>The class is immutable after construction.
  */
 public class UpgradePlanResult {
 
-    private final boolean hasCycle;
     private final List<NetworkNode> topologicalOrder;
     private final Set<NetworkNode> cycleNodes;
     private final Set<NetworkEdge> cycleEdges;
     private final String complexityAnalysis;
 
     /**
-     * Creates a result for an acyclic graph.
+     * Constructs a result for an acyclic graph.
      *
-     * @param topologicalOrder ordered list of nodes representing
-     *                         a valid upgrade sequence
-     * @param complexityAnalysis textual time complexity analysis
-     * @throws IllegalArgumentException if topologicalOrder is null
+     * <p>This constructor must be used when a valid topological ordering
+     * exists for the dependency graph.
+     *
+     * @param topologicalOrder ordered list of stations
+     * @param complexityAnalysis textual complexity analysis
      */
     public UpgradePlanResult(List<NetworkNode> topologicalOrder,
                              String complexityAnalysis) {
 
-        if (topologicalOrder == null) {
-            throw new IllegalArgumentException("Topological order cannot be null");
-        }
-
-        this.hasCycle = false;
-        this.topologicalOrder = new ArrayList<>(topologicalOrder);
-        this.cycleNodes = new HashSet<>();
-        this.cycleEdges = new HashSet<>();
+        this.topologicalOrder = topologicalOrder;
+        this.cycleNodes = Collections.emptySet();
+        this.cycleEdges = Collections.emptySet();
         this.complexityAnalysis = complexityAnalysis;
     }
 
     /**
-     * Creates a result for a graph containing cycles.
+     * Constructs a result for a graph containing cycles.
      *
-     * @param cycleNodes nodes involved in cycles
-     * @param cycleEdges edges involved in cycles
-     * @param complexityAnalysis textual time complexity analysis
-     * @throws IllegalArgumentException if cycleNodes or cycleEdges are null
+     * <p>This constructor must be used when no complete topological
+     * ordering exists due to directed cycles.
+     *
+     * @param cycleNodes stations involved in cycles
+     * @param cycleEdges links involved in cycles
+     * @param complexityAnalysis textual complexity analysis
      */
     public UpgradePlanResult(Set<NetworkNode> cycleNodes,
                              Set<NetworkEdge> cycleEdges,
                              String complexityAnalysis) {
 
-        if (cycleNodes == null || cycleEdges == null) {
-            throw new IllegalArgumentException("Cycle nodes and edges cannot be null");
-        }
-
-        this.hasCycle = true;
-        this.topologicalOrder = new ArrayList<>();
-        this.cycleNodes = new HashSet<>(cycleNodes);
-        this.cycleEdges = new HashSet<>(cycleEdges);
+        this.topologicalOrder = Collections.emptyList();
+        this.cycleNodes = cycleNodes;
+        this.cycleEdges = cycleEdges;
         this.complexityAnalysis = complexityAnalysis;
     }
 
     /**
      * Indicates whether the dependency graph contains cycles.
      *
-     * @return {@code true} if cycles were detected; {@code false} otherwise
+     * @return true if cycles were detected, false otherwise
      */
     public boolean hasCycle() {
-        return hasCycle;
+        return !cycleNodes.isEmpty();
     }
 
     /**
-     * Returns the topological ordering of nodes.
+     * Returns the topological ordering of stations.
      *
-     * <p>This list is meaningful only if {@link #hasCycle()} returns {@code false}.
+     * <p>This list is non-empty only if {@link #hasCycle()} returns false.
      *
-     * @return ordered list of nodes, or an empty list if cycles exist
+     * @return list of stations in upgrade order
      */
     public List<NetworkNode> getTopologicalOrder() {
-        return new ArrayList<>(topologicalOrder);
+        return topologicalOrder;
     }
 
     /**
-     * Returns the nodes involved in cycles.
+     * Returns the stations involved in cycles.
      *
-     * <p>This set is meaningful only if {@link #hasCycle()} returns {@code true}.
+     * <p>This set is non-empty only if {@link #hasCycle()} returns true.
      *
-     * @return set of nodes involved in cycles, or an empty set if no cycles exist
+     * @return set of stations involved in cycles
      */
     public Set<NetworkNode> getCycleNodes() {
-        return new HashSet<>(cycleNodes);
+        return cycleNodes;
     }
 
     /**
-     * Returns the edges involved in cycles.
+     * Returns the directed links involved in cycles.
      *
-     * <p>This set is meaningful only if {@link #hasCycle()} returns {@code true}.
-     *
-     * @return set of edges involved in cycles, or an empty set if no cycles exist
+     * @return set of dependency edges that close cycles
      */
     public Set<NetworkEdge> getCycleEdges() {
-        return new HashSet<>(cycleEdges);
+        return cycleEdges;
     }
 
     /**
-     * Returns the time complexity analysis of the executed algorithm.
+     * Returns the complexity analysis of the executed algorithm.
      *
-     * @return complexity analysis string
+     * @return textual complexity analysis
      */
     public String getComplexityAnalysis() {
         return complexityAnalysis;

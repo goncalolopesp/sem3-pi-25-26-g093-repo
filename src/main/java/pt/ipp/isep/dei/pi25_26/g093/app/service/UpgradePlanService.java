@@ -12,28 +12,29 @@ import java.util.*;
 /**
  * Service for calculating railway network upgrade plans (USEI11).
  *
- * <p>This service determines a valid upgrade order for railway network nodes
+ * <p>This service determines a valid upgrade order for Belgian railway stations
  * based on directed dependency relationships.
  *
- * <p>The service performs:
+ * <p>The implementation strictly follows the graph algorithms presented in the
+ * ESINF lectures:
  * <ul>
- *   <li>Cycle detection in the dependency graph</li>
- *   <li>Topological sorting when the graph is acyclic</li>
- *   <li>Identification of nodes and edges involved in cycles</li>
- *   <li>Time complexity analysis</li>
+ *   <li>Cycle detection using Depth-First Search (DFS) with back edge identification</li>
+ *   <li>Topological sorting using Kahn’s Algorithm for directed acyclic graphs</li>
  * </ul>
  *
- * <p>The implementation reuses algorithms provided by the {@code graphs} package:
+ * <p>All graph algorithms are reused from the provided {@code graphs} package,
+ * as required by the project guidelines. No custom graph algorithms are implemented.
+ *
+ * <p>Expected behavior:
  * <ul>
- *   <li>{@link Algorithms#hasCycleDirected(Graph)} for cycle detection</li>
- *   <li>{@link Algorithms#topologicalSort(Graph)} for upgrade ordering</li>
- *   <li>{@link Algorithms#directedBackEdges(Graph)} to identify cycle-related edges</li>
+ *   <li>If the graph is acyclic, return a topological ordering of all stations</li>
+ *   <li>If cycles exist, return the stations and links involved in those cycles</li>
  * </ul>
  *
  * <p>Time Complexity:
  * <ul>
- *   <li>Cycle Detection: O(V + E)</li>
- *   <li>Topological Sort: O(V + E)</li>
+ *   <li>Cycle Detection (DFS): O(V + E)</li>
+ *   <li>Topological Sort (Kahn): O(V + E)</li>
  * </ul>
  *
  * @author Logistics on Rails Team
@@ -43,21 +44,10 @@ public class UpgradePlanService {
     /**
      * Calculates the upgrade plan for a railway network.
      *
-     * <p>If the dependency graph is acyclic, a topological ordering of all nodes
-     * is returned, representing a valid upgrade sequence.
-     *
-     * <p>If cycles are detected, the method returns the set of nodes and edges
-     * involved in those cycles.
-     *
-     * @param nodes list of network nodes
+     * @param nodes list of network nodes (stations)
      * @param edges list of directed dependency edges
-     * @return an {@link UpgradePlanResult} containing either:
-     *         <ul>
-     *           <li>a topological ordering of nodes, or</li>
-     *           <li>cycle-related nodes and edges</li>
-     *         </ul>
-     * @throws IllegalArgumentException if the nodes list is null or empty,
-     *         or if the edges list is null
+     * @return an {@link UpgradePlanResult} containing either a topological order
+     *         or cycle-related information
      */
     public UpgradePlanResult calculateUpgradePlan(List<NetworkNode> nodes,
                                                   List<NetworkEdge> edges) {
@@ -69,10 +59,10 @@ public class UpgradePlanService {
             throw new IllegalArgumentException("Edges list cannot be null");
         }
 
-        // Build directed graph
+        // Build directed graph using adjacency list representation
         Graph<NetworkNode, NetworkEdge> graph = buildGraph(nodes, edges);
 
-        // Detect cycles
+        // Cycle detection using DFS with back edges (ESINF slides)
         boolean hasCycle = Algorithms.hasCycleDirected(graph);
 
         if (hasCycle) {
@@ -82,14 +72,18 @@ public class UpgradePlanService {
             return new UpgradePlanResult(
                     cycleNodes,
                     cycleEdges,
-                    generateComplexityAnalysis(graph.numVertices(), graph.numEdges(), true)
+                    generateComplexityAnalysis(
+                            graph.numVertices(),
+                            graph.numEdges(),
+                            true
+                    )
             );
         }
 
-        // Topological sort (acyclic case)
+        // Topological sorting using Kahn’s Algorithm (ESINF slides)
         List<NetworkNode> topologicalOrder = Algorithms.topologicalSort(graph);
 
-        // Ensure isolated nodes are included
+        // Ensure isolated vertices are included in the final ordering
         if (topologicalOrder.size() < graph.numVertices()) {
             Set<NetworkNode> processed = new HashSet<>(topologicalOrder);
             for (NetworkNode node : graph.vertices()) {
@@ -101,7 +95,11 @@ public class UpgradePlanService {
 
         return new UpgradePlanResult(
                 topologicalOrder,
-                generateComplexityAnalysis(graph.numVertices(), graph.numEdges(), false)
+                generateComplexityAnalysis(
+                        graph.numVertices(),
+                        graph.numEdges(),
+                        false
+                )
         );
     }
 
@@ -110,7 +108,7 @@ public class UpgradePlanService {
      *
      * @param nodes list of network nodes
      * @param edges list of directed dependency edges
-     * @return a directed graph representation of the network
+     * @return a directed graph representation of the railway network
      */
     private Graph<NetworkNode, NetworkEdge> buildGraph(List<NetworkNode> nodes,
                                                        List<NetworkEdge> edges) {
@@ -139,13 +137,15 @@ public class UpgradePlanService {
      * Collects all network nodes involved in cycles.
      *
      * <p>The nodes are identified from the endpoints of back edges
-     * detected during depth-first search.
+     * detected during DFS traversal.
      *
      * @param graph the directed dependency graph
      * @return a set of nodes involved in cycles
      */
     private Set<NetworkNode> collectCycleNodes(Graph<NetworkNode, NetworkEdge> graph) {
         Set<NetworkNode> cycleNodes = new HashSet<>();
+
+        // Back edges correspond to cycle-closing edges in DFS
         Set<Edge<NetworkNode, NetworkEdge>> backEdges =
                 Algorithms.directedBackEdges(graph);
 
@@ -153,20 +153,19 @@ public class UpgradePlanService {
             cycleNodes.add(edge.getVOrig());
             cycleNodes.add(edge.getVDest());
         }
+
         return cycleNodes;
     }
 
     /**
      * Collects all network edges involved in cycles.
      *
-     * <p>The edges correspond to back edges detected in the graph,
-     * which represent dependencies that close cycles.
-     *
      * @param graph the directed dependency graph
      * @return a set of edges involved in cycles
      */
     private Set<NetworkEdge> collectCycleEdges(Graph<NetworkNode, NetworkEdge> graph) {
         Set<NetworkEdge> cycleEdges = new HashSet<>();
+
         Set<Edge<NetworkNode, NetworkEdge>> backEdges =
                 Algorithms.directedBackEdges(graph);
 
@@ -175,31 +174,34 @@ public class UpgradePlanService {
                 cycleEdges.add(edge.getWeight());
             }
         }
+
         return cycleEdges;
     }
 
     /**
-     * Generates a textual analysis of the time and space complexity
-     * of the executed algorithm.
+     * Generates a textual analysis of the time and space complexity.
      *
      * @param nodeCount number of nodes (V)
      * @param edgeCount number of edges (E)
      * @param hasCycle whether cycles were detected
-     * @return a formatted complexity analysis string
+     * @return formatted complexity analysis
      */
-    private String generateComplexityAnalysis(int nodeCount, int edgeCount, boolean hasCycle) {
+    private String generateComplexityAnalysis(int nodeCount,
+                                              int edgeCount,
+                                              boolean hasCycle) {
+
         StringBuilder sb = new StringBuilder();
         sb.append("Time Complexity Analysis:\n");
         sb.append(String.format("  - Nodes (V): %d\n", nodeCount));
         sb.append(String.format("  - Edges (E): %d\n", edgeCount));
 
         if (hasCycle) {
-            sb.append("  - Cycle Detection: O(V + E)\n");
+            sb.append("  - Cycle Detection (DFS): O(V + E)\n");
         } else {
-            sb.append("  - Topological Sort: O(V + E)\n");
+            sb.append("  - Topological Sort (Kahn): O(V + E)\n");
         }
 
-        sb.append("  - Space Complexity: O(V + E)\n");
+        sb.append("  - Space Complexity (Adjacency List): O(V + E)\n");
         return sb.toString();
     }
 }
