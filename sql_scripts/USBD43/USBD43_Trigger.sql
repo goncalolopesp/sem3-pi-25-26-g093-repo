@@ -1,26 +1,20 @@
-CREATE OR REPLACE TRIGGER trg_electric_locomotive_model_check
-BEFORE INSERT OR UPDATE ON Electric_Locomotive_Model
+CREATE OR REPLACE TRIGGER TRG_USBD43_CHECK_ELECTRIC_MODEL
+BEFORE INSERT ON Electric_Locomotive_Model
 FOR EACH ROW
 DECLARE
-    v_count NUMBER;
+    v_is_diesel NUMBER;
 BEGIN
     SELECT COUNT(*)
-    INTO v_count
-    FROM Locomotive_Model
+    INTO v_is_diesel
+    FROM Diesel_Locomotive_Model
     WHERE locomotiveModelID = :NEW.locomotiveModelID;
 
-    IF v_count = 0 THEN
-        RAISE_APPLICATION_ERROR(
-            -20010,
-            'Referenced locomotive model does not exist.'
-        );
+    IF v_is_diesel > 0 THEN
+        RAISE_APPLICATION_ERROR(-20010, 'Business Rule Violation: Model cannot be both Electric and Diesel.');
     END IF;
 
     IF :NEW.voltage IS NULL OR :NEW.frequence IS NULL THEN
-        RAISE_APPLICATION_ERROR(
-            -20011,
-            'Electric locomotive must have voltage and frequence defined.'
-        );
+        RAISE_APPLICATION_ERROR(-20011, 'Validation Error: Voltage and Frequency are required.');
     END IF;
 END;
 /
