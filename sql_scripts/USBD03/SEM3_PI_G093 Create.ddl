@@ -9,7 +9,7 @@ CREATE TABLE Facility_Path (Facilityid number(10) NOT NULL, PathpathID number(10
 CREATE TABLE Facility_Type (id number(10) GENERATED AS IDENTITY, typeName varchar2(50) NOT NULL, PRIMARY KEY (id));
 CREATE TABLE Freight (freightID number(10) GENERATED AS IDENTITY, trainID number(10) NOT NULL, startFacilityID number(10) NOT NULL, endFacilityID number(10) NOT NULL, freightDate date NOT NULL, PRIMARY KEY (freightID));
 CREATE TABLE Gauge (gaugeID number(10) GENERATED AS IDENTITY, name varchar2(100) NOT NULL, width_mm number(10) NOT NULL, PRIMARY KEY (gaugeID));
-CREATE TABLE Locomotive (locomotiveID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, locomotiveModelID number(10) NOT NULL, trainID number(10), name varchar2(30) NOT NULL, serviceStart date NOT NULL, identifier varchar2(20) NOT NULL, PRIMARY KEY (locomotiveID));
+CREATE TABLE Locomotive (locomotiveID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, locomotiveModelID number(10) NOT NULL, trainID number(10), currentFacilityID number(10) NOT NULL, name varchar2(30) NOT NULL, serviceStart date NOT NULL, identifier varchar2(20) NOT NULL, PRIMARY KEY (locomotiveID));
 CREATE TABLE Locomotive_Model (locomotiveModelID number(10) GENERATED AS IDENTITY, power double precision NOT NULL, topSpeed double precision NOT NULL, trackType number(10) NOT NULL, tareWeight number(10) NOT NULL, maxWeight number(10) NOT NULL, numberOfBogies number(10) NOT NULL, maker varchar2(10) NOT NULL, length double precision NOT NULL, weight double precision NOT NULL, width number(10) NOT NULL, PRIMARY KEY (locomotiveModelID));
 CREATE TABLE Locomotive_Model_Gauge (locomotiveModelID number(10) NOT NULL, gaugeID number(10) NOT NULL, PRIMARY KEY (locomotiveModelID, gaugeID));
 CREATE TABLE Operator (operatorID number(10) GENERATED AS IDENTITY, vatNumber varchar2(20) NOT NULL, shortName varchar2(10) NOT NULL, name varchar2(50) NOT NULL, PRIMARY KEY (operatorID));
@@ -19,7 +19,7 @@ CREATE TABLE Railway_Line (id number(10) GENERATED AS IDENTITY, startFacilityID 
 CREATE TABLE Railway_Segment (id number(10) GENERATED AS IDENTITY, railwayLineID number(10) NOT NULL, segmentOrder number(22) NOT NULL, isElectrified char(1) NOT NULL, length number(22) NOT NULL, numberTracks number(10) NOT NULL, weightLimit number(22) NOT NULL, PRIMARY KEY (id), CONSTRAINT segmentOrderLine UNIQUE (segmentOrder, railwayLineID));
 CREATE TABLE Siding (railwaySegmentID number(10) NOT NULL, position number(10) NOT NULL, length number(10) NOT NULL, PRIMARY KEY (railwaySegmentID));
 CREATE TABLE Train (trainID number(10) GENERATED AS IDENTITY, pathID number(10) NOT NULL, operatorID number(10) NOT NULL, startDate date NOT NULL, PRIMARY KEY (trainID));
-CREATE TABLE Wagon (wagonID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, wagonModelID number(10) NOT NULL, identifier varchar2(20) NOT NULL, serviceStart date NOT NULL, PRIMARY KEY (wagonID));
+CREATE TABLE Wagon (wagonID number(10) GENERATED AS IDENTITY, operatorID number(10) NOT NULL, wagonModelID number(10) NOT NULL, currentFacilityID number(10) NOT NULL, status varchar2(50) NOT NULL, identifier varchar2(20) NOT NULL, serviceStart date NOT NULL, PRIMARY KEY (wagonID));
 CREATE TABLE Wagon_Freight (wagonID number(10) NOT NULL, freightID number(10) NOT NULL, PRIMARY KEY (wagonID, freightID));
 CREATE TABLE Wagon_Model (wagonModelID number(10) GENERATED AS IDENTITY, wagonModelTypeID number(10) NOT NULL, capacity number(10) NOT NULL, volumeCapacity number(10) NOT NULL, length double precision NOT NULL, height number(10) NOT NULL, maxSpeed number(10) NOT NULL, maker varchar2(10) NOT NULL, tareWeight number(10) NOT NULL, numberOfBogies number(10) NOT NULL, payload number(10) NOT NULL, PRIMARY KEY (wagonModelID));
 CREATE TABLE Wagon_Model_Gauge (wagonModelID number(10) NOT NULL, gaugeID number(10) NOT NULL, PRIMARY KEY (wagonModelID, gaugeID));
@@ -56,4 +56,6 @@ ALTER TABLE Railway_Line ADD CONSTRAINT FKRailway_Li336626 FOREIGN KEY (gaugeID)
 ALTER TABLE Facility_Path ADD CONSTRAINT FKFacility_P409019 FOREIGN KEY (Facilityid) REFERENCES Facility (id);
 ALTER TABLE Facility_Path ADD CONSTRAINT FKFacility_P359707 FOREIGN KEY (PathpathID) REFERENCES Path (pathID);
 ALTER TABLE Train ADD CONSTRAINT FKTrain178822 FOREIGN KEY (pathID) REFERENCES Path (pathID);
+ALTER TABLE Wagon ADD CONSTRAINT FKWagon427619 FOREIGN KEY (currentFacilityID) REFERENCES Facility (id);
+ALTER TABLE Locomotive ADD CONSTRAINT FKLocomotive854082 FOREIGN KEY (currentFacilityID) REFERENCES Facility (id);
 
