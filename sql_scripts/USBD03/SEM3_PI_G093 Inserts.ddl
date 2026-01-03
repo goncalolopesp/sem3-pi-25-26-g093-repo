@@ -242,12 +242,15 @@ VALUES ((SELECT MAX(locomotiveModelID) FROM Locomotive_Model), (SELECT gaugeID F
 INSERT INTO Locomotive_Model_Gauge (locomotiveModelID, gaugeID)
 VALUES ((SELECT MAX(locomotiveModelID) FROM Locomotive_Model), (SELECT gaugeID FROM Gauge WHERE width_mm=1435));
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
+-- Inserção para wagons com payload 61
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
 SELECT
     (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Metalsines' AND payload=61),
     identifier,
-    TO_DATE('02/05/1987', 'DD/MM/YYYY')
+    TO_DATE('02/05/1987', 'DD/MM/YYYY'),
+    (SELECT id FROM Facility WHERE name = 'Leixões'),
+    'FREE'
 FROM (
          SELECT '356 3 077' as identifier FROM DUAL UNION ALL
          SELECT '356 3 078' FROM DUAL UNION ALL
@@ -267,12 +270,15 @@ FROM (
          SELECT '356 3 092' FROM DUAL
      );
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
+-- Inserção para wagons com payload 56
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
 SELECT
     (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Metalsines' AND payload=56),
     identifier,
-    TO_DATE('12/04/1990', 'DD/MM/YYYY')
+    TO_DATE('12/04/1990', 'DD/MM/YYYY'),
+    (SELECT id FROM Facility WHERE name = 'Leixões'),
+    'FREE'
 FROM (
          SELECT '082 3 045' as identifier FROM DUAL UNION ALL
          SELECT '082 3 046' FROM DUAL UNION ALL
@@ -280,12 +286,15 @@ FROM (
          SELECT '082 3 048' FROM DUAL
      );
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
+-- Inserção para wagons com payload 26
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
 SELECT
     (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Equimetal' AND payload=26),
     identifier,
-    TO_DATE('03/02/1977', 'DD/MM/YYYY')
+    TO_DATE('03/02/1977', 'DD/MM/YYYY'),
+    (SELECT id FROM Facility WHERE name = 'Leixões'),
+    'FREE'
 FROM (
          SELECT '074 1 001' as identifier FROM DUAL UNION ALL
          SELECT '074 1 002' FROM DUAL UNION ALL
@@ -296,12 +305,15 @@ FROM (
          SELECT '074 1 007' FROM DUAL
      );
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
+
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
 SELECT
     (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
     (SELECT wagonModelID FROM Wagon_Model WHERE maker='SepsaComet'),
     identifier,
-    TO_DATE('03/02/1977', 'DD/MM/YYYY')
+    TO_DATE('03/02/1977', 'DD/MM/YYYY'),
+    (SELECT id FROM Facility WHERE name = 'Leixões'),
+    'FREE'
 FROM (
          SELECT '181 1 010' as identifier FROM DUAL UNION ALL
          SELECT '181 1 011' FROM DUAL UNION ALL
@@ -310,91 +322,142 @@ FROM (
          SELECT '181 1 014' FROM DUAL
      );
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 001', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 001', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 002', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 002', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 003', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 003', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 004', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 004', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 005', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 005', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 006', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 006', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 007', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 007', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 008', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 008', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 009', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 009', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'), (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'), '333 0 010', TO_DATE('01/09/2005', 'DD/MM/YYYY'));
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES
+    ((SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
+     (SELECT wagonModelID FROM Wagon_Model WHERE maker='Simmering'),
+     '333 0 010', TO_DATE('01/09/2005', 'DD/MM/YYYY'),
+     (SELECT id FROM Facility WHERE name = 'Leixões'),
+     'FREE');
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Siemens' AND rownum=1),
-           NULL, 'Inês', TO_DATE('01/01/1995', 'DD/MM/YYYY'), '5621'
+           NULL, 'Inês', TO_DATE('01/01/1995', 'DD/MM/YYYY'), '5621', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Siemens' AND rownum=1),
-           NULL, 'Paz', TO_DATE('01/04/1995', 'DD/MM/YYYY'), '5623'
+           NULL, 'Paz', TO_DATE('01/04/1995', 'DD/MM/YYYY'), '5623', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Siemens' AND rownum=1),
-           NULL, 'Helena', TO_DATE('02/01/1996', 'DD/MM/YYYY'), '5630'
+           NULL, 'Helena', TO_DATE('02/01/1996', 'DD/MM/YYYY'), '5630', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Alstom' AND rownum=1),
-           NULL, 'Eva', TO_DATE('07/04/1981', 'DD/MM/YYYY'), '1903'
+           NULL, 'Eva', TO_DATE('07/04/1981', 'DD/MM/YYYY'), '1903', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Stadler' AND rownum=1),
-           NULL, 'Adriana', TO_DATE('15/02/2017', 'DD/MM/YYYY'), '5034'
+           NULL, 'Adriana', TO_DATE('15/02/2017', 'DD/MM/YYYY'), '5034', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Medway'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Stadler' AND rownum=1),
-           NULL, 'Marina', TO_DATE('01/02/2017', 'DD/MM/YYYY'), '5036'
+           NULL, 'Marina', TO_DATE('01/02/2017', 'DD/MM/YYYY'), '5036', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Captrain'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Stadler' AND rownum=1),
-           NULL, '335.001', TO_DATE('07/05/2019', 'DD/MM/YYYY'), '335.001'
+           NULL, '335.001', TO_DATE('07/05/2019', 'DD/MM/YYYY'), '335.001', (SELECT id FROM Facility WHERE name='Leixões')
        );
 
-INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier)
+INSERT INTO Locomotive (operatorID, locomotiveModelID, trainID, name, serviceStart, identifier, currentFacilityID)
 VALUES (
            (SELECT operatorID FROM Operator WHERE shortName = 'Captrain'),
            (SELECT locomotiveModelID FROM Locomotive_Model WHERE maker = 'Stadler' AND rownum=1),
-           NULL, '335.003', TO_DATE('03/06/2019', 'DD/MM/YYYY'), '335.003'
+           NULL, '335.003', TO_DATE('03/06/2019', 'DD/MM/YYYY'), '335.003', (SELECT id FROM Facility WHERE name='Leixões')
        );
+
 
 
 INSERT INTO Path (pathID) VALUES (DEFAULT);
@@ -551,3 +614,7 @@ INSERT INTO Wagon_Freight (wagonID, freightID)
 SELECT w.wagonID, f.freightID FROM Wagon w, Freight f
 WHERE w.identifier IN ('181 1 011', '181 1 012', '356 3 077', '356 3 078', '356 3 079', '356 3 080')
   AND f.startFacilityID=(SELECT id FROM Facility WHERE name='Valença') AND f.endFacilityID=(SELECT id FROM Facility WHERE name='Leixões') AND f.freightDate=TO_DATE('2025-10-06', 'YYYY-MM-DD');
+
+ALTER TABLE Wagon
+    ADD CONSTRAINT chk_wagon_status
+        CHECK (status IN ('FREE', 'RESERVED', 'IN_FREIGHT'));
