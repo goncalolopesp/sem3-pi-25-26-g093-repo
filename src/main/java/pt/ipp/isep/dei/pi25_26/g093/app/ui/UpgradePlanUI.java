@@ -76,21 +76,54 @@ public class UpgradePlanUI {
     }
 
     private void displayResults(UpgradePlanResult result) {
-        System.out.println("\n=== Upgrade Plan Results ===");
+        System.out.println("\n==================================================");
+        System.out.println(" USEI11 – Directed Line Upgrade Plan");
+        System.out.println("==================================================");
 
         if (result.hasCycle()) {
-            System.out.println("❌ Cycle detected. Upgrade order is impossible.");
-            System.out.println("Nodes involved in cycles:");
-            result.getCycleNodes()
-                    .forEach(n -> System.out.println(" - " + n.getName()));
+            System.out.println("\n Upgrade order is NOT possible");
+            System.out.println("Reason: Dependency cycles detected in the network");
+
+            System.out.println("\n--------------------------------------------------");
+            System.out.println(" Stations involved in cycles ("
+                    + result.getCycleNodes().size() + ")");
+            System.out.println("--------------------------------------------------");
+
+            result.getCycleNodes().forEach(
+                    n -> System.out.println("  • " + n.getName()
+                            + " (" + n.getNodeId() + ")")
+            );
+
+            System.out.println("\n--------------------------------------------------");
+            System.out.println(" Links involved in cycles ("
+                    + result.getCycleEdges().size() + ")");
+            System.out.println("--------------------------------------------------");
+
+            result.getCycleEdges().forEach(
+                    e -> System.out.println("  • "
+                            + e.getFromNodeId() + " → " + e.getToNodeId()
+                            + " | dist=" + String.format("%.2f", e.getDistanceKm()) + " km"
+                            + " | cap=" + e.getCapacity()
+                            + " | cost=" + String.format("%.2f", e.getCost()))
+            );
+
         } else {
-            System.out.println("✅ Valid upgrade order:");
+            System.out.println("\n Valid upgrade order found");
+            System.out.println("\n--------------------------------------------------");
+
             int i = 1;
             for (NetworkNode node : result.getTopologicalOrder()) {
-                System.out.println(i++ + ". " + node.getName());
+                System.out.println(" " + (i++) + ". "
+                        + node.getName() + " (" + node.getNodeId() + ")");
             }
         }
 
-        System.out.println("\n" + result.getComplexityAnalysis());
+        System.out.println("\n--------------------------------------------------");
+        System.out.println(" Complexity Analysis");
+        System.out.println("--------------------------------------------------");
+        System.out.println(result.getComplexityAnalysis());
+
+        System.out.println("==================================================");
     }
+
 }
