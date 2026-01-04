@@ -72,7 +72,7 @@ public class RiskAwareShortestPathController {
 
         Map<CompleteStation, Double> dist = new HashMap<>();
         Map<CompleteStation, CompleteStation> path = new HashMap<>();
-        boolean negativeCycle = false;
+        CompleteStation cycleNode = null;
 
         for (CompleteStation station : g.vertices()) {
             dist.put(station, Double.POSITIVE_INFINITY);
@@ -100,13 +100,43 @@ public class RiskAwareShortestPathController {
             double weight = edge.getWeight() + getRiskPenalty(u, v);
 
             if (dist.get(u) + weight < dist.get(v)) {
-                negativeCycle = true;
+                cycleNode = v;
+                break;
             }
         }
 
-        if (negativeCycle) {
-            return new PathResult(false, "Negative cycle detected between stations.");
+        if (cycleNode != null) {
+
+            for (int i = 0; i < g.numVertices(); i++) {
+                cycleNode = path.get(cycleNode);
+            }
+
+            List<CompleteStation> cycleStations = new ArrayList<>();
+            List<Edge<CompleteStation, Double>> cycleEdges = new ArrayList<>();
+
+            CompleteStation current = cycleNode;
+            do {
+                cycleStations.add(current);
+                CompleteStation prev = path.get(current);
+                if (prev == null) break;
+
+                for (Edge<CompleteStation, Double> e : g.outgoingEdges(prev)) {
+                    if (e.getVDest().equals(current)) {
+                        cycleEdges.add(e);
+                        break;
+                    }
+                }
+
+                current = prev;
+            } while (!current.equals(cycleNode));
+
+
+            Collections.reverse(cycleStations);
+            Collections.reverse(cycleEdges);
+
+            return new PathResult(cycleStations, cycleEdges);
         }
+
 
         List<CompleteStation> pathList = new ArrayList<>();
         CompleteStation current = end;

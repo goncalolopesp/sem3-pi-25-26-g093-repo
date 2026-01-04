@@ -65,6 +65,20 @@ public class RiskAwareShortestPathUI {
 
         if (!result.isSuccess()) {
             System.out.println("Error: " + result.getErrorMessage());
+
+            if (result.getNegativeCycleStations() != null) {
+                System.out.println("Stations involved in negative cycle:");
+                for (CompleteStation s : result.getNegativeCycleStations()) {
+                    System.out.println(" - " + s.getStation());
+                }
+
+                System.out.println("Edges involved in negative cycle:");
+                for (Edge<CompleteStation, Double> e : result.getNegativeCycleEdges()) {
+                    System.out.println(" - " + e.getVOrig().getStation() +
+                            " -> " + e.getVDest().getStation());
+                }
+            }
+
         } else {
             printAnalysisResults(result);
             generateShortestPathFiles(start, end, result);

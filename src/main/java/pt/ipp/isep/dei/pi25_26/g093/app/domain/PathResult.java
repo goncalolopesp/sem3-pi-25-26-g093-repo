@@ -1,12 +1,16 @@
 package pt.ipp.isep.dei.pi25_26.g093.app.domain;
 
+import pt.ipp.isep.dei.pi25_26.g093.app.graphs.Edge;
+
 import java.util.List;
 
 public class  PathResult {
     private final boolean success;
     private final String errorMessage;
-    private final List<CompleteStation> path;
-    private final double totalCost;
+    private List<CompleteStation> path;
+    private double totalCost;
+    private List<CompleteStation> negativeCycleStations;
+    private List<Edge<CompleteStation, Double>> negativeCycleEdges;
 
     public PathResult(boolean success, String errorMessage) {
         this.success = success;
@@ -20,6 +24,14 @@ public class  PathResult {
         this.errorMessage = null;
         this.path = path;
         this.totalCost = totalCost;
+    }
+
+    public PathResult(List<CompleteStation> cycleStations,
+                      List<Edge<CompleteStation, Double>> cycleEdges) {
+        this.success = false;
+        this.negativeCycleStations = cycleStations;
+        this.negativeCycleEdges = cycleEdges;
+        this.errorMessage = "Negative cycle detected.";
     }
 
     public boolean isSuccess() {
@@ -37,4 +49,8 @@ public class  PathResult {
     public double getTotalCost() {
         return totalCost;
     }
+
+    public List<CompleteStation> getNegativeCycleStations() { return negativeCycleStations; }
+    public List<Edge<CompleteStation, Double>> getNegativeCycleEdges() { return negativeCycleEdges; }
+
 }
