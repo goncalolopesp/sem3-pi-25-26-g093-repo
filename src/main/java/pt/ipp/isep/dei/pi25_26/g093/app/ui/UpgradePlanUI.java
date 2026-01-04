@@ -6,15 +6,14 @@ import pt.ipp.isep.dei.pi25_26.g093.app.domain.NetworkNode;
 import pt.ipp.isep.dei.pi25_26.g093.app.service.UpgradePlanResult;
 import pt.ipp.isep.dei.pi25_26.g093.app.utilities.RailwayNetworkCsvLoader;
 
-import java.util.List;
-import java.util.Scanner;
+import pt.ipp.isep.dei.pi25_26.g093.app.graphs.Graph;
+import pt.ipp.isep.dei.pi25_26.g093.app.graphs.MapGraph;        // <- ajusta se o teu nome for diferente
+import pt.ipp.isep.dei.pi25_26.g093.app.graphs.Algorithms;
+import pt.ipp.isep.dei.pi25_26.g093.app.graphs.Edge;
 
-/**
- * User Interface for USEI11 - Directed Line Upgrade Plan.
- *
- * <p>This UI loads the railway network from CSV files and computes
- * a valid upgrade order or detects dependency cycles.
- */
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class UpgradePlanUI {
 
     private final UpgradePlanController controller;
@@ -51,9 +50,6 @@ public class UpgradePlanUI {
         } while (option != 0);
     }
 
-    /**
-     * Loads data from CSV files and calculates the upgrade plan.
-     */
     private void calculateUpgradePlanFromCsv() {
         try {
             String stationsPath = "train_station_dataset/stations.csv";
@@ -65,65 +61,160 @@ public class UpgradePlanUI {
             List<NetworkNode> nodes = loader.loadNodes();
             List<NetworkEdge> edges = loader.loadEdges(nodes);
 
+            // Build graph locally to allow cycle printing as paths
+            Graph<NetworkNode, NetworkEdge> g = buildGraph(nodes, edges);
+
             UpgradePlanResult result =
                     controller.calculateUpgradePlan(nodes, edges);
 
-            displayResults(result);
+            displayResults(result, g);
 
         } catch (Exception e) {
             System.out.println("Error processing CSV data: " + e.getMessage());
         }
     }
 
-    private void displayResults(UpgradePlanResult result) {
-        System.out.println("\n==================================================");
-        System.out.println(" USEI11 – Directed Line Upgrade Plan");
-        System.out.println("==================================================");
+    private Graph<NetworkNode, NetworkEdge> buildGraph(List<NetworkNode> nodes, List<NetworkEdge> edges) {
+        Graph<NetworkNode, NetworkEdge> g = new MapGraph<>(true); // directed
 
-        if (result.hasCycle()) {
-            System.out.println("\n Upgrade order is NOT possible");
-            System.out.println("Reason: Dependency cycles detected in the network");
+        for (NetworkNode n : nodes) {
+            g.addVertex(n);
+        }
 
-            System.out.println("\n--------------------------------------------------");
-            System.out.println(" Stations involved in cycles ("
-                    + result.getCycleNodes().size() + ")");
-            System.out.println("--------------------------------------------------");
+        // Need a quick map id->node for adding edges using node objects
+        Map<String, NetworkNode> byId = nodes.stream()
+                .collect(Collectors.toMap(NetworkNode::getNodeId, x -> x));
 
-            result.getCycleNodes().forEach(
-                    n -> System.out.println("  • " + n.getName()
-                            + " (" + n.getNodeId() + ")")
-            );
-
-            System.out.println("\n--------------------------------------------------");
-            System.out.println(" Links involved in cycles ("
-                    + result.getCycleEdges().size() + ")");
-            System.out.println("--------------------------------------------------");
-
-            result.getCycleEdges().forEach(
-                    e -> System.out.println("  • "
-                            + e.getFromNodeId() + " → " + e.getToNodeId()
-                            + " | dist=" + String.format("%.2f", e.getDistanceKm()) + " km"
-                            + " | cap=" + e.getCapacity()
-                            + " | cost=" + String.format("%.2f", e.getCost()))
-            );
-
-        } else {
-            System.out.println("\n Valid upgrade order found");
-            System.out.println("\n--------------------------------------------------");
-
-            int i = 1;
-            for (NetworkNode node : result.getTopologicalOrder()) {
-                System.out.println(" " + (i++) + ". "
-                        + node.getName() + " (" + node.getNodeId() + ")");
+        for (NetworkEdge e : edges) {
+            NetworkNode from = byId.get(e.getFromNodeId());
+            NetworkNode to = byId.get(e.getToNodeId());
+            if (from != null && to != null) {
+                g.addEdge(from, to, e);
             }
         }
 
-        System.out.println("\n--------------------------------------------------");
-        System.out.println(" Complexity Analysis");
-        System.out.println("--------------------------------------------------");
+        return g;
+    }
+
+    private void displayResults(UpgradePlanResult result,
+                                Graph<NetworkNode, NetworkEdge> g) {
+
+        System.out.println("\n══════════════════════════════════════════════════════════════");
+        System.out.println(" USEI11 – DIRECTED LINE UPGRADE PLAN");
+        System.out.println("══════════════════════════════════════════════════════════════");
+
+        System.out.println("\n⏳ Computing upgrade plan...");
+        System.out.println("   • Cycle detection using Colored DFS");
+        System.out.println("   • Topological ordering if acyclic");
+
+        System.out.println("\n──────────────────────────────────────────────────────────────");
+        System.out.println(" RESULTS");
+        System.out.println("──────────────────────────────────────────────────────────────");
+
+        if (result.hasCycle()) {
+
+            System.out.println("\n⚠ GRAPH CONTAINS CYCLES");
+            System.out.println("The railway network has circular dependencies.");
+            System.out.println("Upgrade cannot proceed until these cycles are resolved.");
+
+            List<List<NetworkNode>> cycles = Algorithms.findDirectedCycles(g);
+
+            System.out.println("\nSummary:");
+            System.out.println("  • Total cycles detected: " + cycles.size());
+            System.out.println("  • Unique stations in cycles: " + result.getCycleNodes().size());
+
+            int maxCycles = 10;
+            int shown = Math.min(maxCycles, cycles.size());
+
+            System.out.println("\n──────────────────────────────────────────────────────────────");
+            System.out.println(" CYCLES (showing " + shown + " of " + cycles.size() + ")");
+            System.out.println("──────────────────────────────────────────────────────────────");
+
+            for (int i = 0; i < shown; i++) {
+                List<NetworkNode> cycle = cycles.get(i);
+
+                System.out.println("\nCycle " + (i + 1));
+                System.out.println("  Stations:");
+                System.out.print("    ");
+
+                for (int j = 0; j < cycle.size(); j++) {
+                    System.out.print(cycle.get(j).getName());
+                    if (j < cycle.size() - 1) System.out.print(" → ");
+                }
+                System.out.println();
+
+                System.out.println("  Links:");
+                for (int j = 0; j < cycle.size() - 1; j++) {
+                    NetworkNode a = cycle.get(j);
+                    NetworkNode b = cycle.get(j + 1);
+
+                    Edge<NetworkNode, NetworkEdge> edge = g.edge(a, b);
+                    if (edge != null) {
+                        NetworkEdge e = edge.getWeight();
+                        System.out.printf(
+                                "    - %s → %s | dist=%6.2f km | cap=%2d | cost=%6.2f%n",
+                                e.getFromNodeId(),
+                                e.getToNodeId(),
+                                e.getDistanceKm(),
+                                e.getCapacity(),
+                                e.getCost()
+                        );
+                    }
+                }
+            }
+
+            if (cycles.size() > maxCycles) {
+                System.out.println("\n    ... and " + (cycles.size() - maxCycles)
+                        + " additional cycles not shown");
+            }
+
+            System.out.println("\n──────────────────────────────────────────────────────────────");
+            System.out.println(" STATIONS INVOLVED IN CYCLES (" + result.getCycleNodes().size() + ")");
+            System.out.println("──────────────────────────────────────────────────────────────");
+
+            result.getCycleNodes().stream()
+                    .sorted(Comparator.comparing(NetworkNode::getName,
+                            String.CASE_INSENSITIVE_ORDER))
+                    .forEach(n ->
+                            System.out.println("  • " + n.getName()
+                                    + " (" + n.getNodeId() + ")"));
+
+            System.out.println("\n──────────────────────────────────────────────────────────────");
+            System.out.println(" LINKS INVOLVED IN CYCLES (" + result.getCycleEdges().size() + ")");
+            System.out.println("──────────────────────────────────────────────────────────────");
+
+            result.getCycleEdges().stream()
+                    .sorted(Comparator.comparing(NetworkEdge::getFromNodeId)
+                            .thenComparing(NetworkEdge::getToNodeId))
+                    .forEach(e ->
+                            System.out.printf(
+                                    "  • %s → %s | dist=%6.2f km | cap=%2d | cost=%6.2f%n",
+                                    e.getFromNodeId(),
+                                    e.getToNodeId(),
+                                    e.getDistanceKm(),
+                                    e.getCapacity(),
+                                    e.getCost()
+                            ));
+
+        } else {
+
+            System.out.println("\n✔ GRAPH IS ACYCLIC");
+            System.out.println("A valid upgrade order exists.");
+
+            System.out.println("\nUpgrade order:");
+            int i = 1;
+            for (NetworkNode n : result.getTopologicalOrder()) {
+                System.out.println("  " + (i++) + ". " + n.getName()
+                        + " (" + n.getNodeId() + ")");
+            }
+        }
+
+        System.out.println("\n──────────────────────────────────────────────────────────────");
+        System.out.println(" COMPLEXITY ANALYSIS");
+        System.out.println("──────────────────────────────────────────────────────────────");
         System.out.println(result.getComplexityAnalysis());
 
-        System.out.println("==================================================");
+        System.out.println("══════════════════════════════════════════════════════════════");
     }
 
 }
