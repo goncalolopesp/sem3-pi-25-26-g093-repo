@@ -37,6 +37,7 @@ public class MainMenuUI {
                 case 7 -> runUpgradePlan();
                 case 8 -> runMinimalBackbone();
                 case 9 -> runHubScore();
+                case 11 -> runRisk();
                 case 0 -> System.out.println("Exiting program...");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -58,6 +59,8 @@ public class MainMenuUI {
         System.out.println("7. Directed Line Upgrade Plan (USEI11)");
         System.out.println("8. Minimal Backbone (USEI12)");
         System.out.println("9. Rail Hub Score (USEI13)");
+        System.out.println("10. Hub Score (USEI14)");
+        System.out.println("11. Risk Aware Shortest Path (USEI15)");
         System.out.println("0. Exit");
         System.out.println("-----------------------");
         System.out.print("Select an option: ");
@@ -177,6 +180,17 @@ public class MainMenuUI {
         }catch (Exception e)
         {
             System.out.println("Error executing HubCentralityUI: " + e.getMessage());
+        }
+    }
+
+    private void runRisk() {
+
+        try{
+            RiskAwareShortestPathUI riskAwareShortestPathUI = new RiskAwareShortestPathUI();
+            riskAwareShortestPathUI.run();
+
+        } catch (Exception e) {
+            System.out.println("Error executing RiskAwareShortestPathUI: " + e.getMessage());
         }
     }
 }
