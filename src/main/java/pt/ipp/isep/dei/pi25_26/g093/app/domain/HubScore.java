@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HubScore {
-    private static List<HubScore> scoreList = new ArrayList<>();
-
     private int id;
     private String stationName;
     private int degree;
@@ -32,8 +30,4 @@ public class HubScore {
     public double getBetweenness() {return betweenness;}
     public double getCloseness() {return closeness;}
     public double getHubScore() {return hubScore;}
-
-    public static void addScore(HubScore score) {scoreList.add(score);}
-    public static void resetList() {scoreList.clear();}
-    public static List<HubScore> getScoreList() {return scoreList;}
 }

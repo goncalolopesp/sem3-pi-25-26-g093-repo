@@ -8,19 +8,14 @@ import pt.ipp.isep.dei.pi25_26.g093.app.graphs.Graph;
 import pt.ipp.isep.dei.pi25_26.g093.app.graphs.MapGraph;
 import pt.ipp.isep.dei.pi25_26.g093.app.repositories.Repositories;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.function.BinaryOperator;
 
 public class HubCentralityController {
 
-    public void HubCentrality()
+    public List<HubScore> HubCentrality(Graph<CompleteStation, Double> graph)
     {
-        HubScore.resetList();
-        Graph<CompleteStation, Double> graph = Repositories.getInstance().getGraphRepository().getGraph();
-
+        List<HubScore> scores = new ArrayList<>();
         Collection<Edge<CompleteStation, Double>> allEdges = graph.edges();
         double totalWeight = 0;
         for(Edge<CompleteStation, Double> edge : allEdges)
@@ -46,8 +41,10 @@ public class HubCentralityController {
             double hubScore = betweenness * 0.35 + closeness * 0.35 + strength * 0.3;
 
             HubScore score = new HubScore(i, station.getStation(), degree, strength, betweenness, closeness, hubScore);
-            HubScore.addScore(score);
+            scores.add(score);
         }
+
+        return scores;
     }
 
     public double Betweenness(Graph<CompleteStation, Double> graph, CompleteStation station)

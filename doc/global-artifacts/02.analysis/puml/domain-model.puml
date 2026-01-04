@@ -15,13 +15,12 @@ package "Infrastructure" {
     +isIntermodal
   }
 
-  class Station
-  class Terminal
-  class FreightYard
+  class FacilityType{
+    +typeName
+  }
 
-  Facility <|-- Station
-  Facility <|-- Terminal
-  Facility <|-- FreightYard
+ Facility "1" -- "1" FacilityType
+
 
   class Owner {
     +name
@@ -51,6 +50,8 @@ package "Infrastructure" {
 
   Gauge "1" -- "0..*" RailwayLine : allowedOn >
   Gauge "1" -- "0..*" RailwaySegment : supports >
+
+
 }
 
 ' ===================== BUILDINGS & CARGO =====================
@@ -60,18 +61,18 @@ package "Facilities & Cargo" {
     +name
   }
 
-  class Warehouse
-  class GrainSilo
-  class RefrigeratedArea
+  class BuildingType{
+    +typeName
+  }
 
-  Building <|-- Warehouse
-  Building <|-- GrainSilo
-  Building <|-- RefrigeratedArea
+  Building "1" -- "1" BuildingType
 
   Facility "1" -- "0..*" Building : contains >
 
   class Cargo {
     +quantity
+    +expiryDate
+    +receivedAt
   }
 
   class CargoType {
@@ -80,43 +81,65 @@ package "Facilities & Cargo" {
 
   Cargo "1" -- "1" CargoType : ofType >
   Cargo "1" -- "1" Building : storedAt >
+
+  class Warehouse {
+      +capacity
+    }
+
+    class Aisle {
+      +aisleNumber
+    }
+
+    class Bay {
+      +bayNumber
+      +capacity
+    }
+
+    Building "1" -- "0..*" Warehouse : contains >
+    Warehouse "1" -- "0..*" Aisle : contains >
+    Aisle "1" -- "0..*" Bay : contains >
+
+    Cargo "1" -- "0..*" Bay : storedIn >
 }
 
 ' ===================== OPERATORS & ROLLING STOCK =====================
 package "Rolling Stock & Operators" {
+
+  Gauge "1" -- "0..*" Locomotive : compatibleWith >
+  Gauge "1" -- "0..*" Wagon : compatibleWith >
 
   class Operator {
     +name
     +shortName
   }
 
-  abstract class RollingStock {
-    +gauge
-    +tareWeight
-    +maxWeight
-    +numberOfBogies
-  }
-
   class Locomotive {
     +name
     +serviceYear
+    +serviceStart
   }
 
   class Wagon {
-    +name
-    +serviceYear
+      +name
+      +serviceStart
+      +serviceYear
   }
 
-  RollingStock <|-- Locomotive
-  RollingStock <|-- Wagon
+
 
   abstract class LocomotiveModel {
     +make
-    +model
     +power
     +acceleration
     +maxSpeed
     +weight
+    +tareWeight
+    +maxWeight
+    +numberOfBogies
+    +maker
+    +length
+    +weight
+    +width
   }
 
   class DieselLocomotiveModel {
@@ -139,26 +162,26 @@ package "Rolling Stock & Operators" {
     +length
     +height
     +maxSpeed
+    +tareWeight
+    +maxWeight
+    +numberOfBogies
+    +maker
+    +length
+    +height
   }
 
-  class Boxcar
-  class Flatcar
-  class TankCar
-  class HopperCar
-  class RefrigeratedCar
+  class WagonModelType{
+    +typeName
+  }
 
-  WagonModel <|-- Boxcar
-  WagonModel <|-- Flatcar
-  WagonModel <|-- TankCar
-  WagonModel <|-- HopperCar
-  WagonModel <|-- RefrigeratedCar
+  WagonModel "1" -- "1" WagonModelType
 
   Wagon "1" -- "1" WagonModel : ofModel >
 
-  Operator "1" -- "0..*" RollingStock : owns >
+  Operator "1" -- "0..*" Locomotive : owns >
+  Operator "1" -- "0..*" Wagon : owns >
 }
 
-' ===================== FREIGHT, TRAINS & ROUTES =====================
 package "Freight & Train Operations" {
 
   class Freight {
@@ -176,25 +199,18 @@ package "Freight & Train Operations" {
     +plannedStartDateTime
   }
 
-  ' Correct: a Train is pulled by 1..* locomotives
   Train "1" -- "1..*" Locomotive : isPulledBy >
 
   Train "1" -- "1..*" Freight : carries >
 
+
   class Route {
-    +description
     +isComplex
   }
 
   Train "1" -- "1" Route : follows >
+  Route "1" -- "2..*" Facility : passesThrough
 
-  class Path {
-    +sequenceOrder
-    +plannedTime
-  }
-
-  Route "1" -- "1..*" Path : consistsOf >
-  Path "1" -- "1" Facility : refersTo >
 }
 
 @enduml

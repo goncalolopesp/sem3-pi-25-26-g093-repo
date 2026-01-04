@@ -1,0 +1,34 @@
+graph path {
+  layout=neato;
+  overlap=false;
+  splines=true;
+  "GERMOIR" [pos="5.945,196.746!"];
+  "BRUXELL-LUX" [pos="5.937,196.771!"];
+  "BRUX-SCHUMAN" [pos="5.934,196.888!"];
+  "SCHAERBEEK" [pos="6.004,197.051!"];
+  "DIEGEM" [pos="6.139,197.122!"];
+  "ZAVENTEM" [pos="6.263,197.040!"];
+  "NOSSEGEM" [pos="6.351,197.040!"];
+  "KORTENBERG" [pos="6.493,197.070!"];
+  "ERPS-KWERPS" [pos="6.635,197.096!"];
+  "VELTEM" [pos="6.783,197.115!"];
+  "HERENT" [pos="6.975,197.151!"];
+  "LEUVEN" [pos="7.300,196.922!"];
+  "ANS" [pos="9.268,195.964!"];
+  "LIEGE-GUILL" [pos="9.886,195.671!"];
+  "OUGREE" [pos="9.884,195.594!"];
+  "GERMOIR" -- "BRUXELL-LUX" [label="0.55"];
+  "BRUXELL-LUX" -- "BRUX-SCHUMAN" [label="2.46"];
+  "BRUX-SCHUMAN" -- "SCHAERBEEK" [label="3.74"];
+  "SCHAERBEEK" -- "DIEGEM" [label="3.19"];
+  "DIEGEM" -- "ZAVENTEM" [label="3.13"];
+  "ZAVENTEM" -- "NOSSEGEM" [label="1.86"];
+  "NOSSEGEM" -- "KORTENBERG" [label="3.05"];
+  "KORTENBERG" -- "ERPS-KWERPS" [label="3.02"];
+  "ERPS-KWERPS" -- "VELTEM" [label="3.14"];
+  "VELTEM" -- "HERENT" [label="4.11"];
+  "HERENT" -- "LEUVEN" [label="8.35"];
+  "LEUVEN" -- "ANS" [label="46.11"];
+  "ANS" -- "LIEGE-GUILL" [label="14.45"];
+  "LIEGE-GUILL" -- "OUGREE" [label="1.62"];
+}

@@ -1,0 +1,18 @@
+graph path {
+  layout=neato;
+  overlap=false;
+  splines=true;
+  "GERMOIR" [pos="5.945,196.746!"];
+  "BRUXELL-LUX" [pos="5.937,196.771!"];
+  "BRUX-SCHUMAN" [pos="5.934,196.888!"];
+  "TOUR-TAXIS" [pos="5.854,196.968!"];
+  "SIMONIS" [pos="5.786,196.924!"];
+  "BRUX-OUEST" [pos="5.480,196.876!"];
+  "ANDERLECHT" [pos="5.252,196.928!"];
+  "GERMOIR" -- "BRUXELL-LUX" [label="0.55"];
+  "BRUXELL-LUX" -- "BRUX-SCHUMAN" [label="2.46"];
+  "BRUX-SCHUMAN" -- "TOUR-TAXIS" [label="2.38"];
+  "TOUR-TAXIS" -- "SIMONIS" [label="1.69"];
+  "SIMONIS" -- "BRUX-OUEST" [label="6.52"];
+  "BRUX-OUEST" -- "ANDERLECHT" [label="4.93"];
+}
