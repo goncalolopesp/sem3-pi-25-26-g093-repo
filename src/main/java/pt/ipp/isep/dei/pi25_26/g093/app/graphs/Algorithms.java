@@ -587,4 +587,71 @@
             // Mark current vertex as BLACK (completely processed)
             color.put(current, NodeColor.BLACK);
         }
+
+        /* ============================
+   CYCLE ENUMERATION (DFS stack)
+   - Produces cycles as vertex paths: [A, B, C, A]
+   - Works on directed graphs
+   ============================ */
+
+        public static <V, E> List<List<V>> findDirectedCycles(Graph<V, E> g) {
+            if (g == null) return Collections.emptyList();
+            if (!g.isDirected()) {
+                throw new IllegalArgumentException("Cycle enumeration requires a directed graph");
+            }
+
+            Map<V, NodeColor> color = new HashMap<>();
+            Deque<V> stack = new ArrayDeque<>();
+            List<List<V>> cycles = new ArrayList<>();
+
+            for (V v : g.vertices()) {
+                color.put(v, NodeColor.WHITE);
+            }
+
+            for (V v : g.vertices()) {
+                if (color.get(v) == NodeColor.WHITE) {
+                    dfsCollectCycles(g, v, color, stack, cycles);
+                }
+            }
+            return cycles;
+        }
+
+        private static <V, E> void dfsCollectCycles(Graph<V, E> g,
+                                                    V u,
+                                                    Map<V, NodeColor> color,
+                                                    Deque<V> stack,
+                                                    List<List<V>> cycles) {
+
+            color.put(u, NodeColor.GRAY);
+            stack.push(u); // top of stack = current
+
+            Collection<Edge<V, E>> out = g.outgoingEdges(u);
+            if (out != null) {
+                for (Edge<V, E> e : out) {
+                    V v = e.getVDest();
+                    NodeColor vc = color.getOrDefault(v, NodeColor.WHITE);
+
+                    if (vc == NodeColor.GRAY) {
+                        // Back-edge u -> v found. Reconstruct cycle v ... u -> v.
+                        // stack iterator goes from top (u) downwards.
+                        List<V> path = new ArrayList<>();
+                        for (V x : stack) {
+                            path.add(x);
+                            if (x.equals(v)) break; // stop when we reach v in stack
+                        }
+                        // path currently is [u, ..., v] (reverse order)
+                        Collections.reverse(path); // [v, ..., u]
+                        path.add(v);               // close cycle: [v, ..., u, v]
+                        cycles.add(path);
+                    } else if (vc == NodeColor.WHITE) {
+                        dfsCollectCycles(g, v, color, stack, cycles);
+                    }
+                }
+            }
+
+            stack.pop();
+            color.put(u, NodeColor.BLACK);
+        }
+
+
     }
