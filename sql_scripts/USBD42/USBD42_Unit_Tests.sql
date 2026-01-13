@@ -14,3 +14,5 @@ ELSE
 END IF;
 END;
 /
+
+ -- SELECT * FROM Train_Movement ORDER BY movementID DESC;

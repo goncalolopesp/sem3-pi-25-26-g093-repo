@@ -1,26 +1,32 @@
 SET SERVEROUTPUT ON;
 
-CREATE OR REPLACE TYPE t_gauge_list AS TABLE OF NUMBER;
-/
-
 CREATE OR REPLACE FUNCTION fn_usbd37(
-    p_train_id IN NUMBER
+    p_operator_id   IN NUMBER,
+    p_identifier    IN VARCHAR2,
+    p_maker         IN VARCHAR2,
+    p_payload       IN NUMBER
 ) RETURN BOOLEAN IS
     v_model_id NUMBER;
+
 BEGIN
+    -- 1. Criar o Modelo
 INSERT INTO Wagon_Model (wagonModelTypeID, maker, payload, capacity, volumeCapacity, length, height, maxSpeed, tareWeight, numberOfBogies)
-VALUES (1, 'SimpleMaker', 50, 50, 100, 15, 4, 120, 20, 2)
+VALUES (1, p_maker, p_payload, 50, 100, 15, 4, 120, 20, 2)
     RETURNING wagonModelID INTO v_model_id;
 
-INSERT INTO Wagon_Model_Gauge (wagonModelID, gaugeID) VALUES (v_model_id, 1);
+-- 2. Associar a Bitola
+INSERT INTO Wagon_Model_Gauge (wagonModelID, gaugeID)
+VALUES (v_model_id, 1);
 
-INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart)
-VALUES (1, v_model_id, 'WAGON-US37-SIMPLE', SYSDATE);
+-- 3. Criar o Vagão
+INSERT INTO Wagon (operatorID, wagonModelID, identifier, serviceStart, currentFacilityID, status)
+VALUES (p_operator_id, v_model_id, p_identifier, SYSDATE, 1, 'Active');
 
 RETURN TRUE;
 
 EXCEPTION
     WHEN OTHERS THEN
-        RETURN FALSE;
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+RETURN FALSE;
 END fn_usbd37;
 /
